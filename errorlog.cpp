@@ -3,7 +3,6 @@
 
 //#define DEBUG
 
-#include "logger.h"
 #include <cstdio>
 #include <ctime>
 #include <fstream>
