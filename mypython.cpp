@@ -1,5 +1,5 @@
 #include <iostream>
-#include "errorlog.cpp"
+#include "log.h"
 
 using namespace std;
 

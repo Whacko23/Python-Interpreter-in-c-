@@ -1,31 +1,25 @@
-#ifndef LOGGER_CPP
-#define LOGGER_CPP
+#ifndef LOG_CPP
+#define LOG_CPP
 
 //#define DEBUG
 
-#include <cstdio>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <stdint.h>
-#include <stdio.h>
-#include <string>
+#include "log.h"
 
 void
-log(int32 code){
+log(int code){
 
   #ifdef DEBUG
   printf("error code %i\n", code);
   #endif
 
   if(code==0){
-    printf("%s","Exiting the program...");
-    printf("%s","The log is saved on logfile.log");
+    printf("%s","Exiting the program...\n");
+    printf("%s","The log is saved on error.log\n");
     logger("Exiting the program...");
     exit(0);
   }
   if(code==1){
-    printf("%s","Required arguments not passed to the console");
+    printf("%s","Required arguments not passed to the console\n");
     logger("Required arguments not passed to the console");
     log(0);
   }
