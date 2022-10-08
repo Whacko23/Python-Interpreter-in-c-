@@ -13,7 +13,18 @@ int main(int argc, const char *argv[]) {
     }
 
     #ifdef LEXERTEST
-    ch = getch();
-    lextokens mytoken =lexer();
+   
+   ch = getch();
+    while( tracker < (int)mycode.length()){
+
+        lextokens curtoken = lexer();
+        if(curtoken == intsym){
+            cout << intvalue << endl;
+        } else {
+            std::cout << "intvalue = " << intvalue << std::endl; 
+        }
+        
+    }
+    //std::cout << "intvalue = " << intvalue << std::endl; 
     #endif
 }

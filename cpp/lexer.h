@@ -2,6 +2,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include <string>
+
 //Setting max identifier length to 35 although python allows for infinite length for identifiers
 #define MAXIDENTIFIERLENGTH 35
 
@@ -31,6 +33,7 @@ typedef enum{
 } lextokens;
 
 extern lextokens lexer();
+extern int tracker;
 
 extern char identifier[MAXIDENTIFIERLENGTH + 1];
 extern char ch;
@@ -41,6 +44,7 @@ extern int intvalue;
 #define TEST
 #ifdef TEST
 extern char getch();
+extern std::string mycode;
 #endif
 
 

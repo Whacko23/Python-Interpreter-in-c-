@@ -8,17 +8,13 @@
 #define TEST
 #ifdef TEST
 
-#include <cstring>
+std::string mycode = "123,564";
 #include <iostream>
-#include <string>
-using namespace std;
-string mycode = "print(3+5)";
 
 int tracker = -1;
 char getch(){
     tracker = tracker + 1;
-    if (tracker < mycode.length()){
-        cout << mycode[tracker];
+    if (tracker < (int)mycode.length()){
         return mycode[tracker];
     }
     return '\0';
@@ -28,11 +24,23 @@ char getch(){
 
 char ch;
 char identifier[MAXIDENTIFIERLENGTH + 1];
-int intvalue = 0;
+int intvalue;
 lextokens lexer(){
+    std::string strinteger;
     lextokens currenttoken;
     switch (ch) {
         //TODO address EOF case
+        case '0': case '1': case '2': case '3': case '4': case '5':
+        case '6': case '7': case '8': case '9': {
+            while (isdigit(ch)){
+                strinteger = strinteger + ch;
+                ch = getch();
+            }
+            currenttoken = intsym;
+            intvalue = stoi(strinteger);
+           // std::cout << "intvalue = " << intvalue << std::endl; 
+            break;
+        }
         case ';': currenttoken = semicolonsym; ch = getch(); break;
         case ',': currenttoken = commasym; ch = getch(); break;
         case '+': currenttoken = plussym; ch = getch(); break;
@@ -43,13 +51,7 @@ lextokens lexer(){
         case ')': currenttoken = closebracketsym; ch = getch(); break;
         case '[': currenttoken = opensquaresym; ch = getch(); break;
         case ']': currenttoken = closesquaresym; ch = getch(); break;
-        case '=': ch = getch(); currenttoken = (ch == '=') ? equalsym : assignsym; break;
-        case '0': case '1': case '2': case '3': case '4': case '5':
-        case '6': case '7': case '8': case '9': {
-            while (isdigit(ch)){
-                
-            }
-        }
+        case '=': ch = getch(); currenttoken = (ch == '=') ? equalsym : assignsym; break;       
    }
 }
  
