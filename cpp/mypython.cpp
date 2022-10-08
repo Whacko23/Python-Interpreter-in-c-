@@ -13,9 +13,7 @@ int main(int argc, const char *argv[]) {
     }
 
     #ifdef LEXERTEST
-
-   //TODO Fix lexer enum comparison
-   // if(curtoken == intsym) is false even if the token passed is intsym
+    
    ch = getch();
     while( tracker < (int)mycode.length()){
 
@@ -23,6 +21,8 @@ int main(int argc, const char *argv[]) {
         if(curtoken == intsym){
             cout << intvalue << endl;
         }
+
+        if(curtoken == printsym) {cout << "Current token =" << identifier << endl;}
         
     }
     //std::cout << "intvalue = " << intvalue << std::endl; 
