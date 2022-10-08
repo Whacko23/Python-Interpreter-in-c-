@@ -53,6 +53,7 @@ lextokens lexer(){
         case ']': currenttoken = closesquaresym; ch = getch(); break;
         case '=': ch = getch(); currenttoken = (ch == '=') ? equalsym : assignsym; break;       
    }
+   return currenttoken;
 }
  
 
