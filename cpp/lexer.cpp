@@ -24,14 +24,14 @@ char getch(){
 }
 #endif
 
-
+//TODO Comprehensive testing
 lextokens lexer(){
     std::string strinteger;
     lextokens currenttoken;
 
     if (ch == EOF) return eofsym;
 
-    //Checking for whole numbers
+    //Check integers
     if (isdigit(ch)){
         strinteger = "";
         while (isdigit(ch)){
@@ -43,15 +43,13 @@ lextokens lexer(){
         return currenttoken;
     }
 
-    //Checking for identifiers, reserved keywords
+    //Check identifiers, reserved keywords
     if (isalpha(ch)){
         identifier = "";
         unsigned int i = 0;
         while (isalpha(ch) || isdigit(ch)){
-            if (i < MAXIDENTIFIERLENGTH){
-                identifier = identifier + ch;
-                i++;
-            } else {
+            if (i < MAXIDENTIFIERLENGTH) { identifier = identifier + ch; i++; } 
+            else {
                 //Error: The identifier name is too long
                 //TODO print to the screen about the error
                 //TODO write the error to the file
@@ -82,7 +80,8 @@ lextokens lexer(){
         case ')': currenttoken = closebracketsym; ch = getch(); break;
         case '[': currenttoken = opensquaresym; ch = getch(); break;
         case ']': currenttoken = closesquaresym; ch = getch(); break;
-        case '=': ch = getch(); currenttoken = (ch == '=') ? equalsym : assignsym; break;    
+        case '=': ch = getch(); currenttoken = (ch == '=') ? equalsym : assignsym; break;
+        case '#': ch = getch(); currenttoken = (ch == '!') ? shebangsym : commentsym; break;  
    }
    return currenttoken;
 }

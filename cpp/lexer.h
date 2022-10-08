@@ -6,8 +6,8 @@
 using namespace std;
 
 //Setting max identifier length to 35 although python allows for infinite length for identifiers
-//NOTE The max identifier length can be set to unlimited
-//NOTE The max length is enforced on lexer.cpp -> lexer() -> if (isalpha(ch))
+//NOTE The max identifier length can be set to unlimited. Max length is enforced on lexer.cpp -> lexer() -> if (isalpha(ch))
+
 #define MAXIDENTIFIERLENGTH 35
 
 typedef enum{
@@ -34,6 +34,8 @@ typedef enum{
     identifiersym,
     errorsym,
     eofsym,
+    shebangsym,
+    commentsym,
 } lextokens;
 
 extern lextokens lexer();
