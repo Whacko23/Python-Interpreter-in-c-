@@ -1,6 +1,9 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 #include "log.h"
 #include "lexer.h"
+#include "parser.h"
 
 #define LEXERTEST
 
@@ -12,17 +15,36 @@ int main(int argc, const char *argv[]) {
         return 0;
     }
 
+    /* Opening the file */
+    string filename = argv[1];
+    string lineInput;
+    ifstream file (filename);
+
+    if (file){
+        while(file.good()){
+            
+            //Taking each line of the file as a string input
+            getline(file, lineInput);
+            cout << lineInput;
+
+        }
+        file.close();
+    } else {
+        std::cout << "Input file not found";
+    }
+
     #ifdef LEXERTEST
     
    ch = getch();
     while( tracker < (int)mycode.length()){
 
-        lextokens curtoken = lexer();
-        if(curtoken == intsym){
+        currenttoken = lexer();
+        if(currenttoken == intsym){
             cout << intvalue << endl;
         }
 
-        if(curtoken == printsym) {cout << "Current token =" << identifier << endl;}
+        if(currenttoken == printsym) {cout << "Print token =" << identifier << endl;}
+        if(currenttoken == identifiersym) {cout << "Identifier token =" << identifier << endl;}
         
     }
     //std::cout << "intvalue = " << intvalue << std::endl; 

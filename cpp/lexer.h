@@ -43,6 +43,7 @@ extern int tracker;
 
 extern string identifier;
 extern char ch;
+extern lextokens currenttoken;
 
 //Variable to store the last integer value encountered by the lexer
 extern int intvalue;

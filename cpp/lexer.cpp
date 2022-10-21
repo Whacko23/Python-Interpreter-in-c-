@@ -9,13 +9,15 @@ char ch;
 string identifier;
 int intvalue;
 int tracker = -1;
+lextokens currenttoken;
 
 //For testing the lexer
 #define TEST
 #ifdef TEST
 
-std::string mycode = "123print";
+std::string mycode = "123printprinte";
 #include <iostream>
+
 
 char getch(){
     tracker = tracker + 1;
@@ -27,7 +29,7 @@ char getch(){
 //TODO Comprehensive testing
 lextokens lexer(){
     std::string strinteger;
-    lextokens currenttoken;
+    
 
     if (ch == EOF) return eofsym;
 
