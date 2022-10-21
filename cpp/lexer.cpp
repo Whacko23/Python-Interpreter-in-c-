@@ -38,16 +38,16 @@ lextokens lexer(){
             strinteger = strinteger + ch;
             ch = getch();
         }
-        currenttoken = intsym;
         intvalue = stoi(strinteger);
-        return currenttoken;
+        return intsym;
     }
 
     //Check identifiers, reserved keywords
     if (isalpha(ch)){
         identifier = "";
         unsigned int i = 0;
-        while (isalpha(ch) || isdigit(ch)){
+        //NOTE Does not handle identifier that starts with '_' eg __main__
+        while (isalpha(ch) || isdigit(ch) || ch == '_'){
             if (i < MAXIDENTIFIERLENGTH) { identifier = identifier + ch; i++; } 
             else {
                 //Error: The identifier name is too long
@@ -64,6 +64,8 @@ lextokens lexer(){
         else if (identifier == "print") {currenttoken = printsym; ch = getch();}
         else if (identifier == "return") {currenttoken = returnsym; ch = getch();}
         else if (identifier == "while") {currenttoken = whilesym; ch = getch();}
+        else if (identifier == "def") {currenttoken = defsym; ch = getch();}
+        else {currenttoken = identifiersym; ch =getch();}
 
         return currenttoken;
     }
