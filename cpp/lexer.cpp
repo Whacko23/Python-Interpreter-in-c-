@@ -15,7 +15,7 @@ lextokens currenttoken;
 #define TEST
 #ifdef TEST
 
-std::string mycode = "123printprinte";
+std::string mycode = "123 print printe";
 #include <iostream>
 
 
@@ -32,6 +32,14 @@ lextokens lexer(){
     
 
     if (ch == EOF) return eofsym;
+    
+    if (ch == ' '){
+        ch = getch();
+        if (ch == ' ') { currenttoken = blocksym; ch = getch(); }
+        else { currenttoken = whitespacesym;}
+
+        return currenttoken;
+    }
 
     //Check integers
     if (isdigit(ch)){

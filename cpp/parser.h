@@ -11,6 +11,8 @@ extern void ifstatement();
 extern void whilestatement();
 extern void printstatement();
 extern void returnstatement();
+extern void expressiont();
+extern void term();
 
 
 #endif

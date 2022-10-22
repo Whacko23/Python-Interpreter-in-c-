@@ -29,7 +29,29 @@ else if (currenttoken==returnsym) returnstatement();
 /* else empty */
 }
 
+/*
+<expression> : := <expression> <addingop> <term> | <term> | <addingop> <term>
+*/
+void expression()
+{
+//TODO Log("inside expression function: Parser")
+if ((currenttoken==plussym) || (currenttoken==minussym)) {
+    currenttoken = lexer();
+}
 
+term();
+
+while ((currenttoken==plussym) || (currenttoken==minussym)) {
+    currenttoken = lexer();
+    term();
+}
+}
+
+
+void term()
+{
+
+}
 
 
 #endif

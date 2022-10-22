@@ -11,6 +11,8 @@ using namespace std;
 #define MAXIDENTIFIERLENGTH 35
 
 typedef enum{
+    whitespacesym,
+    blocksym,
     intsym,
     printsym,
     ifsym,
