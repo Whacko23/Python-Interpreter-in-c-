@@ -28,6 +28,9 @@ int main(int argc, const char *argv[]) {
             
             //Taking each line of the file as a string input
             getline(file, lineInput);
+
+            // DEEBUG
+            cout << "     Current line = " << lineInput << endl;
             
             tracker = -1;
             ch = getch();
@@ -35,6 +38,8 @@ int main(int argc, const char *argv[]) {
             #ifdef LEXERTEST
     
             while( tracker < (int)lineInput.length()){
+
+            //    cout << "current char = " << ch << endl;
 
                 currenttoken = lexer();
                 if(currenttoken == intsym){cout << "Integer token = " << intvalue << endl;}

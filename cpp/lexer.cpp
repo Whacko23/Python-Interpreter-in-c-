@@ -14,26 +14,10 @@ string lineInput;
 
 char getch(){
     tracker ++;
-    //cout << "Tracker " << tracker << endl;
-    //cout << "Requested character --> " << lineInput[tracker] << endl;
+    // cout << "Tracker " << tracker << endl;
+    // cout << "Requested character --> " << lineInput[tracker] << endl;
     return lineInput[tracker];
 }
-#endif
-
-//For testing the lexer
-#define TEST
-#ifdef TEST
-
-string mycode = "123 234 323 print 234 323 while printe67 whilev   dev  ocp djal;et dj makil";
-
-
-
-
-void printstring(){
-    cout << "mystring" << lineInput;
-}
-
-
 
 
 //TODO Comprehensive testing
@@ -60,6 +44,7 @@ lextokens lexer(){
         unsigned int i = 0;
         //NOTE Does not handle identifier that starts with '_' eg __main__
         while (isalpha(ch) || isdigit(ch) || ch == '_'){
+            //Check for max identifier length 
             if (i < MAXIDENTIFIERLENGTH) { identifier = identifier + ch; i++; } 
             else {
                 //Error: The identifier name is too long
@@ -70,19 +55,20 @@ lextokens lexer(){
             ch = getch();
         }
 
-        if (identifier == "if") {currenttoken = ifsym; ch = getch();} 
-        else if (identifier == "elif") {currenttoken = elseifsym; ch = getch();}
-        else if (identifier == "else") {currenttoken = elsesym; ch = getch();}
-        else if (identifier == "print") {currenttoken = printsym; ch = getch();}
-        else if (identifier == "return") {currenttoken = returnsym; ch = getch();}
-        else if (identifier == "while") {currenttoken = whilesym; ch = getch();}
-        else if (identifier == "def") {currenttoken = defsym; ch = getch();}
-        else {currenttoken = identifiersym; ch = getch();}
+        if (identifier == "if") {currenttoken = ifsym;} 
+        else if (identifier == "elif") {currenttoken = elseifsym;}
+        else if (identifier == "else") {currenttoken = elsesym;}
+        else if (identifier == "print") {currenttoken = printsym;}
+        else if (identifier == "return") {currenttoken = returnsym;}
+        else if (identifier == "while") {currenttoken = whilesym;}
+        else if (identifier == "def") {currenttoken = defsym;}
+        else {currenttoken = identifiersym;}
 
         return currenttoken;
     }
 
     //Checking for symbols
+
     switch (ch) {
         case ';': currenttoken = semicolonsym; ch = getch(); break;
         case ',': currenttoken = commasym; ch = getch(); break;
@@ -94,13 +80,12 @@ lextokens lexer(){
         case ')': currenttoken = closebracketsym; ch = getch(); break;
         case '[': currenttoken = opensquaresym; ch = getch(); break;
         case ']': currenttoken = closesquaresym; ch = getch(); break;
-        case '=': ch = getch(); currenttoken = (ch == '=') ? equalsym : assignsym; break;
-        case '#': ch = getch(); currenttoken = (ch == '!') ? shebangsym : commentsym; break;  
-        case ' ': ch = getch(); currenttoken = (ch == ' ') ? blocksym : whitespacesym; break;
-        return currenttoken;
+        case '=': ch = getch(); if(ch == '='){currenttoken = equalsym; ch = getch();} else {currenttoken = assignsym;}; break;
+        case '#': ch = getch(); if(ch == '!'){currenttoken = shebangsym; ch = getch();} else {currenttoken = commentsym;};  break;  
+        case ' ': ch = getch(); if(ch == ' '){currenttoken = blocksym; ch = getch();} else {currenttoken = whitespacesym;}; break;
+        
    }
-   
-   return errorsym;
+   return currenttoken;
    
 }
  
