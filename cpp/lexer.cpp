@@ -3,28 +3,38 @@
 #define LEXER_CPP
 
 #include "lexer.h"
-
+#include <iostream>
 //Declaring all the global variables
 char ch;
 string identifier;
 int intvalue;
-int tracker = -1;
+int tracker;
 lextokens currenttoken;
+string lineInput;
+
+char getch(){
+    tracker ++;
+    //cout << "Tracker " << tracker << endl;
+    //cout << "Requested character --> " << lineInput[tracker] << endl;
+    return lineInput[tracker];
+}
+#endif
 
 //For testing the lexer
 #define TEST
 #ifdef TEST
 
-std::string mycode = "123 print printe";
-#include <iostream>
+string mycode = "123 234 323 print 234 323 while printe67 whilev   dev  ocp djal;et dj makil";
 
 
-char getch(){
-    tracker = tracker + 1;
-    if (tracker < (int)mycode.length()) return mycode[tracker];
-    return '\0';
+
+
+void printstring(){
+    cout << "mystring" << lineInput;
 }
-#endif
+
+
+
 
 //TODO Comprehensive testing
 lextokens lexer(){
@@ -32,14 +42,6 @@ lextokens lexer(){
     
 
     if (ch == EOF) return eofsym;
-    
-    if (ch == ' '){
-        ch = getch();
-        if (ch == ' ') { currenttoken = blocksym; ch = getch(); }
-        else { currenttoken = whitespacesym;}
-
-        return currenttoken;
-    }
 
     //Check integers
     if (isdigit(ch)){
@@ -75,7 +77,7 @@ lextokens lexer(){
         else if (identifier == "return") {currenttoken = returnsym; ch = getch();}
         else if (identifier == "while") {currenttoken = whilesym; ch = getch();}
         else if (identifier == "def") {currenttoken = defsym; ch = getch();}
-        else {currenttoken = identifiersym; ch =getch();}
+        else {currenttoken = identifiersym; ch = getch();}
 
         return currenttoken;
     }
@@ -94,8 +96,12 @@ lextokens lexer(){
         case ']': currenttoken = closesquaresym; ch = getch(); break;
         case '=': ch = getch(); currenttoken = (ch == '=') ? equalsym : assignsym; break;
         case '#': ch = getch(); currenttoken = (ch == '!') ? shebangsym : commentsym; break;  
+        case ' ': ch = getch(); currenttoken = (ch == ' ') ? blocksym : whitespacesym; break;
+        return currenttoken;
    }
-   return currenttoken;
+   
+   return errorsym;
+   
 }
  
 

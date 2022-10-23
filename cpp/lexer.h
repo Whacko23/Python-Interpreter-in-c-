@@ -49,10 +49,13 @@ extern lextokens currenttoken;
 
 //Variable to store the last integer value encountered by the lexer
 extern int intvalue;
+extern string lineInput;
+
+extern char getch();
 
 #define TEST
 #ifdef TEST
-extern char getch();
+
 extern string mycode;
 #endif
 
