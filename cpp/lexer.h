@@ -41,6 +41,11 @@ typedef enum{
     leftanklesym,
     rightanklesym,
     colonsym,
+    notequalsym,
+    greaterthansym,
+    lessthansym,
+    greaterorequalsym,
+    lessorequalsym,
 } lextokens;
 
 extern lextokens lexer();

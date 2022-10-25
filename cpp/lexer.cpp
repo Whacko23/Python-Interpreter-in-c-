@@ -81,6 +81,9 @@ lextokens lexer(){
         case ')': currenttoken = closebracketsym; ch = getch(); break;
         case '[': currenttoken = opensquaresym; ch = getch(); break;
         case ']': currenttoken = closesquaresym; ch = getch(); break;
+        case '!': ch = getch(); if(ch == '='){currenttoken = notequalsym; ch = getch();}; break;
+        case '>': ch = getch(); if(ch == '='){currenttoken = greaterorequalsym; ch = getch();} else {currenttoken = greaterthansym;}; break;
+        case '<': ch = getch(); if(ch == '='){currenttoken = lessorequalsym; ch = getch();} else {currenttoken = lessthansym;}; break;
         case '=': ch = getch(); if(ch == '='){currenttoken = equalsym; ch = getch();} else {currenttoken = assignsym;}; break;
         case '#': ch = getch(); if(ch == '!'){currenttoken = shebangsym; ch = getch();} else {currenttoken = commentsym;};  break;  
         case ' ': ch = getch(); if(ch == ' '){currenttoken = blocksym; ch = getch();} else {currenttoken = whitespacesym;}; break;

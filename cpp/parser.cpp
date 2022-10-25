@@ -9,8 +9,19 @@
 
 void whilestatement(){};
 void returnstatement(){};
-void booleanexpression(){};
 
+//NOTE the previous function (assignment) has already checked for [] brackets
+void list(){};
+
+
+/*
+<function> -> identifier {()| (<argumentlist>))} : <functionbody>
+*/
+void function(){};
+
+void functionbody(){};
+
+void argumentlist(){};
 
 
 /*
@@ -59,9 +70,11 @@ void term() {
 void factor(){
 
     if(currenttoken == identifiersym ){
+        currenttoken = lexer();
         //TODO
         cout << "Do something" << endl;
     } else if(currenttoken == intsym) {
+        currenttoken = lexer();
         //TODO
         cout << "Do something" << endl;
     } else {
@@ -80,8 +93,8 @@ void factor(){
 }
 
 /* if statement
-<ifstmt> -> if (<boolexpr>) <statement>
-[else <statement>]
+<ifstmt> -> if <boolexpr> <statement> [else <statement>]
+//TODO <ifstmt> -> if (<boolexpr>) <statement> [else <statement>] --> Add () around boolexpr
 */
 void ifstatement(){
     if (currenttoken != ifsym){
@@ -120,7 +133,7 @@ void ifstatement(){
 
 
 /* assign statement
-<assignment> -> identifier = <experssion>
+<assignment> -> identifier = {<experssion> | <list>}
 */
 void assignment(){
     if(currenttoken != identifiersym){
@@ -131,14 +144,22 @@ void assignment(){
             //TODO Expected assign symbol
         } else {
             currenttoken = lexer();
-            expression();
+            if (currenttoken == opensquaresym){
+                currenttoken = lexer();
+                list();
+                if (currenttoken != closesquaresym){
+                    //TODO Expected ']'
+                }
+            } else {
+                expression();
+            }  
         }
     }
     
 };
 
 /* print statement
-<print> -> print(expression)
+<print> -> print({<expression> | <list>) //TODO List
 */
 void printstatement(){
     if (currenttoken != printsym){
@@ -157,5 +178,23 @@ void printstatement(){
     }
 };
 
+/* boolean expression
+<boolean expression> -> <expresion> <boolean operation> <expression>
+*/
+void booleanexpression(){
+    expression();
+    booleanoperation();
+    expression();
+};
+
+/* boolean operation
+<boolean expression> -> { == | != | >= | <= | > | <}
+*/
+
+void booleanoperation(){
+    if (currenttoken == equalsym || currenttoken == notequalsym || currenttoken == greaterorequalsym || currenttoken == lessorequalsym || currenttoken == greaterthansym || currenttoken == lessthansym){
+        currenttoken = lexer();
+    }
+}
 
 #endif

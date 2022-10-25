@@ -22,6 +22,12 @@ extern void expressiont();
 extern void term();
 extern void factor();
 extern void booleanexpression();
+extern void function();
+extern void functionbody();
+extern void argumentlist();
+extern void list();
+extern void booleanexpression();
+extern void booleanoperation();
 
 
 #endif
