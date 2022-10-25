@@ -38,6 +38,9 @@ typedef enum{
     eofsym,
     shebangsym,
     commentsym,
+    leftanklesym,
+    rightanklesym,
+    colonsym,
 } lextokens;
 
 extern lextokens lexer();

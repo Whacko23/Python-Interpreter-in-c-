@@ -65,6 +65,10 @@ int main(int argc, const char *argv[]) {
                 if(currenttoken == minussym) {cout << "Minus token "  << endl;}
                 if(currenttoken == multiplysym) {cout << "multiply token "  << endl;}
                 if(currenttoken == equalsym) {cout << "Euqal token "  << endl;}
+                if(currenttoken == leftanklesym) {cout << "Left ankle token "  << endl;}
+                if(currenttoken == rightanklesym) {cout << "Right ankle token "  << endl;}
+                if(currenttoken == colonsym) {cout << "Colon token "  << endl;}
+
             }
             //std::cout << "intvalue = " << intvalue << std::endl; 
             #endif

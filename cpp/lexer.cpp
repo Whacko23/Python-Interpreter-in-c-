@@ -71,6 +71,7 @@ lextokens lexer(){
 
     switch (ch) {
         case ';': currenttoken = semicolonsym; ch = getch(); break;
+        case ':': currenttoken = colonsym; ch = getch(); break;
         case ',': currenttoken = commasym; ch = getch(); break;
         case '+': currenttoken = plussym; ch = getch(); break;
         case '/': currenttoken = dividesym; ch = getch(); break;
