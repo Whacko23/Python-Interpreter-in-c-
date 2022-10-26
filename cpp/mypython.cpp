@@ -23,11 +23,14 @@ int main(int argc, const char *argv[]) {
     
     ifstream file (filename);
 
+    linenumber = 0;
+
     if (file){
         while(file.good()){
             
             //Taking each line of the file as a string input
             getline(file, lineInput);
+            linenumber++;
 
             // DEEBUG
             cout << "     Current line = " << lineInput << endl;
@@ -57,7 +60,7 @@ int main(int argc, const char *argv[]) {
                 if(currenttoken == semicolonsym) {cout << "semicolon token "  << endl;}
                 if(currenttoken == commasym) {cout << "comma token "  << endl;}
                 if(currenttoken == assignsym) {cout << "assign token "  << endl;}
-                if(currenttoken == errorsym) {cout << "error token "  << endl;}
+                if(currenttoken == errorsym) {cout << "Error "  << identifier << " is unrecognized on line " << linenumber << " at character " << tracker << endl;}
                 if(currenttoken == dividesym) {cout << "divide token "  << endl;}
                 if(currenttoken == openbracketsym) {cout << "OpenBracker token "  << endl;}
                 if(currenttoken == closebracketsym) {cout << "CloseBracker token "  << endl;}

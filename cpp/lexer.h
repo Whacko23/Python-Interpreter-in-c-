@@ -50,6 +50,7 @@ typedef enum{
 
 extern lextokens lexer();
 extern int tracker;
+extern int linenumber;
 
 extern string identifier;
 extern char ch;

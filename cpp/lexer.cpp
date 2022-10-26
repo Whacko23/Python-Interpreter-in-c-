@@ -9,6 +9,7 @@ char ch;
 string identifier;
 int intvalue;
 int tracker;
+int linenumber;
 lextokens currenttoken;
 string lineInput;
 
@@ -87,6 +88,12 @@ lextokens lexer(){
         case '=': ch = getch(); if(ch == '='){currenttoken = equalsym; ch = getch();} else {currenttoken = assignsym;}; break;
         case '#': ch = getch(); if(ch == '!'){currenttoken = shebangsym; ch = getch();} else {currenttoken = commentsym;};  break;  
         case ' ': ch = getch(); if(ch == ' '){currenttoken = blocksym; ch = getch();} else {currenttoken = whitespacesym;}; break;
+        default: 
+            currenttoken = errorsym; 
+            identifier = "";
+            identifier = identifier + ch;
+            ch = getch();
+            break;
         
    }
    return currenttoken;
