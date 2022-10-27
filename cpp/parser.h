@@ -5,12 +5,51 @@
 #include <string>
 using namespace std;
 
+
+
+typedef enum {
+    n_assignment,
+    n_print,
+    //Unary operator
+    n_uminus,
+    //Arithmetic operator
+    n_plus,
+    n_minus,
+    n_mul,
+    n_div,
+    //Relational operator
+    n_eq,
+    n_ne,
+    n_lt,
+    n_le,
+    n_gt,
+    n_ge,
+    //Integer
+    n_integer,
+    //Variable
+    n_id,
+    //Function call,
+    n_fcall,
+    //Argument list
+    n_args,
+    //Return statement
+    n_return,
+    //While
+    n_while,
+    //If
+    n_if,
+
+} nodetype;
+
+
 typedef struct tnode *astptr;
 typedef struct tnode {
-    int asttype;
+    nodetype asttype;
     int astdata1,astdata2;
     astptr p1,p2,p3;
 } astnode;
+
+extern astptr newnode(nodetype n, int s, astptr first, astptr second, astptr third);
 
 extern void statement();
 extern void assignment();
@@ -18,8 +57,8 @@ extern void ifstatement();
 extern void whilestatement();
 extern void printstatement();
 extern void returnstatement();
-extern void expressiont();
-extern void term();
+extern astptr expressiont();
+extern astptr term();
 extern void factor();
 extern void booleanexpression();
 extern void function();

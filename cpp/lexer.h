@@ -52,12 +52,14 @@ extern lextokens lexer();
 extern int tracker;
 extern int linenumber;
 
+//Variable to store the last identifier encountered by lexer. Error symbol also uses the same variable
 extern string identifier;
 extern char ch;
 extern lextokens currenttoken;
 
 //Variable to store the last integer value encountered by the lexer
 extern int intvalue;
+//
 extern string lineInput;
 
 extern char getch();

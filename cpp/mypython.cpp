@@ -38,14 +38,13 @@ int main(int argc, const char *argv[]) {
             tracker = -1;
             ch = getch();
 
+
+
             #ifdef LEXERTEST
-    
             while( tracker < (int)lineInput.length()){
 
-            //    cout << "current char = " << ch << endl;
-
                 currenttoken = lexer();
-                if(currenttoken == intsym){cout << "Integer token = " << intvalue << endl;}
+                if(currenttoken == intsym) cout << "Integer token = " << intvalue << endl;
                 if(currenttoken == printsym) {cout << "Print token " << endl;}
                 if(currenttoken == whitespacesym) {cout << "Whitespace token " << endl;}
                 if(currenttoken == blocksym) {cout << "Block token "  << endl;}

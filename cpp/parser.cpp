@@ -6,6 +6,16 @@
 #include "lexer.h"
 #include "log.h"
 
+astptr newnode(nodetype n, int s, astptr first, astptr second, astptr third){
+    astnode* mynode = new astnode();
+    mynode->asttype = n;
+    mynode->astdata1 = s;
+    mynode->p1 = first;
+    mynode->p2 = second;
+    mynode->p3 = third;
+    return mynode;
+}
+
 
 void whilestatement(){};
 void returnstatement(){};
@@ -40,28 +50,49 @@ else if (currenttoken==returnsym) returnstatement();
 }
 
 /*
-<expr> -> <term> {(+ | -) <term>}
+<expr> -> [+ | -]<term> {(+ | -) <term>}
 */
-void expression() {
+astptr expression() {
     //TODO Log("inside expression function: Parser")
-    term();
 
-    while ((currenttoken == plussym) || (currenttoken == minussym)) {
+    astptr pfirst; /* first pointer in the expr chain */
+    astptr term2;
+    int startingtoken;
+    nodetype ntype;
+
+    startingtoken = plussym;
+    if ((currenttoken == plussym) || (currenttoken == minussym)) {
+        startingtoken = currenttoken;
         currenttoken = lexer();
-        term();
+    }
+
+    pfirst = term();
+
+    if (startingtoken==minussym) pfirst = newnode(n_uminus, 0, pfirst, NULL, NULL);
+    while ((currenttoken == plussym) || (currenttoken == minussym)) {
+        if (currenttoken == plussym) ntype = n_plus; else ntype = n_minus;
+            currenttoken = lexer();
+            term2 = term();
+            pfirst = newnode(ntype, 0, pfirst, term2, NULL);
         }
+
+    return pfirst;
 }
 
 /* term
 <term> -> <factor> {(* | /) <factor>)
 */
-void term() {
+astptr term() {
+    astptr pfirst;
+    pfirst = newnode(n_assignment,3,NULL,NULL, NULL);
     factor();
 
     while ((currenttoken == multiplysym) || (currenttoken == dividesym)) {
         currenttoken = lexer();
         factor();
         }
+    
+    return pfirst;
 }
 
 /* factor
