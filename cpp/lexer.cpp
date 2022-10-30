@@ -94,7 +94,13 @@ lextokens lexer(){
    return currenttoken;
    
 }
- 
 
+lextokens cleanLexer(){
+    currenttoken = lexer();
+    while(currenttoken == whitespacesym || currenttoken == blocksym){
+        currenttoken = lexer();
+    }
+    return currenttoken;
+}
 
 #endif

@@ -45,7 +45,7 @@ void statement()
 if (currenttoken == commentsym){
     int currentline = linenumber;
     while( linenumber == currentline){
-        currenttoken = lexer(); 
+        currenttoken = cleanLexer(); 
     }  
 }
 else if (currenttoken==identifiersym) assignment();
@@ -68,12 +68,12 @@ astptr expression() {
     string tokendata;
     nodetype ntype;
 
-    cout << "Inside expression" << endl;
+    // cout << "Inside expression" << endl;
 
     startingtoken = plussym;
     if ((currenttoken == plussym) || (currenttoken == minussym)) {
         startingtoken = currenttoken;
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
     }
 
     pfirst = term();
@@ -81,7 +81,7 @@ astptr expression() {
     if (startingtoken==minussym) pfirst = newnode(n_uminus, "-", pfirst, NULL, NULL);
     while ((currenttoken == plussym) || (currenttoken == minussym)) {
         if (currenttoken == plussym) {ntype = n_plus; tokendata = "+";} else {ntype = n_minus; tokendata = "-";};
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
         term2 = term();
         pfirst = newnode(ntype, tokendata, pfirst, term2, NULL);
         }
@@ -98,11 +98,11 @@ astptr term() {
     string tokendata;
     pfirst = factor();
 
-    cout << "Inside term" << endl;
+    // cout << "Inside term" << endl;
 
     while ((currenttoken == multiplysym) || (currenttoken == dividesym)) {
         if (currenttoken == multiplysym) {ntype = n_mul; tokendata = "*";} else {ntype = n_div; tokendata = "/";};
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
         factor2 = factor();
         pfirst = newnode(ntype, tokendata, pfirst, factor2, NULL);
         }
@@ -121,17 +121,17 @@ astptr factor(){
     if(currenttoken == identifiersym ){
         // cout << "Inside identifier" << identifier << endl;
         pfirst = newnode(n_id, identifier, NULL, NULL, NULL);
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
     } else if(currenttoken == intsym) {
         // cout << "Inside intsym" << intvalue << endl;
         pfirst = newnode(n_integer, to_string(intvalue) , NULL, NULL, NULL);
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
     } else {
         if(currenttoken ==  openbracketsym) {
-            currenttoken = lexer();
+            currenttoken = cleanLexer();
             pfirst = expression();
             if (currenttoken == closebracketsym){
-                currenttoken = lexer();
+                currenttoken = cleanLexer();
             } else {
                 //TODO - Missing ')' 
             }
@@ -150,28 +150,28 @@ void ifstatement(){
     if (currenttoken != ifsym){
         //TODO Errror not an if ststaement
     } else {
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
         booleanexpression();
         if(currenttoken != colonsym){
             //TODO Error expected ':' after if
         } else {
             //NOTE Does this need to consume another lex token?
-            currenttoken = lexer();
+            currenttoken = cleanLexer();
             if(currenttoken != blocksym){
                 //TODO Error expected identation
             } else {
                 //NOTE Does this need to consume another lex token?
-                currenttoken = lexer();
+                currenttoken = cleanLexer();
                 statement();
                 if(currenttoken == elsesym){
-                    currenttoken = lexer();
+                    currenttoken = cleanLexer();
                     if(currenttoken != colonsym){
                         //TODO Expected ':'
                     } else {
                         if(currenttoken != blocksym){
                             //TODO expected identation
                         } else {
-                            currenttoken = lexer();
+                            currenttoken = cleanLexer();
                             statement();
                         }                       
                     }
@@ -189,13 +189,13 @@ void assignment(){
     if(currenttoken != identifiersym){
         //TODO Expected identifier
     } else {
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
         if (currenttoken != assignsym){
             //TODO Expected assign symbol
         } else {
-            currenttoken = lexer();
+            currenttoken = cleanLexer();
             if (currenttoken == opensquaresym){
-                currenttoken = lexer();
+                currenttoken = cleanLexer();
                 list();
                 if (currenttoken != closesquaresym){
                     //TODO Expected ']'
@@ -215,11 +215,11 @@ void printstatement(){
     if (currenttoken != printsym){
         //TODO Expected print
     } else {
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
         if(currenttoken != openbracketsym){
             //TODO Expected '('
         } else {
-            currenttoken = lexer();
+            currenttoken = cleanLexer();
             expression();
             if(currenttoken != closebracketsym){
                 //TODO Expected ')'
@@ -243,7 +243,7 @@ void booleanexpression(){
 
 void booleanoperation(){
     if (currenttoken == equalsym || currenttoken == notequalsym || currenttoken == greaterorequalsym || currenttoken == lessorequalsym || currenttoken == greaterthansym || currenttoken == lessthansym){
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
     }
 }
 

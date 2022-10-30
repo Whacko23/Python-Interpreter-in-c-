@@ -66,12 +66,7 @@ extern string lineInput;
 
 extern char getch();
 
-#define TEST
-#ifdef TEST
-
-extern string mycode;
-#endif
-
-
+// This function returns tokens that is not whitespace or block symbol
+extern lextokens cleanLexer();
 
 #endif
