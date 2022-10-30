@@ -6,7 +6,7 @@
 #include "parser.h"
 
 
-#define LEXERTEST
+// #define LEXERTEST
 
 using namespace std;
 
@@ -38,38 +38,57 @@ int main(int argc, const char *argv[]) {
             tracker = -1;
             ch = getch();
 
+            currenttoken = lexer();
+
+            astptr parseetree = parser();
+            printParserTree(parseetree);
+            freeMemory(parseetree);
 
 
             #ifdef LEXERTEST
             while( tracker < (int)lineInput.length()){
-
                 currenttoken = lexer();
-                if(currenttoken == intsym) cout << "Integer token = " << intvalue << endl;
-                if(currenttoken == printsym) {cout << "Print token " << endl;}
-                if(currenttoken == whitespacesym) {cout << "Whitespace token " << endl;}
-                if(currenttoken == blocksym) {cout << "Block token "  << endl;}
-                if(currenttoken == identifiersym) {cout << "Identifier token = " << identifier  << endl;}
-                if(currenttoken == whilesym) {cout << "While token "  << endl;}
-                if(currenttoken == eofsym) {cout << "EOF token "  << endl;}
-                if(currenttoken == ifsym) {cout << "IF token "  << endl;}
-                if(currenttoken == elsesym) {cout << "Else token "  << endl;}
-                if(currenttoken == elseifsym) {cout << "Elseif token "  << endl;}
-                if(currenttoken == defsym) {cout << "Def token "  << endl;}
-                if(currenttoken == returnsym) {cout << "REturn token "  << endl;}
-                if(currenttoken == semicolonsym) {cout << "semicolon token "  << endl;}
-                if(currenttoken == commasym) {cout << "comma token "  << endl;}
-                if(currenttoken == assignsym) {cout << "assign token "  << endl;}
-                if(currenttoken == errorsym) {cout << "Error "  << identifier << " is unrecognized on line " << linenumber << " at character " << tracker << endl;}
-                if(currenttoken == dividesym) {cout << "divide token "  << endl;}
-                if(currenttoken == openbracketsym) {cout << "OpenBracker token "  << endl;}
-                if(currenttoken == closebracketsym) {cout << "CloseBracker token "  << endl;}
-                if(currenttoken == plussym) {cout << "Plus token "  << endl;}
-                if(currenttoken == minussym) {cout << "Minus token "  << endl;}
-                if(currenttoken == multiplysym) {cout << "multiply token "  << endl;}
-                if(currenttoken == equalsym) {cout << "Euqal token "  << endl;}
-                if(currenttoken == leftanklesym) {cout << "Left ankle token "  << endl;}
-                if(currenttoken == rightanklesym) {cout << "Right ankle token "  << endl;}
-                if(currenttoken == colonsym) {cout << "Colon token "  << endl;}
+                switch(currenttoken){
+                    case intsym: cout << "Integer token = " << intvalue << endl; break;
+                    case whitespacesym: cout << "Whitespace token " << endl; break;
+                    case printsym: cout << "Print token " << endl; break;
+                    case blocksym: cout << "Block token "  << endl;
+                    case identifiersym: cout << "Identifier token = " << identifier  << endl; break;
+                    case whilesym: cout << "While token "  << endl; break;
+                    case eofsym: cout << "EOF token "  << endl; break;
+                    case ifsym: cout << "IF token "  << endl; break;
+                    case elsesym: cout << "Else token "  << endl; break;
+                    case elseifsym: cout << "Elseif token "  << endl; break;
+                    case defsym: cout << "Def token "  << endl; break;
+                    case returnsym: cout << "REturn token "  << endl; break;
+                    case semicolonsym: cout << "semicolon token "  << endl; break;
+                    case commasym: cout << "comma token "  << endl; break;
+                    case assignsym: cout << "assign token "  << endl; break;
+                    case errorsym: cout << "Error "  << identifier << " is unrecognized on line " << linenumber << " at character " << tracker << endl; break;
+                    case dividesym: cout << "divide token "  << endl; break;
+                    case openbracketsym: cout << "OpenBracker token "  << endl; break;
+                    case closebracketsym: cout << "CloseBracker token "  << endl; break;
+                    case plussym: cout << "Plus token "  << endl; break;
+                    case minussym: cout << "Minus token "  << endl; break;
+                    case multiplysym: cout << "multiply token "  << endl; break;
+                    case equalsym: cout << "Euqal token "  << endl; break;
+                    case leftanklesym: cout << "Left ankle token "  << endl; break;
+                    case rightanklesym: cout << "Right ankle token "  << endl; break;
+                    case colonsym: cout << "Colon token "  << endl; break;
+                    case commentsym: cout << "Comment token "  << endl; break;
+                    case singlequotesym: cout << "Single quote token "  << endl; break;
+                    case doublequotesym: cout << "Double quote token "  << endl; break;
+                    case opensquaresym: cout << "Open sq bracket token "  << endl; break;
+                    case closesquaresym: cout << "Close sq bracket token "  << endl; break;
+                    case shebangsym: cout << "Shebang token "  << endl; break;
+                    case notequalsym: cout << "Not equal token "  << endl; break;
+                    case greaterorequalsym: cout << "Greater than or equal token "  << endl; break;
+                    case lessorequalsym: cout << "Less than or equal token "  << endl; break;
+                    case lessthansym: cout << "Less than token "  << endl; break;
+                    case greaterthansym: cout << "Greater than token "  << endl; break;
+                    
+                }
+
 
             }
             //std::cout << "intvalue = " << intvalue << std::endl; 

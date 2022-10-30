@@ -43,13 +43,15 @@ typedef enum {
 
 
 typedef struct tnode *astptr;
+
 typedef struct tnode {
     nodetype asttype;
-    int astdata1,astdata2;
+    string astdata;
     astptr p1,p2,p3;
 } astnode;
 
 extern astptr newnode(nodetype n, int s, astptr first, astptr second, astptr third);
+
 
 extern void statement();
 extern void assignment();
@@ -59,7 +61,7 @@ extern void printstatement();
 extern void returnstatement();
 extern astptr expressiont();
 extern astptr term();
-extern void factor();
+extern astptr factor();
 extern void booleanexpression();
 extern void function();
 extern void functionbody();
@@ -67,6 +69,11 @@ extern void argumentlist();
 extern void list();
 extern void booleanexpression();
 extern void booleanoperation();
+extern astptr parser();
+
+
+extern void printParserTree(astptr head);
+extern void freeMemory(astptr head);
 
 
 #endif

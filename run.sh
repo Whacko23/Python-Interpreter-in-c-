@@ -1,1 +1,1 @@
-[ -z "$1" ] && ~/bin/mypython "testcase/tc01.py" || ~/bin/mypython "$1"
+[ -z "$1" ] && ~/bin/mypython "testcase/in08.py" || ~/bin/mypython "$1"

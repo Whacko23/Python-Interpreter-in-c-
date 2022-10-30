@@ -6,10 +6,11 @@
 #include "lexer.h"
 #include "log.h"
 
-astptr newnode(nodetype n, int s, astptr first, astptr second, astptr third){
+astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third){
     astnode* mynode = new astnode();
+   
     mynode->asttype = n;
-    mynode->astdata1 = s;
+    mynode->astdata = s;
     mynode->p1 = first;
     mynode->p2 = second;
     mynode->p3 = third;
@@ -41,7 +42,13 @@ void argumentlist(){};
 void statement()
 {
 //TODO Log("inside statement function: Parser")
-if (currenttoken==identifiersym) assignment();
+if (currenttoken == commentsym){
+    int currentline = linenumber;
+    while( linenumber == currentline){
+        currenttoken = lexer(); 
+    }  
+}
+else if (currenttoken==identifiersym) assignment();
 else if (currenttoken==ifsym) ifstatement();
 else if (currenttoken==whilesym) whilestatement();
 else if (currenttoken==printsym) printstatement();
@@ -50,7 +57,7 @@ else if (currenttoken==returnsym) returnstatement();
 }
 
 /*
-<expr> -> [+ | -]<term> {(+ | -) <term>}
+<expr> -> [+ | -]<term> {(+ | -) <term>} 
 */
 astptr expression() {
     //TODO Log("inside expression function: Parser")
@@ -58,7 +65,10 @@ astptr expression() {
     astptr pfirst; /* first pointer in the expr chain */
     astptr term2;
     int startingtoken;
+    string tokendata;
     nodetype ntype;
+
+    cout << "Inside expression" << endl;
 
     startingtoken = plussym;
     if ((currenttoken == plussym) || (currenttoken == minussym)) {
@@ -68,12 +78,12 @@ astptr expression() {
 
     pfirst = term();
 
-    if (startingtoken==minussym) pfirst = newnode(n_uminus, 0, pfirst, NULL, NULL);
+    if (startingtoken==minussym) pfirst = newnode(n_uminus, "-", pfirst, NULL, NULL);
     while ((currenttoken == plussym) || (currenttoken == minussym)) {
-        if (currenttoken == plussym) ntype = n_plus; else ntype = n_minus;
-            currenttoken = lexer();
-            term2 = term();
-            pfirst = newnode(ntype, 0, pfirst, term2, NULL);
+        if (currenttoken == plussym) {ntype = n_plus; tokendata = "+";} else {ntype = n_minus; tokendata = "-";};
+        currenttoken = lexer();
+        term2 = term();
+        pfirst = newnode(ntype, tokendata, pfirst, term2, NULL);
         }
 
     return pfirst;
@@ -83,13 +93,18 @@ astptr expression() {
 <term> -> <factor> {(* | /) <factor>)
 */
 astptr term() {
-    astptr pfirst;
-    pfirst = newnode(n_assignment,3,NULL,NULL, NULL);
-    factor();
+    astptr pfirst, factor2;
+    nodetype ntype;
+    string tokendata;
+    pfirst = factor();
+
+    cout << "Inside term" << endl;
 
     while ((currenttoken == multiplysym) || (currenttoken == dividesym)) {
+        if (currenttoken == multiplysym) {ntype = n_mul; tokendata = "*";} else {ntype = n_div; tokendata = "/";};
         currenttoken = lexer();
-        factor();
+        factor2 = factor();
+        pfirst = newnode(ntype, tokendata, pfirst, factor2, NULL);
         }
     
     return pfirst;
@@ -98,20 +113,23 @@ astptr term() {
 /* factor
 <factor> -> id | integer | ( <expr> )
 */
-void factor(){
+astptr factor(){
+    astptr pfirst;
 
+    // cout << "Inside factor" << endl;
+    
     if(currenttoken == identifiersym ){
+        // cout << "Inside identifier" << identifier << endl;
+        pfirst = newnode(n_id, identifier, NULL, NULL, NULL);
         currenttoken = lexer();
-        //TODO
-        cout << "Do something" << endl;
     } else if(currenttoken == intsym) {
+        // cout << "Inside intsym" << intvalue << endl;
+        pfirst = newnode(n_integer, to_string(intvalue) , NULL, NULL, NULL);
         currenttoken = lexer();
-        //TODO
-        cout << "Do something" << endl;
     } else {
         if(currenttoken ==  openbracketsym) {
             currenttoken = lexer();
-            expression();
+            pfirst = expression();
             if (currenttoken == closebracketsym){
                 currenttoken = lexer();
             } else {
@@ -121,6 +139,7 @@ void factor(){
             //TODO - error not an id, integer or (expression)
         }
     }
+    return pfirst;
 }
 
 /* if statement
@@ -228,4 +247,41 @@ void booleanoperation(){
     }
 }
 
+astptr parser(){
+    return expression();
+};
+
+void printParserTree(astptr head){
+    string current;
+    astptr left, right;
+
+    switch(head->asttype){
+        case n_id: case n_integer: 
+            cout << head->astdata << " "; break;
+        case n_plus: case n_minus: 
+        case n_div: case n_mul:
+            cout << head->astdata << " ";
+            left = head->p1;
+            right = head->p2;
+            printParserTree(left);
+            printParserTree(right); break;
+    }
+    
+}
+
+void freeMemory(astptr head){
+    astptr left, right;
+
+     switch(head->asttype){
+        case n_id: case n_integer: 
+            delete head; break;
+        case n_plus: case n_minus: 
+        case n_div: case n_mul:
+            left = head->p1;
+            right = head->p2;
+            delete head;
+            freeMemory(left);
+            freeMemory(right); break;
+    }
+}
 #endif
