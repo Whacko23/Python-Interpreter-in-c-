@@ -8,7 +8,11 @@ using namespace std;
 
 
 typedef enum {
+    n_statements,
+    n_statement,
     n_assignment,
+    n_simple_stmt,
+    n_compount_stmt,
     n_print,
     //Unary operator
     n_uminus,
@@ -38,6 +42,10 @@ typedef enum {
     n_while,
     //If
     n_if,
+    //Error
+    n_empty,
+    n_def,
+    n_block_stmt,
 
 } nodetype;
 
@@ -52,24 +60,32 @@ typedef struct tnode {
 
 extern astptr newnode(nodetype n, int s, astptr first, astptr second, astptr third);
 
+extern astptr generate_ast();
+extern astptr statements();
+extern astptr statement();
+extern astptr simple_stmt();
+extern astptr compound_stmt();
 
-extern void statement();
-extern void assignment();
-extern void ifstatement();
-extern void whilestatement();
-extern void printstatement();
-extern void returnstatement();
+
+
+extern astptr assignment();
+extern astptr ifstatement();
+extern astptr whilestatement();
+extern astptr blockstatement(int curentline);
+extern astptr printstatement();
+extern astptr returnstatement();
 extern astptr expressiont();
 extern astptr term();
 extern astptr factor();
-extern void booleanexpression();
-extern void function();
-extern void functionbody();
-extern void argumentlist();
-extern void list();
-extern void booleanexpression();
-extern void booleanoperation();
+extern astptr booleanexpression();
+extern astptr function();
+extern astptr functionbody();
+extern astptr argumentlist();
+extern astptr list();
+extern astptr booleanexpression();
+extern astptr booleanoperation();
 extern astptr parser();
+
 
 
 extern void printParserTree(astptr head);

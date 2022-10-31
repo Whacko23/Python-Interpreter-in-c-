@@ -17,44 +17,147 @@ astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third){
     return mynode;
 }
 
+/*
+generate -> [statements]
+*/
+astptr generate_ast(){
+    return statements;
+}
 
-void whilestatement(){};
-void returnstatement(){};
+/*
+<statements> ::= <statement> | <statements>
+*/
+astptr statements(){
+    astptr pfirst = statement();
+    return newnode(n_statements, "", pfirst, statements(), NULL);
+};
+
+/*
+statement: compound_stmt  | simple_stmts 
+*/
+astptr statement(){
+    pfirst = simple_stmt();
+    if (pfirst->head == n_empty){
+        pfirst = compound_stmt();
+    }
+    return newnode(n_statement, "", pfirst , NULL, NULL)
+}
+
+
+/*
+<statement> : := <assignment> | <printstatement> | <returnstatement> | empty
+*/
+astptr simple_stmt()
+{
+    //TODO Log("inside statement function: Parser")
+    if (currenttoken == commentsym){
+        int currentline = linenumber;
+        while( linenumber == currentline){
+            currenttoken = cleanLexer(); 
+        }  
+    }
+    if (currenttoken==identifiersym) return assignment();
+    else if (currenttoken==printsym) return printstatement();
+    else if (currenttoken==returnsym) return returnstatement();
+    else return newnode(n_empty, "", NULL, NULL, NULL);
+
+}
+
+/*
+compound_stmt:
+    | function_def
+    | if_stmt
+    | while_stmt
+*/
+astptr compound_stmt(){
+    if (currenttoken==ifsym) return ifstatement();
+    else if (currenttoken == defsym) return function();
+    else if (currenttoken == whilesym) return  whilestatement();
+    else return newnode(n_empty, "", NULL, NULL, NULL);
+}
+
+/*
+<while> -> "while" <binary expression> ":" <block statement> ["else" <block statement>]
+*/
+astptr whilestatement(){
+    astptr pbexp = NULL;
+    astptr pwhile = NULL;
+    int currentline;
+
+    if (currenttoken != whilesym){
+        //TODO Error Expected while
+    } else {
+        currenttoken = cleanLexer();
+        pbexp = booleanexpression();
+        if (currenttoken == colonsym){
+            currentline = linenumber;
+            currenttoken = lexer();
+            pwhile = newnode(n_while, "while", pbexp, blockstatement(currentline), NULL);
+        } else {
+            //TODO Error expected ":"
+        }    
+    }
+    return pwhile;
+};
+
+/*
+block:
+    | NEWLINE INDENT statements DEDENT 
+    | simple_stmts
+
+*/
+astptr blockstatement(int currentline){
+    astprt pfirst;
+    int current_indent;
+    if (currentline != linenumber){
+        if(currenttoken == blocksym){
+            current_indent = 2;
+            currenttoken = lexer();
+            while(currenttoken == whitespacesym || currenttoken == blocksym){
+                if(currenttoken == whitespace) current_indent ++; else current_indent += 2;
+                currenttoken = lexer();
+            }
+            pfirst = newnode(n_block_stmt, to_string(current_indent), statements(), NULL, NULL);
+        } else {
+            //TODO IndentationError: expected an indented block
+        }
+    } else {
+        pfirst = newnode(n_simple_stmt, "", simple_stmt, NULL,NULL)
+        return pfirst;
+    }
+
+};
+
+astprt returnstatement(){
+    return newnode(n_empty, "", NULL, NULL, NULL);
+};
 
 //NOTE the previous function (assignment) has already checked for [] brackets
-void list(){};
+astptr list(){
+    return newnode(n_empty, "", NULL, NULL, NULL);
+
+};
 
 
 /*
 <function> -> identifier {()| (<argumentlist>))} : <functionbody>
 */
-void function(){};
+astptr function(){
+    return newnode(n_empty, "", NULL, NULL, NULL);
 
-void functionbody(){};
+};
 
-void argumentlist(){};
+astptr functionbody(){
+    return newnode(n_empty, "", NULL, NULL, NULL);
+
+};
+
+astptr argumentlist(){
+    return newnode(n_empty, "", NULL, NULL, NULL);
+
+};
 
 
-/*
-<statement> : := <assignment> | <ifstatement> | <whilestatement> | <printstatement> | <returnstatement>
-*/
-
-void statement()
-{
-//TODO Log("inside statement function: Parser")
-if (currenttoken == commentsym){
-    int currentline = linenumber;
-    while( linenumber == currentline){
-        currenttoken = cleanLexer(); 
-    }  
-}
-else if (currenttoken==identifiersym) assignment();
-else if (currenttoken==ifsym) ifstatement();
-else if (currenttoken==whilesym) whilestatement();
-else if (currenttoken==printsym) printstatement();
-else if (currenttoken==returnsym) returnstatement();
-/* else empty */
-}
 
 /*
 <expr> -> [+ | -]<term> {(+ | -) <term>} 
@@ -146,7 +249,8 @@ astptr factor(){
 <ifstmt> -> if <boolexpr> <statement> [else <statement>]
 //TODO <ifstmt> -> if (<boolexpr>) <statement> [else <statement>] --> Add () around boolexpr
 */
-void ifstatement(){
+astptr ifstatement(){
+    astptr pfirst;
     if (currenttoken != ifsym){
         //TODO Errror not an if ststaement
     } else {
@@ -231,7 +335,7 @@ void printstatement(){
 /* boolean expression
 <boolean expression> -> <expresion> <boolean operation> <expression>
 */
-void booleanexpression(){
+astptr booleanexpression(){
     expression();
     booleanoperation();
     expression();
@@ -260,11 +364,16 @@ void printParserTree(astptr head){
             cout << head->astdata << " "; break;
         case n_plus: case n_minus: 
         case n_div: case n_mul:
+        case n_statements: case n_while:
             cout << head->astdata << " ";
             left = head->p1;
             right = head->p2;
             printParserTree(left);
             printParserTree(right); break;
+        case n_statement: case n_block_stmt:
+        case n_simple_stmt:
+            left = head->p1;
+            printParserTree(left); break;
     }
     
 }
@@ -274,14 +383,22 @@ void freeMemory(astptr head){
 
      switch(head->asttype){
         case n_id: case n_integer: 
+        case n_empty: 
             delete head; break;
         case n_plus: case n_minus: 
         case n_div: case n_mul:
+        case statements: case n_while:
             left = head->p1;
             right = head->p2;
             delete head;
             freeMemory(left);
             freeMemory(right); break;
+        case n_statement: case n_block_stmt:
+        case n_simple_stmt:
+            left = head->p1;
+            delete head;
+            freeMemory(left); break;
+
     }
 }
 #endif

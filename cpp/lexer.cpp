@@ -10,6 +10,7 @@ string identifier;
 int intvalue;
 int tracker;
 int linenumber;
+int previousline = 1;
 lextokens currenttoken;
 string lineInput;
 
@@ -24,7 +25,12 @@ char getch(){
 lextokens lexer(){
     std::string strinteger;
     
-
+    if (previousline != linenumber){
+        previousline = linenumber;
+        ch = getch();
+        return newlinesym;
+    }
+    
     if (ch == EOF) return eofsym;
 
     //Check integers
@@ -91,6 +97,7 @@ lextokens lexer(){
         case ' ': ch = getch(); if(ch == ' '){currenttoken = blocksym; ch = getch();} else {currenttoken = whitespacesym;}; break;
         default: currenttoken = errorsym; identifier = ""; identifier = identifier + ch; ch = getch(); break;
    }
+
    return currenttoken;
    
 }

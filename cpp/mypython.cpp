@@ -3,10 +3,10 @@
 #include <string>
 #include "log.h"
 #include "lexer.h"
-#include "parser.h"
+// #include "parser.h"
 
 
-// #define LEXERTEST
+#define LEXERTEST
 
 using namespace std;
 
@@ -36,13 +36,11 @@ int main(int argc, const char *argv[]) {
             cout << "     Current line = " << lineInput << endl;
             
             tracker = -1;
-            ch = getch();
 
             currenttoken = lexer();
-
-            astptr parseetree = parser();
-            printParserTree(parseetree);
-            freeMemory(parseetree);
+            // astptr parseetree = parser();
+            // printParserTree(parseetree);
+            // freeMemory(parseetree);
 
 
             #ifdef LEXERTEST
@@ -86,6 +84,7 @@ int main(int argc, const char *argv[]) {
                     case lessorequalsym: cout << "Less than or equal token "  << endl; break;
                     case lessthansym: cout << "Less than token "  << endl; break;
                     case greaterthansym: cout << "Greater than token "  << endl; break;
+                    case newlinesym: cout << "  New line "  << endl; break;
                     
                 }
 
@@ -97,6 +96,7 @@ int main(int argc, const char *argv[]) {
 
         }
         file.close();
+        currenttoken = eofsym;
     } else {
         cout << "Input file not found";
     }
