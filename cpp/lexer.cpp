@@ -10,9 +10,9 @@ string identifier;
 int intvalue;
 int tracker;
 int linenumber;
-int previousline = 1;
 lextokens currenttoken;
 string lineInput;
+bool firstline = true;
 
 char getch(){
     tracker ++;
@@ -23,15 +23,54 @@ char getch(){
 
 
 lextokens lexer(){
-    std::string strinteger;
+    string strinteger;
     
-    if (previousline != linenumber){
-        previousline = linenumber;
-        ch = getch();
-        return newlinesym;
+    if (tracker == 0){
+        if (firstline == false){
+            ch = getch();
+            return newlinesym;
+        } else {
+            firstline = false;
+            
+        } 
     }
     
     if (ch == EOF) return eofsym;
+
+    if (ch == '"'){
+        identifier = "";
+        ch = getch();
+        while(tracker < lineInput.length()){
+            identifier = identifier + ch;
+            ch = getch();
+            if(ch == '"') break;
+            if(tracker == lineInput.length() - 1){
+                //TODO SyntaxError: EOL while scanning string literal
+                cout << "SyntaxError: EOL while scanning string literal" << endl;
+                break;
+            } 
+        }
+        ch = getch();
+        return doublequotesym;
+    }
+
+    if (ch == '\''){
+        identifier = "";
+        ch = getch();
+        while(tracker < lineInput.length()){
+            identifier = identifier + ch;
+            ch = getch();
+            if(ch == '\'') break;
+            if(tracker == lineInput.length() - 1){
+                //TODO SyntaxError: EOL while scanning string literal
+                cout << "SyntaxError: EOL while scanning string literal" << endl;
+                break;
+            } 
+        }
+        ch = getch();
+        return singlequotesym;
+    }
+
 
     //Check integers
     if (isdigit(ch)){
@@ -74,11 +113,9 @@ lextokens lexer(){
     }
 
     //Checking for symbols
-
+    //TODO Fix "  '2+3 " as a token s.t. block, identifier and double quote
     switch (ch) {
         case ';': currenttoken = semicolonsym; ch = getch(); break;
-        case '"': currenttoken = doublequotesym; ch = getch(); break;
-        case '\'': currenttoken = singlequotesym; ch = getch(); break;
         case ':': currenttoken = colonsym; ch = getch(); break;
         case ',': currenttoken = commasym; ch = getch(); break;
         case '+': currenttoken = plussym; ch = getch(); break;

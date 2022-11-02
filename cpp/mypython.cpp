@@ -74,8 +74,8 @@ int main(int argc, const char *argv[]) {
                     case rightanklesym: cout << "Right ankle token "  << endl; break;
                     case colonsym: cout << "Colon token "  << endl; break;
                     case commentsym: cout << "Comment token "  << endl; break;
-                    case singlequotesym: cout << "Single quote token "  << endl; break;
-                    case doublequotesym: cout << "Double quote token "  << endl; break;
+                    case singlequotesym: cout << "Single quote token = " << identifier << endl; break;
+                    case doublequotesym: cout << "Double quote token = " << identifier  << endl; break;
                     case opensquaresym: cout << "Open sq bracket token "  << endl; break;
                     case closesquaresym: cout << "Close sq bracket token "  << endl; break;
                     case shebangsym: cout << "Shebang token "  << endl; break;

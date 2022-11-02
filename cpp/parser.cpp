@@ -21,7 +21,7 @@ astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third){
 generate -> [statements]
 */
 astptr generate_ast(){
-    return statements;
+    return statements();
 }
 
 /*
@@ -36,11 +36,11 @@ astptr statements(){
 statement: compound_stmt  | simple_stmts 
 */
 astptr statement(){
-    pfirst = simple_stmt();
-    if (pfirst->head == n_empty){
+    astptr pfirst = simple_stmt();
+    if (pfirst->asttype == n_empty){
         pfirst = compound_stmt();
     }
-    return newnode(n_statement, "", pfirst , NULL, NULL)
+    return newnode(n_statement, "", pfirst , NULL, NULL);
 }
 
 
@@ -107,14 +107,14 @@ block:
 
 */
 astptr blockstatement(int currentline){
-    astprt pfirst;
+    astptr pfirst;
     int current_indent;
     if (currentline != linenumber){
         if(currenttoken == blocksym){
             current_indent = 2;
             currenttoken = lexer();
             while(currenttoken == whitespacesym || currenttoken == blocksym){
-                if(currenttoken == whitespace) current_indent ++; else current_indent += 2;
+                if(currenttoken == whitespacesym) current_indent ++; else current_indent += 2;
                 currenttoken = lexer();
             }
             pfirst = newnode(n_block_stmt, to_string(current_indent), statements(), NULL, NULL);
@@ -122,13 +122,13 @@ astptr blockstatement(int currentline){
             //TODO IndentationError: expected an indented block
         }
     } else {
-        pfirst = newnode(n_simple_stmt, "", simple_stmt, NULL,NULL)
+        pfirst = newnode(n_simple_stmt, "", simple_stmt(), NULL,NULL);
         return pfirst;
     }
 
 };
 
-astprt returnstatement(){
+astptr returnstatement(){
     return newnode(n_empty, "", NULL, NULL, NULL);
 };
 
@@ -250,46 +250,52 @@ astptr factor(){
 //TODO <ifstmt> -> if (<boolexpr>) <statement> [else <statement>] --> Add () around boolexpr
 */
 astptr ifstatement(){
-    astptr pfirst;
+    astptr pfirst = NULL, bexp = NULL, elsee = NULL;
     if (currenttoken != ifsym){
         //TODO Errror not an if ststaement
     } else {
         currenttoken = cleanLexer();
-        booleanexpression();
+        bexp = booleanexpression();
         if(currenttoken != colonsym){
             //TODO Error expected ':' after if
         } else {
             //NOTE Does this need to consume another lex token?
-            currenttoken = cleanLexer();
+            currenttoken = lexer();
+            //TODO Make this as a block statement instead of checking for blocksym
             if(currenttoken != blocksym){
                 //TODO Error expected identation
             } else {
                 //NOTE Does this need to consume another lex token?
                 currenttoken = cleanLexer();
-                statement();
+                pfirst = statement();
                 if(currenttoken == elsesym){
                     currenttoken = cleanLexer();
                     if(currenttoken != colonsym){
                         //TODO Expected ':'
                     } else {
+                        currenttoken = lexer();
+                        //TODO Make this as a block statement instead of checking for blocksym
                         if(currenttoken != blocksym){
                             //TODO expected identation
                         } else {
                             currenttoken = cleanLexer();
-                            statement();
+                            elsee = statement();
                         }                       
                     }
                 }
             }  
         }
     }
+    return newnode(n_if, "", bexp, pfirst, elsee);
 }
 
 
 /* assign statement
 <assignment> -> identifier = {<experssion> | <list>}
 */
-void assignment(){
+astptr assignment(){
+    astptr pfirst, lis, exp;
+    string id;
     if(currenttoken != identifiersym){
         //TODO Expected identifier
     } else {
@@ -300,22 +306,27 @@ void assignment(){
             currenttoken = cleanLexer();
             if (currenttoken == opensquaresym){
                 currenttoken = cleanLexer();
-                list();
+                lis = list();
+                //NOTE: second pointer is used if the datatype is list
+                pfirst = newnode(n_assignment, identifier, NULL, lis, NULL);
                 if (currenttoken != closesquaresym){
                     //TODO Expected ']'
                 }
             } else {
-                expression();
+                exp = expression();
+                //NOTE: first pointer is used if the datatype is expression
+                pfirst = newnode(n_assignment, identifier, exp, NULL, NULL);
             }  
         }
     }
-    
+    return pfirst;
 };
 
 /* print statement
 <print> -> print({<expression> | <list>) //TODO List
 */
-void printstatement(){
+astptr printstatement(){
+    astptr pfirst;
     if (currenttoken != printsym){
         //TODO Expected print
     } else {
@@ -357,7 +368,7 @@ astptr parser(){
 
 void printParserTree(astptr head){
     string current;
-    astptr left, right;
+    astptr left, right, mid;
 
     switch(head->asttype){
         case n_id: case n_integer: 
@@ -374,12 +385,28 @@ void printParserTree(astptr head){
         case n_simple_stmt:
             left = head->p1;
             printParserTree(left); break;
+        case n_if:
+            left = head->p1;
+            mid = head->p2;
+            right = head->p3;
+            printParserTree(left);
+            printParserTree(mid);
+            printParserTree(right); break;
+        case n_assignment:
+            if(head->p1 == NULL){
+                left = head->p2;
+            } else {
+                left = head->p1;
+            }
+            cout << head->astdata << " = ";
+            printParserTree(left); break;
+
     }
     
 }
 
 void freeMemory(astptr head){
-    astptr left, right;
+    astptr left, right, mid;
 
      switch(head->asttype){
         case n_id: case n_integer: 
@@ -387,7 +414,7 @@ void freeMemory(astptr head){
             delete head; break;
         case n_plus: case n_minus: 
         case n_div: case n_mul:
-        case statements: case n_while:
+        case n_statements: case n_while:
             left = head->p1;
             right = head->p2;
             delete head;
@@ -398,6 +425,23 @@ void freeMemory(astptr head){
             left = head->p1;
             delete head;
             freeMemory(left); break;
+        case n_if:
+            left = head->p1;
+            mid = head->p2;
+            right = head->p3;
+            delete head;
+            freeMemory(left);
+            freeMemory(mid);
+            freeMemory(right); break;
+        case n_assignment:
+            if(head->p1 == NULL){
+                left = head->p2;
+            } else {
+                left = head->p1;
+            }
+            freeMemory(head);
+            freeMemory(left); break;
+
 
     }
 }

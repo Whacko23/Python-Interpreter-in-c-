@@ -54,7 +54,8 @@ typedef enum{
 extern lextokens lexer();
 extern int tracker;
 extern int linenumber;
-extern int previousline;
+extern bool firstline;
+
 
 //Variable to store the last identifier encountered by lexer. Error symbol also uses the same variable
 extern string identifier;
