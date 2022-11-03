@@ -340,19 +340,18 @@ astptr printstatement(){
             expr = expression();
             pfirst = newnode(n_print,"print",expr,NULL, NULL);
             if(currenttoken == commasym){
-                
+
                 currenttoken == cleanLexer();
                     while(currenttoken != closebracketsym){
                         
-                        if (tracker == lineInput.length() - 1) {
-                            cout << "IM here " << endl;
-                            break;
-                        }
-                        // cout << "IM here " << endl;
+                        if (tracker == lineInput.length() - 1 || currenttoken == closebracketsym) {
 
                         expr = expression();
                         printParserTree(expr);
-                        pfirst = newnode(n_prints,"print",pfirst,expr, NULL);
+                        pfirst = newnode(n_prints,"",pfirst,expr, NULL);
+                            break;
+                        }
+                        
                     }
             }
             if(currenttoken != closebracketsym){
