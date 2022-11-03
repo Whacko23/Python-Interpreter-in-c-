@@ -22,7 +22,14 @@ astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third){
 */
 astptr statements(){
     astptr pfirst = statement();
-    return newnode(n_statements, "", pfirst, statements(), NULL);
+    while(currenttoken!=eofsym){
+        if(currenttoken == newlinesym){
+            currenttoken = cleanLexer();
+            pfirst = newnode(n_statements, "", pfirst, statement(), NULL);
+        }
+    }
+    
+    return pfirst;
 };
 
 /*
@@ -44,8 +51,15 @@ astptr simple_stmt()
 {
     //TODO Log("inside statement function: Parser")
     if (currenttoken == commentsym){
-        int currentline = linenumber;
-        while( linenumber == currentline){
+        currenttoken = cleanLexer();
+        
+        while(true){
+            if(currenttoken == newlinesym){
+                currenttoken = cleanLexer();
+                break;
+            } else if(currenttoken == eofsym){
+                break;
+            }
             currenttoken = cleanLexer(); 
         }  
     }
@@ -383,7 +397,7 @@ astptr booleanoperation(){
 }
 
 astptr parser(){
-    return printstatement();
+    return statements();
 };
 
 void printParserTree(astptr head){
