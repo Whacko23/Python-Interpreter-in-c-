@@ -10,10 +10,13 @@ using namespace std;
 typedef enum {
     n_statements,
     n_statement,
-    n_assignment,
+    n_assignment_list,
+    n_assignment_int,
     n_simple_stmt,
     n_compount_stmt,
+    n_booleanexp,
     n_print,
+    n_prints,
     //Unary operator
     n_uminus,
     //Arithmetic operator
@@ -71,14 +74,14 @@ extern astptr compound_stmt();
 extern astptr assignment();
 extern astptr ifstatement();
 extern astptr whilestatement();
-extern astptr blockstatement(int curentline);
+extern astptr blockstatement();
 extern astptr printstatement();
 extern astptr returnstatement();
 extern astptr expressiont();
 extern astptr term();
 extern astptr factor();
 extern astptr booleanexpression();
-extern astptr function();
+extern astptr funct();
 extern astptr functionbody();
 extern astptr argumentlist();
 extern astptr list();

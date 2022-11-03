@@ -3,10 +3,11 @@
 #include <string>
 #include "log.h"
 #include "lexer.h"
-// #include "parser.h"
+#include "parser.h"
 
 
-#define LEXERTEST
+// #define LEXERTEST
+#define ASTTEST
 
 using namespace std;
 
@@ -37,10 +38,16 @@ int main(int argc, const char *argv[]) {
             
             tracker = -1;
 
-            currenttoken = lexer();
-            // astptr parseetree = parser();
-            // printParserTree(parseetree);
-            // freeMemory(parseetree);
+            #ifdef ASTTEST
+            currenttoken = cleanLexer();
+            currenttoken = cleanLexer();
+            astptr parseetree = parser();
+            printParserTree(parseetree);
+            
+            freeMemory(parseetree); 
+            cout << " ---Endl" << endl;                
+
+            #endif
 
 
             #ifdef LEXERTEST

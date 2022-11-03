@@ -71,7 +71,7 @@ compound_stmt:
 */
 astptr compound_stmt(){
     if (currenttoken==ifsym) return ifstatement();
-    else if (currenttoken == defsym) return function();
+    else if (currenttoken == defsym) return funct();
     else if (currenttoken == whilesym) return  whilestatement();
     else return newnode(n_empty, "", NULL, NULL, NULL);
 }
@@ -92,7 +92,7 @@ astptr whilestatement(){
         if (currenttoken == colonsym){
             currentline = linenumber;
             currenttoken = lexer();
-            pwhile = newnode(n_while, "while", pbexp, blockstatement(currentline), NULL);
+            pwhile = newnode(n_while, "while", pbexp, blockstatement(), NULL);
         } else {
             //TODO Error expected ":"
         }    
@@ -106,10 +106,11 @@ block:
     | simple_stmts
 
 */
-astptr blockstatement(int currentline){
+astptr blockstatement(){
     astptr pfirst;
     int current_indent;
-    if (currentline != linenumber){
+    if (currenttoken == newlinesym){
+        currenttoken = cleanLexer();
         if(currenttoken == blocksym){
             current_indent = 2;
             currenttoken = lexer();
@@ -142,7 +143,7 @@ astptr list(){
 /*
 <function> -> identifier {()| (<argumentlist>))} : <functionbody>
 */
-astptr function(){
+astptr funct(){
     return newnode(n_empty, "", NULL, NULL, NULL);
 
 };
@@ -163,6 +164,7 @@ astptr argumentlist(){
 <expr> -> [+ | -]<term> {(+ | -) <term>} 
 */
 astptr expression() {
+
     //TODO Log("inside expression function: Parser")
 
     astptr pfirst; /* first pointer in the expr chain */
@@ -196,6 +198,7 @@ astptr expression() {
 <term> -> <factor> {(* | /) <factor>)
 */
 astptr term() {
+    
     astptr pfirst, factor2;
     nodetype ntype;
     string tokendata;
@@ -220,8 +223,7 @@ astptr factor(){
     astptr pfirst;
 
     // cout << "Inside factor" << endl;
-    
-    if(currenttoken == identifiersym ){
+    if(currenttoken == identifiersym ){      
         // cout << "Inside identifier" << identifier << endl;
         pfirst = newnode(n_id, identifier, NULL, NULL, NULL);
         currenttoken = cleanLexer();
@@ -306,16 +308,16 @@ astptr assignment(){
             currenttoken = cleanLexer();
             if (currenttoken == opensquaresym){
                 currenttoken = cleanLexer();
+                id = identifier;
                 lis = list();
-                //NOTE: second pointer is used if the datatype is list
-                pfirst = newnode(n_assignment, identifier, NULL, lis, NULL);
+                pfirst = newnode(n_assignment_list, identifier, lis, NULL, NULL);
                 if (currenttoken != closesquaresym){
                     //TODO Expected ']'
                 }
             } else {
+                id = identifier;
                 exp = expression();
-                //NOTE: first pointer is used if the datatype is expression
-                pfirst = newnode(n_assignment, identifier, exp, NULL, NULL);
+                pfirst = newnode(n_assignment_int, id, exp, NULL, NULL);
             }  
         }
     }
@@ -326,7 +328,7 @@ astptr assignment(){
 <print> -> print({<expression> | <list>) //TODO List
 */
 astptr printstatement(){
-    astptr pfirst;
+    astptr pfirst, expr;
     if (currenttoken != printsym){
         //TODO Expected print
     } else {
@@ -335,35 +337,62 @@ astptr printstatement(){
             //TODO Expected '('
         } else {
             currenttoken = cleanLexer();
-            expression();
+            expr = expression();
+            pfirst = newnode(n_print,"print",expr,NULL, NULL);
+            if(currenttoken == commasym){
+                
+                currenttoken == cleanLexer();
+                    while(currenttoken != closebracketsym){
+                        
+                        if (tracker == lineInput.length() - 1) {
+                            cout << "IM here " << endl;
+                            break;
+                        }
+                        // cout << "IM here " << endl;
+
+                        expr = expression();
+                        printParserTree(expr);
+                        pfirst = newnode(n_prints,"print",pfirst,expr, NULL);
+                    }
+            }
             if(currenttoken != closebracketsym){
                 //TODO Expected ')'
             }
         }
     }
+    return pfirst;
 };
 
 /* boolean expression
 <boolean expression> -> <expresion> <boolean operation> <expression>
 */
 astptr booleanexpression(){
-    expression();
-    booleanoperation();
-    expression();
+    astptr exp1, exp2, bexp;
+    exp1 = expression();
+    exp2 = booleanoperation();
+    bexp = expression();
+    return newnode(n_booleanexp, "", exp1, bexp, exp2);
 };
 
 /* boolean operation
 <boolean expression> -> { == | != | >= | <= | > | <}
 */
 
-void booleanoperation(){
-    if (currenttoken == equalsym || currenttoken == notequalsym || currenttoken == greaterorequalsym || currenttoken == lessorequalsym || currenttoken == greaterthansym || currenttoken == lessthansym){
-        currenttoken = cleanLexer();
+astptr booleanoperation(){
+    switch (currenttoken) {
+        case equalsym: currenttoken = cleanLexer(); return newnode(n_eq, "=", NULL, NULL, NULL); break;
+        case notequalsym: currenttoken = cleanLexer(); return newnode(n_ne, "!=", NULL, NULL, NULL); break;
+        case greaterorequalsym: currenttoken = cleanLexer(); return newnode(n_ge, ">=", NULL, NULL, NULL); break;
+        case greaterthansym: currenttoken = cleanLexer(); return newnode(n_gt, ">", NULL, NULL, NULL); break;
+        case lessthansym: currenttoken = cleanLexer(); return newnode(n_lt, "<", NULL, NULL, NULL); break;
+        case lessorequalsym: currenttoken = cleanLexer(); return newnode(n_le, "<=", NULL, NULL, NULL); break;
+        default:
+            break;
     }
 }
 
 astptr parser(){
-    return expression();
+    return printstatement();
 };
 
 void printParserTree(astptr head){
@@ -376,6 +405,7 @@ void printParserTree(astptr head){
         case n_plus: case n_minus: 
         case n_div: case n_mul:
         case n_statements: case n_while:
+        case n_prints:
             cout << head->astdata << " ";
             left = head->p1;
             right = head->p2;
@@ -385,22 +415,22 @@ void printParserTree(astptr head){
         case n_simple_stmt:
             left = head->p1;
             printParserTree(left); break;
-        case n_if:
+        case n_if: 
             left = head->p1;
             mid = head->p2;
             right = head->p3;
             printParserTree(left);
             printParserTree(mid);
             printParserTree(right); break;
-        case n_assignment:
-            if(head->p1 == NULL){
-                left = head->p2;
-            } else {
-                left = head->p1;
-            }
+        case n_assignment_list: case n_assignment_int:
             cout << head->astdata << " = ";
+            left = head->p1;
             printParserTree(left); break;
-
+        case n_print:
+            left = head->p1;
+            cout << head->astdata << " ";
+            printParserTree(left); break;
+   
     }
     
 }
@@ -415,6 +445,7 @@ void freeMemory(astptr head){
         case n_plus: case n_minus: 
         case n_div: case n_mul:
         case n_statements: case n_while:
+        case n_prints:
             left = head->p1;
             right = head->p2;
             delete head;
@@ -433,15 +464,14 @@ void freeMemory(astptr head){
             freeMemory(left);
             freeMemory(mid);
             freeMemory(right); break;
-        case n_assignment:
-            if(head->p1 == NULL){
-                left = head->p2;
-            } else {
-                left = head->p1;
-            }
-            freeMemory(head);
+        case n_assignment_list: case n_assignment_int:
+            left = head->p1;
+            delete head;
             freeMemory(left); break;
-
+        case n_print:
+            left = head->p1;
+            delete head;
+            freeMemory(left); break;
 
     }
 }
