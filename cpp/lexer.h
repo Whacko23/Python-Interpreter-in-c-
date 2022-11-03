@@ -58,7 +58,9 @@ typedef struct lnode {
 } token;
 
 extern token newtoken(lextokens type, string data);
+extern vector<token> vec;
 
+extern lextokens lext();
 extern lextokens lexer();
 extern int tracker;
 extern int linenumber;

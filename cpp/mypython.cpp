@@ -7,8 +7,8 @@
 #include "parser.h"
 
 
-#define LEXERTEST
-// #define ASTTEST
+// #define LEXERTEST
+#define ASTTEST
 
 using namespace std;
 
@@ -25,7 +25,7 @@ int main(int argc, const char *argv[]) {
     
     ifstream file (filename);
 
-    vector<token> vec;
+    
     bool firstline = true;
 
     linenumber = 0;
@@ -35,7 +35,6 @@ int main(int argc, const char *argv[]) {
             
             //Taking each line of the file as a string input
             getline(file, lineInput);
-            linenumber++;
 
             // DEEBUG
             cout << "     Current line = " << lineInput << endl;
@@ -43,24 +42,12 @@ int main(int argc, const char *argv[]) {
             tracker = -1;
             ch = getch();
 
-            #ifdef ASTTEST
-            currenttoken = cleanLexer();
-            currenttoken = cleanLexer();
-            astptr parseetree = parser();
-            printParserTree(parseetree);
-            
-            freeMemory(parseetree); 
-            cout << " ---Endl" << endl;                
-
-            #endif
-
-
-            #ifdef LEXERTEST
+            //Pushing tokens to vector
             if (firstline == false){
                 vec.push_back(newtoken(newlinesym,""));
             }
             while( tracker < (int)lineInput.length()){
-                currenttoken = lexer();
+                currenttoken = lext();
                 switch(currenttoken){
                     case intsym: vec.push_back(newtoken(intsym, to_string(intvalue))); break;
                     case whitespacesym: vec.push_back(newtoken(whitespacesym, " ")); break;
@@ -103,8 +90,6 @@ int main(int argc, const char *argv[]) {
                 }
             }
             firstline = false;
-            //std::cout << "intvalue = " << intvalue << std::endl; 
-            #endif
 
 
         }
@@ -112,6 +97,7 @@ int main(int argc, const char *argv[]) {
         currenttoken = eofsym;
         vec.push_back(newtoken(eofsym,""));
 
+        #ifdef LEXERTEST
         cout << "0000------" << endl;
 
         for (vector<token>::iterator it = vec.begin() ; it != vec.end(); ++it){
@@ -157,6 +143,17 @@ int main(int argc, const char *argv[]) {
                     
                 }
         }
+        #endif
+
+
+        #ifdef ASTTEST
+        currenttoken = lexer();
+        astptr parseetree = parser();
+        printParserTree(parseetree);
+        freeMemory(parseetree); 
+        cout << " ---Endl" << endl;                
+        #endif
+
     } else {
         cout << "Input file not found";
     }

@@ -18,13 +18,6 @@ astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third){
 }
 
 /*
-generate -> [statements]
-*/
-astptr generate_ast(){
-    return statements();
-}
-
-/*
 <statements> ::= <statement> | <statements>
 */
 astptr statements(){

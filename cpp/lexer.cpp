@@ -9,10 +9,12 @@ char ch;
 string identifier;
 int intvalue;
 int tracker;
-int linenumber;
+int linenumber = 1;
+int vectorindex = 0;
 lextokens currenttoken;
 string lineInput;
 bool firstline = true;
+vector<token> vec;
 
 char getch(){
     tracker ++;
@@ -28,7 +30,7 @@ token newtoken(lextokens type, string data){
     return l;
 }
 
-lextokens lexer(){
+lextokens lext(){
     string strinteger;
 
     if (ch == '"'){
@@ -133,9 +135,21 @@ lextokens lexer(){
    
 }
 
+lextokens lexer(){
+    token current = vec[vectorindex];
+    lextokens tok = current.tokentype;
+    string dat = current.data;
+
+    if(tok==newlinesym) linenumber++;
+    if(tok==intsym) intvalue = stoi(dat);
+    if(tok==identifiersym || tok==singlequotesym || tok==doublequotesym) identifier = dat;
+
+    vectorindex++;
+    return tok;
+}
 lextokens cleanLexer(){
     currenttoken = lexer();
-    while(currenttoken == whitespacesym || currenttoken == blocksym){
+    while(currenttoken == whitespacesym){
         currenttoken = lexer();
     }
     return currenttoken;
