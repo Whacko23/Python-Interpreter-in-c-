@@ -3,6 +3,7 @@
 #define LEXER_H
 
 #include <string>
+#include <vector>
 using namespace std;
 
 //Setting max identifier length to 35 although python allows for infinite length for identifiers
@@ -51,10 +52,19 @@ typedef enum{
     newlinesym,
 } lextokens;
 
+typedef struct lnode {
+    lextokens tokentype;
+    string data;
+} token;
+
+extern token newtoken(lextokens type, string data);
+
 extern lextokens lexer();
 extern int tracker;
 extern int linenumber;
 extern bool firstline;
+
+
 
 
 //Variable to store the last identifier encountered by lexer. Error symbol also uses the same variable

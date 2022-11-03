@@ -21,21 +21,15 @@ char getch(){
     return lineInput[tracker];
 }
 
+token newtoken(lextokens type, string data){
+    token l;
+    l.data=data;
+    l.tokentype=type;
+    return l;
+}
 
 lextokens lexer(){
     string strinteger;
-    
-    if (tracker == 0){
-        if (firstline == false){
-            ch = getch();
-            return newlinesym;
-        } else {
-            firstline = false;
-            
-        } 
-    }
-    
-    if (ch == EOF) return eofsym;
 
     if (ch == '"'){
         identifier = "";
@@ -126,13 +120,13 @@ lextokens lexer(){
         case ')': currenttoken = closebracketsym; ch = getch(); break;
         case '[': currenttoken = opensquaresym; ch = getch(); break;
         case ']': currenttoken = closesquaresym; ch = getch(); break;
+        case ' ': currenttoken = whitespacesym; ch = getch(); break;
         case '!': ch = getch(); if(ch == '='){currenttoken = notequalsym; ch = getch();}; break;
         case '>': ch = getch(); if(ch == '='){currenttoken = greaterorequalsym; ch = getch();} else {currenttoken = greaterthansym;}; break;
         case '<': ch = getch(); if(ch == '='){currenttoken = lessorequalsym; ch = getch();} else {currenttoken = lessthansym;}; break;
         case '=': ch = getch(); if(ch == '='){currenttoken = equalsym; ch = getch();} else {currenttoken = assignsym;}; break;
-        case '#': ch = getch(); if(ch == '!'){currenttoken = shebangsym; ch = getch();} else {currenttoken = commentsym;};  break;  
-        case ' ': ch = getch(); if(ch == ' '){currenttoken = blocksym; ch = getch();} else {currenttoken = whitespacesym;}; break;
-        default: currenttoken = errorsym; identifier = ""; identifier = identifier + ch; ch = getch(); break;
+        case '#': ch = getch(); if(ch == '!'){currenttoken = shebangsym; ch = getch();} else {currenttoken = commentsym;};  break;
+        default: currenttoken = errorsym; cout << "Im the culprit " << ch  << " tracker " << tracker<< endl; identifier = ""; identifier = identifier + ch; ch = getch(); break;
    }
 
    return currenttoken;

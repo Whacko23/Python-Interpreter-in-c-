@@ -1,13 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 #include "log.h"
 #include "lexer.h"
 #include "parser.h"
 
 
-// #define LEXERTEST
-#define ASTTEST
+#define LEXERTEST
+// #define ASTTEST
 
 using namespace std;
 
@@ -24,6 +25,9 @@ int main(int argc, const char *argv[]) {
     
     ifstream file (filename);
 
+    vector<token> vec;
+    bool firstline = true;
+
     linenumber = 0;
 
     if (file){
@@ -37,6 +41,7 @@ int main(int argc, const char *argv[]) {
             cout << "     Current line = " << lineInput << endl;
             
             tracker = -1;
+            ch = getch();
 
             #ifdef ASTTEST
             currenttoken = cleanLexer();
@@ -51,14 +56,71 @@ int main(int argc, const char *argv[]) {
 
 
             #ifdef LEXERTEST
+            if (firstline == false){
+                vec.push_back(newtoken(newlinesym,""));
+            }
             while( tracker < (int)lineInput.length()){
                 currenttoken = lexer();
                 switch(currenttoken){
-                    case intsym: cout << "Integer token = " << intvalue << endl; break;
+                    case intsym: vec.push_back(newtoken(intsym, to_string(intvalue))); break;
+                    case whitespacesym: vec.push_back(newtoken(whitespacesym, " ")); break;
+                    case printsym: vec.push_back(newtoken(printsym, "print")); break;
+                    case blocksym: vec.push_back(newtoken(blocksym, "  "));
+                    case identifiersym: vec.push_back(newtoken(identifiersym, identifier)); break;
+                    case whilesym: vec.push_back(newtoken(whilesym, "while")); break;
+                    case eofsym: cout << "EOF token "  << endl; break;
+                    case ifsym: vec.push_back(newtoken(ifsym, "if")); break;
+                    case elsesym: vec.push_back(newtoken(elsesym, "else")); break;
+                    case elseifsym: vec.push_back(newtoken(elseifsym, "else if")); break;
+                    case defsym: vec.push_back(newtoken(defsym, "def")); break;
+                    case returnsym: vec.push_back(newtoken(returnsym, "return")); break;
+                    case semicolonsym: vec.push_back(newtoken(semicolonsym, ";")); break;
+                    case commasym: vec.push_back(newtoken(commasym, ",")); break;
+                    case assignsym: vec.push_back(newtoken(assignsym, "=")); break;
+                    case errorsym: cout << "Error "  << identifier << " is unrecognized on line " << linenumber << " at character " << tracker << endl; break;
+                    case dividesym: vec.push_back(newtoken(dividesym, "/")); break;
+                    case openbracketsym: vec.push_back(newtoken(openbracketsym, "(")); break;
+                    case closebracketsym: vec.push_back(newtoken(closebracketsym, ")")); break;
+                    case plussym: vec.push_back(newtoken(plussym, "+")); break;
+                    case minussym: vec.push_back(newtoken(minussym, "-")); break;
+                    case multiplysym: vec.push_back(newtoken(multiplysym, "*")); break;
+                    case equalsym: vec.push_back(newtoken(equalsym, "==")); break;
+                    case leftanklesym: vec.push_back(newtoken(leftanklesym, "<")); break;
+                    case rightanklesym: vec.push_back(newtoken(rightanklesym, ">")); break;
+                    case colonsym: vec.push_back(newtoken(colonsym, ":")); break;
+                    case commentsym: vec.push_back(newtoken(commentsym, "#")); break;
+                    case singlequotesym: vec.push_back(newtoken(singlequotesym, identifier)); break;
+                    case doublequotesym: vec.push_back(newtoken(doublequotesym, identifier)); break;
+                    case opensquaresym: vec.push_back(newtoken(opensquaresym, "[")); break;
+                    case closesquaresym: vec.push_back(newtoken(closebracketsym, "]")); break;
+                    case shebangsym: vec.push_back(newtoken(shebangsym, "#!")); break;
+                    case notequalsym: vec.push_back(newtoken(notequalsym, "!=")); break;
+                    case greaterorequalsym: vec.push_back(newtoken(greaterorequalsym, ">=")); break;
+                    case lessorequalsym: vec.push_back(newtoken(lessorequalsym, "<=")); break;
+                    case lessthansym: vec.push_back(newtoken(lessthansym, "<")); break;
+                    case greaterthansym: vec.push_back(newtoken(greaterthansym, ">")); break;
+                    case newlinesym: cout << "  New line "  << endl; break;  
+                }
+            }
+            firstline = false;
+            //std::cout << "intvalue = " << intvalue << std::endl; 
+            #endif
+
+
+        }
+        file.close();
+        currenttoken = eofsym;
+        vec.push_back(newtoken(eofsym,""));
+
+        cout << "0000------" << endl;
+
+        for (vector<token>::iterator it = vec.begin() ; it != vec.end(); ++it){
+            switch((*it).tokentype){
+                    case intsym: cout << "Integer token = " << (*it).data << endl; break;
                     case whitespacesym: cout << "Whitespace token " << endl; break;
                     case printsym: cout << "Print token " << endl; break;
                     case blocksym: cout << "Block token "  << endl;
-                    case identifiersym: cout << "Identifier token = " << identifier  << endl; break;
+                    case identifiersym: cout << "Identifier token = " << (*it).data  << endl; break;
                     case whilesym: cout << "While token "  << endl; break;
                     case eofsym: cout << "EOF token "  << endl; break;
                     case ifsym: cout << "IF token "  << endl; break;
@@ -81,8 +143,8 @@ int main(int argc, const char *argv[]) {
                     case rightanklesym: cout << "Right ankle token "  << endl; break;
                     case colonsym: cout << "Colon token "  << endl; break;
                     case commentsym: cout << "Comment token "  << endl; break;
-                    case singlequotesym: cout << "Single quote token = " << identifier << endl; break;
-                    case doublequotesym: cout << "Double quote token = " << identifier  << endl; break;
+                    case singlequotesym: cout << "Single quote token = " << (*it).data << endl; break;
+                    case doublequotesym: cout << "Double quote token = " << (*it).data  << endl; break;
                     case opensquaresym: cout << "Open sq bracket token "  << endl; break;
                     case closesquaresym: cout << "Close sq bracket token "  << endl; break;
                     case shebangsym: cout << "Shebang token "  << endl; break;
@@ -94,16 +156,7 @@ int main(int argc, const char *argv[]) {
                     case newlinesym: cout << "  New line "  << endl; break;
                     
                 }
-
-
-            }
-            //std::cout << "intvalue = " << intvalue << std::endl; 
-            #endif
-
-
         }
-        file.close();
-        currenttoken = eofsym;
     } else {
         cout << "Input file not found";
     }
