@@ -257,20 +257,20 @@ astptr term() {
 }
 
 /* factor
-<factor> -> id | integer | ( <expr> )
+<factor> -> id | integer | string | ( <expr> )
 */
 astptr factor(){
     astptr pfirst;
 
     // cout << "Inside factor" << endl;
     if(currenttoken == identifiersym ){      
-        // cout << "Inside identifier" << identifier << endl;
         pfirst = newnode(n_id, identifier, NULL, NULL, NULL);
         currenttoken = cleanLexer();
     } else if(currenttoken == intsym) {
-        // cout << "Inside intsym" << intvalue << endl;
         pfirst = newnode(n_integer, to_string(intvalue) , NULL, NULL, NULL);
         currenttoken = cleanLexer();
+    }else if(currenttoken == doublequotesym || currenttoken == singlequotesym){
+        pfirst = newnode(n_string, identifier, NULL, NULL, NULL);
     } else {
         if(currenttoken ==  openbracketsym) {
             currenttoken = cleanLexer();
@@ -426,6 +426,7 @@ astptr printstatement(){
             while(currenttoken == commasym){
                 currenttoken = cleanLexer();
                 expr = expression();
+                if(currenttoken == doublequotesym || currenttoken == singlequotesym) currenttoken = cleanLexer();
                 pfirst = newnode(n_prints,"",pfirst,expr, NULL);
                 
             }
@@ -470,7 +471,7 @@ astptr booleanoperation(){
 
 astptr parser(){
     
-    return ifstatement();
+    return statements();
 };
 
 void printParserTree(astptr head){
@@ -479,6 +480,7 @@ void printParserTree(astptr head){
 
     switch(head->asttype){
         case n_id: case n_integer: 
+        case n_string:
             cout << head->astdata << " "; break;
         case n_plus: case n_minus: 
         case n_div: case n_mul:
@@ -525,6 +527,7 @@ void freeMemory(astptr head){
      switch(head->asttype){
         case n_id: case n_integer: 
         case n_empty: case n_error:
+        case n_string:
             delete head; break;
         case n_plus: case n_minus: 
         case n_div: case n_mul:

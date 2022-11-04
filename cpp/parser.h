@@ -33,6 +33,7 @@ typedef enum {
     n_ge,
     //Integer
     n_integer,
+    n_string,
     //Variable
     n_id,
     //Function call,
