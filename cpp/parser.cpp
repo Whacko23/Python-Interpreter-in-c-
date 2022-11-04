@@ -122,7 +122,6 @@ astptr blockstatement(){
     }
     if(current_indent==0) return newnode(n_error,"No block",NULL,NULL,NULL);
     pfirst = statement();
-    cout << currenttoken <<endl;
     return newnode(n_block_stmt,to_string(current_indent), pfirst, NULL, NULL);
 };
 
@@ -137,7 +136,6 @@ astptr blockstatements(){
     int sindent =0;
     astptr psecond;
     while(true){
-        cout << currenttoken << endl;
         if(currenttoken == eofsym)break;
         if(currenttoken == newlinesym){
             currenttoken = lexer();
@@ -439,7 +437,7 @@ astptr booleanoperation(){
 }
 
 astptr parser(){
-    return blockstatements();
+    return statements();
 };
 
 void printParserTree(astptr head){
