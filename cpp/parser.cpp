@@ -161,12 +161,18 @@ astptr blockstatement(){
 */
 astptr blockstatements(){
     astptr pfirst = blockstatement();
-    while(currenttoken!=eofsym){
+    astptr psecond;
+    int i = 0;
+    cout << "Printed " << currenttoken << endl;
+    while(true){
+        if(currenttoken == eofsym)break;
         if(currenttoken == newlinesym){
-            currenttoken = cleanLexer();
-            pfirst = newnode(n_block_stmts, "", pfirst, blockstatement(), NULL);
+            currenttoken = lexer();
+            psecond = blockstatement();
+            pfirst = newnode(n_block_stmts, "", pfirst, psecond, NULL);
         }
     }
+    
     return pfirst;
 };
 
