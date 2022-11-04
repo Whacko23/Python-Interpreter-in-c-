@@ -115,17 +115,16 @@ block statement: block <statement>
 astptr blockstatement(){
     astptr pfirst;
     int current_indent = 0;
-
+    
+    if(currenttoken!=whitespacesym){
+        return newnode(n_empty,"",NULL,NULL,NULL);
+    }
+    
     while (true){
-
-
        if(currenttoken!=whitespacesym) break;
        currenttoken = lexer();
        current_indent++;
-
     }
-
-    if(current_indent==0) return newnode(n_error,"No block",NULL,NULL,NULL);
 
     pfirst = statement();
 
@@ -138,6 +137,8 @@ astptr blockstatement(){
 astptr blockstatements(){
 
     astptr pfirst = blockstatement();
+    if(pfirst->asttype==n_empty) return newnode(n_empty,"",NULL,NULL,NULL);
+
     string firstdata = pfirst->astdata;
     string seconddata = "";
     int findent = stoi(firstdata);
@@ -149,9 +150,9 @@ astptr blockstatements(){
             currenttoken = lexer();
             psecond = blockstatement();
             seconddata = psecond->astdata;
-            sindent = stoi(seconddata);
-            if(sindent!=findent) cout <<"IndentationError: unexpected indent"<<endl;
-            //TODO IndentationError: unexpected indent
+            if(psecond->asttype==n_block_stmt || psecond->asttype==n_block_stmts){
+                sindent = stoi(seconddata);
+            }
             pfirst = newnode(n_block_stmts, seconddata, pfirst, psecond, NULL);
         }
     }
@@ -472,8 +473,14 @@ void printParserTree(astptr head){
         case n_plus: case n_minus: 
         case n_div: case n_mul:
         case n_statements: case n_while:
-        case n_prints: case n_block_stmts:
+        case n_prints: 
+        case n_if:
             cout << head->astdata << " ";
+            left = head->p1;
+            right = head->p2;
+            printParserTree(left);
+            printParserTree(right); break;
+        case n_block_stmts:
             left = head->p1;
             right = head->p2;
             printParserTree(left);
@@ -482,7 +489,7 @@ void printParserTree(astptr head){
         case n_simple_stmt:
             left = head->p1;
             printParserTree(left); break;
-        case n_if: 
+        case n_ifelse: 
             left = head->p1;
             mid = head->p2;
             right = head->p3;
@@ -513,6 +520,7 @@ void freeMemory(astptr head){
         case n_div: case n_mul:
         case n_statements: case n_while:
         case n_prints: case n_block_stmts:
+        case n_if:
             left = head->p1;
             right = head->p2;
             delete head;
@@ -523,7 +531,7 @@ void freeMemory(astptr head){
             left = head->p1;
             delete head;
             freeMemory(left); break;
-        case n_if:
+        case n_ifelse:
             left = head->p1;
             mid = head->p2;
             right = head->p3;

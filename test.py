@@ -1,2 +1,4 @@
-if 2==3:
-  print(2+3,4)
+if a==b:
+  print(2)
+else:
+  print(1)

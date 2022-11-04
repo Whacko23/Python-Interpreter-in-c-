@@ -302,12 +302,12 @@ int main(int argc, const char *argv[]) {
         #ifdef ASTTEST
         currenttoken = lexer();
         astptr parseetree = parser();
-        // printParserTree(parseetree);
+        printParserTree(parseetree);
 
         // Interpreter tmp;
         // tmp.visit(parseetree);
 
-        // freeMemory(parseetree); 
+        freeMemory(parseetree); 
         cout << " ---Endl" << endl;                
         #endif
 
