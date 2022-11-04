@@ -2,9 +2,11 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
 #include "log.h"
 #include "lexer.h"
 #include "parser.h"
+
 
 
 // #define LEXERTEST
@@ -12,6 +14,157 @@
 
 using namespace std;
 
+map<string, double> ints_map;
+map<string, string> string_map;
+
+class Number
+{
+public:
+    double value;
+
+    Number()
+    {
+        value = 0;
+    }
+    Number added(Number other)
+    {
+        Number tmp;
+        tmp.value = value + other.value;
+        return tmp;
+    }
+    Number subtracted(Number other)
+    {
+        Number tmp;
+        tmp.value = value - other.value;
+        return tmp;
+    }
+    Number multiplied(Number other)
+    {
+        Number tmp;
+        tmp.value = value * other.value;
+        return tmp;
+    }
+    Number divided(Number other)
+    {
+        if (value != 0)
+        {
+            Number tmp;
+            // cout << "value on divide" << value << endl;
+            tmp.value = (other.value) / value;
+
+            return tmp;
+        }
+        else
+        {
+            cout << "CANNOT DIVIDE BY 0" << endl;
+            exit(0);
+        }
+    }
+    Number unary_m(double other)
+    {
+        Number tmp;
+        tmp.value = (-1) * other;
+        return tmp;
+    }
+};
+class Interpreter
+{
+public:
+    Interpreter(){};
+
+    Number visit(astptr node)
+    {
+        switch (node->asttype)
+        {
+        case n_integer:
+            return visit_number(*node);
+            break;
+        case n_id:
+            return visit_id(*node);
+            break;
+        case n_plus:
+            return visit_plus(*node);
+            break;
+        case n_minus:
+            return visit_minus(*node);
+            break;
+        case n_uminus:
+            return visit_unarym(*node);
+            break;
+        case n_mul:
+            return visit_mult(*node);
+            break;
+        case n_div:
+            return visit_divide(*node);
+            break;
+        default:
+            break;
+        }
+    }
+    Number visit_number(astnode node)
+    {
+        Number tmp;
+        tmp.value = stod(node.astdata);
+        // cout << stod(node.astdata) << endl;
+        return tmp;
+
+        cout << "found number node data : " << node.astdata << endl;
+    }
+    Number visit_id(astnode node)
+    {
+        cout << "found id node data : " << node.astdata << endl;
+    }
+
+    Number visit_plus(astnode node)
+    {
+        cout << "found plus node" << endl;
+        Number l = visit(node.p1);
+        Number r = visit(node.p2);
+        Number tmp;
+        tmp.value = l.added(r).value;
+        cout << tmp.value << endl;
+        return tmp;
+    }
+    Number visit_minus(astnode node)
+    {
+        cout << "found minus node" << endl;
+        Number l = visit(node.p1);
+        Number r = visit(node.p2);
+        Number tmp;
+        tmp.value = l.subtracted(r).value;
+        cout << tmp.value << endl;
+        return tmp;
+    }
+    Number visit_unarym(astnode node)
+    {
+        /* cout << "found unary node" << endl;
+        Number tmp;
+        double tmp1 = stod(node.astdata);
+        tmp.value = tmp.unary_m(tmp1);*/
+    }
+    Number visit_mult(astnode node)
+    {
+        cout << "found multiply node" << endl;
+        Number l = visit(node.p2);
+        Number r = visit(node.p1);
+
+        Number tmp;
+        tmp.value = l.multiplied(r).value;
+        cout << tmp.value << endl;
+        return tmp;
+    }
+    Number visit_divide(astnode node)
+    {
+        cout << "found divide node" << endl;
+        Number l = visit(node.p2);
+        Number r = visit(node.p1);
+
+        Number tmp;
+        tmp.value = l.divided(r).value;
+        cout << tmp.value << endl;
+        return tmp;
+    }
+};
 
 
 int main(int argc, const char *argv[]) {
