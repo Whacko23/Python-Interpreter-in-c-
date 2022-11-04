@@ -471,7 +471,7 @@ astptr booleanoperation(){
 
 astptr parser(){
     
-    return statements();
+    return printstatement();
 };
 
 void printParserTree(astptr head){
