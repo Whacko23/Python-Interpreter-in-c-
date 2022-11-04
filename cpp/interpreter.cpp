@@ -130,6 +130,11 @@ void interpret(astptr head)
             interpret(right);
             cout << " " << identifier;
         }
+        else if (right->asttype == n_id)
+        {
+
+            cout << int_indefiers[right->astdata] << endl;
+        }
         break;
     case n_print:
         left = head->p1;
@@ -142,6 +147,10 @@ void interpret(astptr head)
         {
             interpret(left);
             cout << " " << identifier;
+        }
+        else if (n_id)
+        {
+            cout << int_indefiers[left->astdata] << endl;
         }
         break;
     }
