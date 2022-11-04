@@ -45,6 +45,7 @@ typedef enum {
     n_while,
     //If
     n_if,
+    n_ifelse,
     //Error
     n_error,
     n_empty,
@@ -73,6 +74,7 @@ extern astptr compound_stmt();
 
 
 
+extern astptr combinedexpression();
 extern astptr assignment();
 extern astptr ifstatement();
 extern astptr whilestatement();

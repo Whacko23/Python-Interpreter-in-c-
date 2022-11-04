@@ -115,13 +115,20 @@ block statement: block <statement>
 astptr blockstatement(){
     astptr pfirst;
     int current_indent = 0;
+
     while (true){
+
+
        if(currenttoken!=whitespacesym) break;
        currenttoken = lexer();
        current_indent++;
+
     }
+
     if(current_indent==0) return newnode(n_error,"No block",NULL,NULL,NULL);
+
     pfirst = statement();
+
     return newnode(n_block_stmt,to_string(current_indent), pfirst, NULL, NULL);
 };
 
@@ -129,6 +136,7 @@ astptr blockstatement(){
 <blockstatements> ::= <block statement> | <block statements>
 */
 astptr blockstatements(){
+
     astptr pfirst = blockstatement();
     string firstdata = pfirst->astdata;
     string seconddata = "";
@@ -147,7 +155,6 @@ astptr blockstatements(){
             pfirst = newnode(n_block_stmts, seconddata, pfirst, psecond, NULL);
         }
     }
-    
     return pfirst;
 };
 
@@ -181,7 +188,12 @@ astptr argumentlist(){
 
 };
 
+/*
+<combinedexpression> = list | expression | string
+*/
+astptr combinedexpression(){
 
+}
 
 /*
 <expr> -> [+ | -]<term> {(+ | -) <term>} 
@@ -332,8 +344,21 @@ astptr ifstatement(){
         if(currenttoken != colonsym){
             //TODO Error expected ':' after if
         } else {
+            currenttoken = lexer();
+            if (currenttoken==newlinesym) currenttoken=lexer();
             pfirst = blockstatements();
-            cout << currenttoken << endl;
+            if (currenttoken == elsesym){
+                currenttoken = cleanLexer();
+                if(currenttoken == colonsym){
+
+                }else{
+                    //TODO Missing colon
+                }
+
+            } else {
+                pfirst = newnode(n_if, "", bexp, pfirst, NULL);
+            }
+
         }
     }
     return pfirst;
@@ -384,20 +409,16 @@ astptr printstatement(){
         } else {
             currenttoken = cleanLexer();
             expr = expression();
+            if(currenttoken == doublequotesym || currenttoken == singlequotesym) currenttoken = cleanLexer();
             pfirst = newnode(n_print,"print",expr,NULL, NULL);
-            if(currenttoken == commasym){
 
-                currenttoken == cleanLexer();
-                while(currenttoken != closebracketsym){
-                    
-                    if (tracker == lineInput.length() - 1 || currenttoken == closebracketsym) {
-                    expr = expression();
-                    printParserTree(expr);
-                    pfirst = newnode(n_prints,"",pfirst,expr, NULL);
-                        break;
-                    }
-                }
+            while(currenttoken == commasym){
+                currenttoken = cleanLexer();
+                expr = expression();
+                pfirst = newnode(n_prints,"",pfirst,expr, NULL);
+                
             }
+
             if(currenttoken != closebracketsym){
                 //TODO Expected ')'
             } else {
@@ -437,7 +458,8 @@ astptr booleanoperation(){
 }
 
 astptr parser(){
-    return statements();
+    
+    return ifstatement();
 };
 
 void printParserTree(astptr head){
