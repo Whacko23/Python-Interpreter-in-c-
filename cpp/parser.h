@@ -46,9 +46,11 @@ typedef enum {
     //If
     n_if,
     //Error
+    n_error,
     n_empty,
     n_def,
     n_block_stmt,
+    n_block_stmts,
 
 } nodetype;
 
@@ -75,6 +77,7 @@ extern astptr assignment();
 extern astptr ifstatement();
 extern astptr whilestatement();
 extern astptr blockstatement();
+extern astptr blockstatements();
 extern astptr printstatement();
 extern astptr returnstatement();
 extern astptr expressiont();

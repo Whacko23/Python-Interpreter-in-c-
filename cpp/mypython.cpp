@@ -197,8 +197,7 @@ int main(int argc, const char *argv[]) {
                     case lessorequalsym: cout << "Less than or equal token "  << endl; break;
                     case lessthansym: cout << "Less than token "  << endl; break;
                     case greaterthansym: cout << "Greater than token "  << endl; break;
-                    case newlinesym: cout << "  New line "  << endl; break;
-                    
+                    case newlinesym: cout << "  New line "  << endl; break;  
                 }
     */
 

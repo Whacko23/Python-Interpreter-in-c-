@@ -22,7 +22,8 @@ astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third){
 */
 astptr statements(){
     astptr pfirst = statement();
-    while(currenttoken!=eofsym){
+    while(true){
+        if(currenttoken == eofsym)break;
         if(currenttoken == newlinesym){
             currenttoken = cleanLexer();
             pfirst = newnode(n_statements, "", pfirst, statement(), NULL);
@@ -108,11 +109,12 @@ astptr whilestatement(){
 };
 
 /*
-block:
+block statement:
     | NEWLINE INDENT statements DEDENT 
     | simple_stmts
 
 */
+/*
 astptr blockstatement(){
     astptr pfirst;
     int current_indent;
@@ -135,6 +137,39 @@ astptr blockstatement(){
     }
 
 };
+*/
+
+/*
+block statement: block <statement>
+
+*/
+astptr blockstatement(){
+    astptr pfirst;
+    int current_indent = 0;
+    while (true){
+        currenttoken = lexer();
+       if(currenttoken!=whitespacesym) break;
+       current_indent++;
+    }
+    if(current_indent==0) return newnode(n_error,"No block",NULL,NULL,NULL);
+    pfirst = statement();
+    return newnode(n_block_stmt,to_string(current_indent), pfirst, NULL, NULL);
+};
+
+/*
+<blockstatements> ::= <block statement> | <block statements>
+*/
+astptr blockstatements(){
+    astptr pfirst = blockstatement();
+    while(currenttoken!=eofsym){
+        if(currenttoken == newlinesym){
+            currenttoken = cleanLexer();
+            pfirst = newnode(n_block_stmts, "", pfirst, blockstatement(), NULL);
+        }
+    }
+    return pfirst;
+};
+
 
 astptr returnstatement(){
     return newnode(n_empty, "", NULL, NULL, NULL);
@@ -349,19 +384,20 @@ astptr printstatement(){
             if(currenttoken == commasym){
 
                 currenttoken == cleanLexer();
-                    while(currenttoken != closebracketsym){
-                        
-                        if (tracker == lineInput.length() - 1 || currenttoken == closebracketsym) {
-
-                        expr = expression();
-                        printParserTree(expr);
-                        pfirst = newnode(n_prints,"",pfirst,expr, NULL);
-                            break;
-                        }
+                while(currenttoken != closebracketsym){
+                    
+                    if (tracker == lineInput.length() - 1 || currenttoken == closebracketsym) {
+                    expr = expression();
+                    printParserTree(expr);
+                    pfirst = newnode(n_prints,"",pfirst,expr, NULL);
+                        break;
                     }
+                }
             }
             if(currenttoken != closebracketsym){
                 //TODO Expected ')'
+            } else {
+                currenttoken = cleanLexer();
             }
         }
     }
@@ -397,7 +433,7 @@ astptr booleanoperation(){
 }
 
 astptr parser(){
-    return statements();
+    return blockstatements();
 };
 
 void printParserTree(astptr head){
@@ -410,7 +446,7 @@ void printParserTree(astptr head){
         case n_plus: case n_minus: 
         case n_div: case n_mul:
         case n_statements: case n_while:
-        case n_prints:
+        case n_prints: case n_block_stmts:
             cout << head->astdata << " ";
             left = head->p1;
             right = head->p2;
@@ -445,12 +481,12 @@ void freeMemory(astptr head){
 
      switch(head->asttype){
         case n_id: case n_integer: 
-        case n_empty: 
+        case n_empty: case n_error:
             delete head; break;
         case n_plus: case n_minus: 
         case n_div: case n_mul:
         case n_statements: case n_while:
-        case n_prints:
+        case n_prints: case n_block_stmts:
             left = head->p1;
             right = head->p2;
             delete head;
