@@ -108,51 +108,21 @@ astptr whilestatement(){
     return pwhile;
 };
 
-/*
-block statement:
-    | NEWLINE INDENT statements DEDENT 
-    | simple_stmts
-
-*/
-/*
-astptr blockstatement(){
-    astptr pfirst;
-    int current_indent;
-    if (currenttoken == newlinesym){
-        currenttoken = cleanLexer();
-        if(currenttoken == blocksym){
-            current_indent = 2;
-            currenttoken = lexer();
-            while(currenttoken == whitespacesym || currenttoken == blocksym){
-                if(currenttoken == whitespacesym) current_indent ++; else current_indent += 2;
-                currenttoken = lexer();
-            }
-            pfirst = newnode(n_block_stmt, to_string(current_indent), statements(), NULL, NULL);
-        } else {
-            //TODO IndentationError: expected an indented block
-        }
-    } else {
-        pfirst = newnode(n_simple_stmt, "", simple_stmt(), NULL,NULL);
-        return pfirst;
-    }
-
-};
-*/
 
 /*
 block statement: block <statement>
-
 */
 astptr blockstatement(){
     astptr pfirst;
     int current_indent = 0;
     while (true){
-        currenttoken = lexer();
        if(currenttoken!=whitespacesym) break;
+       currenttoken = lexer();
        current_indent++;
     }
     if(current_indent==0) return newnode(n_error,"No block",NULL,NULL,NULL);
     pfirst = statement();
+    cout << currenttoken <<endl;
     return newnode(n_block_stmt,to_string(current_indent), pfirst, NULL, NULL);
 };
 
@@ -161,15 +131,22 @@ astptr blockstatement(){
 */
 astptr blockstatements(){
     astptr pfirst = blockstatement();
+    string firstdata = pfirst->astdata;
+    string seconddata = "";
+    int findent = stoi(firstdata);
+    int sindent =0;
     astptr psecond;
-    int i = 0;
-    cout << "Printed " << currenttoken << endl;
     while(true){
+        cout << currenttoken << endl;
         if(currenttoken == eofsym)break;
         if(currenttoken == newlinesym){
             currenttoken = lexer();
             psecond = blockstatement();
-            pfirst = newnode(n_block_stmts, "", pfirst, psecond, NULL);
+            seconddata = psecond->astdata;
+            sindent = stoi(seconddata);
+            if(sindent!=findent) cout <<"IndentationError: unexpected indent"<<endl;
+            //TODO IndentationError: unexpected indent
+            pfirst = newnode(n_block_stmts, seconddata, pfirst, psecond, NULL);
         }
     }
     
@@ -296,9 +273,10 @@ astptr factor(){
 }
 
 /* if statement
-<ifstmt> -> if <boolexpr> <statement> [else <statement>]
+<ifstmt> -> if <boolexpr> colon <block statement> [else <statement>]
 //TODO <ifstmt> -> if (<boolexpr>) <statement> [else <statement>] --> Add () around boolexpr
 */
+/*
 astptr ifstatement(){
     astptr pfirst = NULL, bexp = NULL, elsee = NULL;
     if (currenttoken != ifsym){
@@ -338,8 +316,30 @@ astptr ifstatement(){
     }
     return newnode(n_if, "", bexp, pfirst, elsee);
 }
+*/
 
 
+/* if statement
+<ifstmt> -> if <boolexpr> colon <block statement> [else <statement>]
+//TODO <ifstmt> -> if (<boolexpr>) <statement> [else <statement>] --> Add () around boolexpr
+*/
+astptr ifstatement(){
+    astptr pfirst = NULL, bexp = NULL, elsee = NULL;
+    int currentindent=0;
+    if (currenttoken != ifsym){
+        //TODO Errror not an if ststaement
+    } else {
+        currenttoken = cleanLexer();
+        bexp = booleanexpression();
+        if(currenttoken != colonsym){
+            //TODO Error expected ':' after if
+        } else {
+            pfirst = blockstatements();
+            cout << currenttoken << endl;
+        }
+    }
+    return pfirst;
+}
 /* assign statement
 <assignment> -> identifier = {<experssion> | <list>}
 */
