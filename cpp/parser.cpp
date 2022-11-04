@@ -137,6 +137,7 @@ astptr blockstatement(){
 astptr blockstatements(){
 
     astptr pfirst = blockstatement();
+
     if(pfirst->asttype==n_empty) return newnode(n_empty,"",NULL,NULL,NULL);
 
     string firstdata = pfirst->astdata;
@@ -148,7 +149,10 @@ astptr blockstatements(){
         if(currenttoken == eofsym)break;
         if(currenttoken == newlinesym){
             currenttoken = lexer();
+            if(currenttoken != whitespacesym) break;
             psecond = blockstatement();
+
+            
             seconddata = psecond->astdata;
             if(psecond->asttype==n_block_stmt || psecond->asttype==n_block_stmts){
                 sindent = stoi(seconddata);
@@ -347,11 +351,17 @@ astptr ifstatement(){
         } else {
             currenttoken = lexer();
             if (currenttoken==newlinesym) currenttoken=lexer();
+
+
             pfirst = blockstatements();
+
             if (currenttoken == elsesym){
                 currenttoken = cleanLexer();
                 if(currenttoken == colonsym){
-
+                    currenttoken = lexer();
+                    if (currenttoken==newlinesym) currenttoken=lexer();
+                    elsee = blockstatements();
+                    pfirst = newnode(n_ifelse, "", bexp, pfirst, elsee);
                 }else{
                     //TODO Missing colon
                 }
