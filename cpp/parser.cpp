@@ -481,7 +481,8 @@ void printParserTree(astptr head){
     switch(head->asttype){
         case n_id: case n_integer: 
         case n_string:
-            cout << head->astdata << " "; break;
+            cout << head->astdata << " ";
+            cout << "*leaf* " << endl; break;
         case n_plus: case n_minus: 
         case n_div: case n_mul:
         case n_statements: case n_while:
@@ -490,31 +491,41 @@ void printParserTree(astptr head){
             cout << head->astdata << " ";
             left = head->p1;
             right = head->p2;
+            cout << "left " << endl;
             printParserTree(left);
+            cout << "right " << endl;
             printParserTree(right); break;
         case n_block_stmts:
             left = head->p1;
             right = head->p2;
+            cout << "left " << endl;
             printParserTree(left);
+            cout << "right " << endl;
             printParserTree(right); break;
         case n_statement: case n_block_stmt:
         case n_simple_stmt:
             left = head->p1;
+            cout << "down " << endl;
             printParserTree(left); break;
         case n_ifelse: 
             left = head->p1;
             mid = head->p2;
             right = head->p3;
+            cout << "left " << endl;
             printParserTree(left);
+            cout << "mid " << endl;
             printParserTree(mid);
+            cout << "right " << endl;
             printParserTree(right); break;
         case n_assignment_list: case n_assignment_int:
             cout << head->astdata << " = ";
             left = head->p1;
+            cout << "down " << endl;
             printParserTree(left); break;
         case n_print:
             left = head->p1;
             cout << head->astdata << " ";
+            cout << "down" << endl;
             printParserTree(left); break;
    
     }

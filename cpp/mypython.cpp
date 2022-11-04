@@ -151,12 +151,14 @@ int main(int argc, const char *argv[]) {
         #ifdef ASTTEST
         currenttoken = lexer();
         astptr parseetree = parser();
-        printParserTree(parseetree);
+        // printParserTree(parseetree);
+        // cout << " ---Parse tree done---" << endl;                
+
 
         interpret(parseetree);
         
         freeMemory(parseetree); 
-        cout << " ---Endl" << endl;                
+        cout << " ---End of program---" << endl;                
         #endif
 
     } else {

@@ -26,13 +26,37 @@ void interpret(astptr head){
             temp = temp + intvalue; 
             intvalue = temp; break;
         case n_minus: 
-        case n_div: case n_mul:
-
-            cout << head->astdata << " ";
+            temp = 0;
             left = head->p1;
             right = head->p2;
             interpret(left);
-            interpret(right); break;
+            temp = temp + intvalue;
+            interpret(right);
+            temp = temp - intvalue; 
+            intvalue = temp; break;
+        case n_div: 
+            temp = 0;
+            left = head->p1;
+            right = head->p2;
+            interpret(left);
+            temp = temp + intvalue;
+            interpret(right);
+            if(intvalue==0){
+              cout << "ZeroDivisionError: division by zero" << endl;
+              //TODO error.log
+            } else {
+              temp = temp / intvalue;              
+            }
+            intvalue = temp; break;       
+        case n_mul:
+            temp = 0;
+            left = head->p1;
+            right = head->p2;
+            interpret(left);
+            temp = temp + intvalue;
+            interpret(right);
+            temp = temp * intvalue; 
+            intvalue = temp; break;
         case n_statements: case n_while:
         case n_if:
             cout << head->astdata << " ";
@@ -64,10 +88,10 @@ void interpret(astptr head){
             left = head->p1;
             right = head->p2;
             interpret(left);
-            if(right->asttype == n_integer){
+            if(right->asttype == n_integer|| right->asttype == n_plus ||right->asttype == n_minus ||right->asttype == n_mul ||right->asttype == n_div){
                 interpret(right);
                 cout << " " << intvalue;
-            } else if (right->asttype == n_string){
+            } else if (right->asttype == n_string ){
                 interpret(right);
                 cout << " " << identifier;
             }
