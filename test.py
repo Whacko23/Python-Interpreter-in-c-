@@ -1,6 +1,4 @@
-#x = 1
-x = 1
-#y = 2
-y = 2
-z = x+y
-print(z)
+if 2!=3:
+  print("ture")
+else:
+  print("false")
