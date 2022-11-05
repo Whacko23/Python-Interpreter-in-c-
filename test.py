@@ -1,4 +1,3 @@
-if 2!=3:
-  print("ture")
-else:
-  print("false")
+x = 2
+x = x + 10
+print(x)

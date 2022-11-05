@@ -58,7 +58,7 @@ void interpret(astptr head)
 
     nodetype current_dataytpe;
     
-
+    // cout << "Datatype " << head->asttype << " Data " << head->astdata << endl;
     switch (head->asttype)
     {
     case n_eq:
@@ -134,6 +134,11 @@ void interpret(astptr head)
         break;
     case n_statements:
     case n_while:
+        left = head->p1;
+        right = head->p2;
+        interpret(left);
+        interpret(right);
+        break;
     case n_if:
         // cout << head->astdata << " ";
         left = head->p1;
