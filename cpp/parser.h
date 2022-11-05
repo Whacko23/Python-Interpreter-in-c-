@@ -5,9 +5,8 @@
 #include <string>
 using namespace std;
 
-
-
-typedef enum {
+typedef enum
+{
     n_statements,
     n_statement,
     n_assignment_list,
@@ -17,37 +16,38 @@ typedef enum {
     n_booleanexp,
     n_print,
     n_prints,
-    //Unary operator
+    // Unary operator
     n_uminus,
-    //Arithmetic operator
+    // Arithmetic operator
     n_plus,
     n_minus,
     n_mul,
     n_div,
-    //Relational operator
+    // Relational operator
     n_eq,
     n_ne,
     n_lt,
     n_le,
     n_gt,
     n_ge,
-    //Integer
+    // Integer
     n_integer,
     n_string,
-    //Variable
+    n_list,
+    // Variable
     n_id,
-    //Function call,
+    // Function call,
     n_fcall,
-    //Argument list
+    // Argument list
     n_args,
-    //Return statement
+    // Return statement
     n_return,
-    //While
+    // While
     n_while,
-    //If
+    // If
     n_if,
     n_ifelse,
-    //Error
+    // Error
     n_error,
     n_empty,
     n_def,
@@ -56,13 +56,13 @@ typedef enum {
 
 } nodetype;
 
-
 typedef struct tnode *astptr;
 
-typedef struct tnode {
+typedef struct tnode
+{
     nodetype asttype;
     string astdata;
-    astptr p1,p2,p3;
+    astptr p1, p2, p3;
 } astnode;
 
 extern astptr newnode(nodetype n, int s, astptr first, astptr second, astptr third);
@@ -72,8 +72,6 @@ extern astptr statements();
 extern astptr statement();
 extern astptr simple_stmt();
 extern astptr compound_stmt();
-
-
 
 extern astptr combinedexpression();
 extern astptr assignment();
@@ -95,11 +93,7 @@ extern astptr booleanexpression();
 extern astptr booleanoperation();
 extern astptr parser();
 
-
-
 extern void printParserTree(astptr head);
 extern void freeMemory(astptr head);
-
-
 
 #endif

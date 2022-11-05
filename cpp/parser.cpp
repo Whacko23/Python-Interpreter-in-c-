@@ -5,6 +5,10 @@
 #include "parser.h"
 #include "lexer.h"
 #include "log.h"
+#include <vector>
+#include <string>
+vector<int> int_vector;
+vector<string> string_vector;
 
 astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third)
 {
@@ -206,7 +210,45 @@ astptr returnstatement()
 // NOTE the previous function (assignment) has already checked for [] brackets
 astptr list()
 {
-    return newnode(n_empty, "", NULL, NULL, NULL);
+    if (currenttoken == opensquaresym)
+    {
+        currenttoken = cleanLexer();
+        if (currenttoken == intsym)
+        {
+            while (true)
+            {
+
+                if (currenttoken == eofsym)
+                {
+                    break;
+                }
+                if (currenttoken == newlinesym)
+                {
+                    currenttoken = cleanLexer();
+                    break;
+                }
+                int_vector.push_back(intvalue);
+                currenttoken = cleanLexer();
+
+                if (currenttoken == closesquaresym)
+                {
+                    currenttoken = cleanLexer();
+                    break;
+                }
+                if (currenttoken != commasym || currenttoken != closesquaresym)
+                {
+                    cout << "Error in list function checking for comma or closed bracket" << endl;
+                    // Display error
+                    break;
+                }
+                currenttoken = cleanLexer();
+            }
+        }
+        else if (currenttoken == doublequotesym || currenttoken == singlequotesym)
+        {
+        }
+    }
+    return newnode(n_list, "", NULL, NULL, NULL);
 };
 
 /*
@@ -338,7 +380,7 @@ astptr factor()
     }
     else
     {
-        if (currenttoken == openbracketsym)
+        if (currenttoken == opensquaresym)
         {
             currenttoken = cleanLexer();
             pfirst = expression();
