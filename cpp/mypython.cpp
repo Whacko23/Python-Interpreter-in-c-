@@ -39,7 +39,7 @@ int main(int argc, const char *argv[])
             getline(file, lineInput);
 
             // DEEBUG
-            cout << "     Current line = " << lineInput << endl;
+            // cout << "     Current line = " << lineInput << endl;
 
             tracker = -1;
             ch = getch();
@@ -302,13 +302,13 @@ int main(int argc, const char *argv[])
 #ifdef ASTTEST
         currenttoken = lexer();
         astptr parseetree = parser();
-        printParserTree(parseetree);
-        cout << " ---Parse tree done---" << endl;
-
+        // printParserTree(parseetree);
+        // cout << " ---Parse tree done---" << endl;
+// 
         interpret(parseetree);
 
         freeMemory(parseetree);
-        cout << " ---End of program---" << endl;
+        // cout << " ---End of program---" << endl;
 #endif
     }
     else

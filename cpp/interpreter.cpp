@@ -15,10 +15,6 @@ void interpret(astptr head)
     astptr left, right, mid;
     int temp;
     string save_id;
-    int bleft;
-    int bright;
-    nodetype boolean_expression;
-    bool flag = false;
 
     switch (head->asttype)
     {
@@ -26,12 +22,12 @@ void interpret(astptr head)
         intvalue = stoi(head->astdata);
         break;
     case n_string:
-
     case n_id:
         identifier = head->astdata;
-        cout << "identofier in switch: " << identifier << endl;
+        // cout << "identofier in switch: " << identifier << endl;
         intvalue = int_indefiers[identifier];
-        cout << "int  in switch: " << intvalue << endl;
+        // cout << "int  in switch: " << intvalue << endl;
+
         break;
     case n_plus:
         temp = 0;
@@ -84,53 +80,11 @@ void interpret(astptr head)
     case n_statements:
     case n_while:
     case n_if:
-        cout << head->astdata << " ";
+        // cout << head->astdata << " ";
         left = head->p1;
         right = head->p2;
         interpret(left);
-        boolean_expression = left->p3->asttype;
-        cout << "boolean exp" << boolean_expression << endl;
-        switch (boolean_expression)
-        {
-        case n_eq:
-            if (left->p1->astdata == left->p2->astdata)
-            {
-                flag = true;
-            }
-        case n_gt:
-            if (left->p1->asttype == n_integer)
-            {
-                bleft = stoi(left->p1->astdata);
-            }
-            if (left->p2->asttype == n_integer)
-            {
-                bright = stoi(left->p2->astdata);
-            }
-            if (bleft > bright)
-            {
-                flag = true;
-            }
-        case n_lt:
-            if (left->p1->asttype == n_integer)
-            {
-                bleft = stoi(left->p1->astdata);
-            }
-            if (left->p2->asttype == n_integer)
-            {
-                bright = stoi(left->p2->astdata);
-            }
-            if (bleft < bright)
-            {
-                flag = true;
-            }
-        default:
-            break;
-        }
-        if (flag == true)
-        {
-            interpret(right);
-            flag = false;
-        }
+        interpret(right);
         break;
     case n_block_stmts:
         left = head->p1;
@@ -145,9 +99,6 @@ void interpret(astptr head)
         interpret(left);
         break;
     case n_ifelse:
-        cout << head->astdata << " ";
-
-    case n_booleanexp:
         left = head->p1;
         mid = head->p2;
         right = head->p3;
@@ -163,7 +114,7 @@ void interpret(astptr head)
         save_id = identifier;
         interpret(left);
         int_indefiers[save_id] = intvalue;
-        cout << save_id << " = " << int_indefiers[save_id] << endl;
+        // cout << save_id << " = " << int_indefiers[save_id] << endl;
         break;
     case n_prints:
         left = head->p1;
@@ -195,7 +146,7 @@ void interpret(astptr head)
         else if (left->asttype == n_string)
         {
             interpret(left);
-            cout << " " << identifier;
+            cout << identifier;
         }
         else if (n_id)
         {

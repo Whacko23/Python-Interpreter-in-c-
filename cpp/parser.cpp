@@ -570,7 +570,7 @@ astptr booleanoperation()
     {
     case equalsym:
         currenttoken = cleanLexer();
-        return newnode(n_eq, "==", NULL, NULL, NULL);
+        return newnode(n_eq, "=", NULL, NULL, NULL);
         break;
     case notequalsym:
         currenttoken = cleanLexer();
@@ -613,12 +613,6 @@ void printParserTree(astptr head)
     case n_id:
     case n_integer:
     case n_string:
-    case n_eq:
-    case n_ne:
-    case n_ge:
-    case n_gt:
-    case n_lt:
-    case n_le:
         cout << head->astdata << " ";
         cout << "*leaf* " << endl;
         break;
@@ -654,7 +648,6 @@ void printParserTree(astptr head)
         printParserTree(left);
         break;
     case n_ifelse:
-    case n_booleanexp:
         left = head->p1;
         mid = head->p2;
         right = head->p3;
@@ -680,6 +673,7 @@ void printParserTree(astptr head)
         break;
     }
 }
+
 void freeMemory(astptr head)
 {
     astptr left, right, mid;
@@ -691,12 +685,6 @@ void freeMemory(astptr head)
     case n_empty:
     case n_error:
     case n_string:
-    case n_eq:
-    case n_ne:
-    case n_ge:
-    case n_gt:
-    case n_lt:
-    case n_le:
         delete head;
         break;
     case n_plus:
@@ -722,7 +710,6 @@ void freeMemory(astptr head)
         freeMemory(left);
         break;
     case n_ifelse:
-    case n_booleanexp:
         left = head->p1;
         mid = head->p2;
         right = head->p3;
