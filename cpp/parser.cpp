@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 
-#define DEEBUG
+// #define DEEBUG
 
 
 int grammar_tracker = 1;
@@ -272,12 +272,20 @@ astptr blockstatements()
     {
         #ifdef DEEBUG
         cout << grammar_tracker<< " ---inside  block stmts loop---" << endl;
+        
         grammar_tracker++;
         #endif
         
         if (currenttoken == eofsym){
                 #ifdef DEEBUG
                 cout << grammar_tracker << " ---exit block stmt loop by eof ----" << endl;
+                grammar_tracker++;
+                #endif
+            break;
+        }
+        if (currenttoken == elsesym){
+                #ifdef DEEBUG
+                cout << grammar_tracker << " ---exit block stmt loop by else ----" << endl;
                 grammar_tracker++;
                 #endif
             break;
