@@ -10,6 +10,9 @@ map<string, string> string_identifiers;
 map<string, vector<double>> vector_identifiers;
 
 bool flag = false;
+bool newline = false;
+int previous_line = 1;
+int current_line = 1;
 
 bool boolean_evaluate_int(int l, int r, nodetype n){
     if(n == n_eq){
@@ -68,7 +71,11 @@ void interpret(astptr head)
     case n_le:
     case n_ge:
         current_dataytpe = head->asttype;
-    break;
+        break;
+    case n_newline:
+        left = head->p1;
+        interpret(left);
+        break;
     case n_integer:
         intvalue = stoi(head->astdata);
         current_dataytpe= n_integer;
@@ -153,6 +160,10 @@ void interpret(astptr head)
         interpret(right);
         break;
     case n_statement:
+        current_line = stoi(head->astdata);
+        left = head->p1;
+        interpret(left);
+        break;
     case n_block_stmt:
     case n_simple_stmt:
         left = head->p1;
@@ -212,16 +223,19 @@ void interpret(astptr head)
         // cout << save_id << " = " << int_indefiers[save_id] << endl;
         break;
     case n_prints:
+        newline = false;
         left = head->p1;
         right = head->p2;
         interpret(left);
         if (right->asttype == n_integer || right->asttype == n_plus || right->asttype == n_minus || right->asttype == n_mul || right->asttype == n_div)
-        {
+        {   
+            newline=true;
             interpret(right);
             cout << " " << intvalue;
         }
         else if (right->asttype == n_string)
-        {
+        {   
+            newline=true;
             interpret(right);
             cout << " " << identifier;
         }
@@ -233,6 +247,10 @@ void interpret(astptr head)
         break;
     case n_print:
         left = head->p1;
+        if(current_line!=previous_line){
+            cout<<endl;
+            previous_line==current_line;
+        }
         if (left->asttype == n_integer || left->asttype == n_plus || left->asttype == n_minus || left->asttype == n_mul || left->asttype == n_div)
         {
             interpret(left);

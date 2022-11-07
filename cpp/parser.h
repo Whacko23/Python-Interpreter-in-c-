@@ -16,6 +16,7 @@ typedef enum
     n_booleanexp,
     n_print,
     n_prints,
+    n_newline,
     // Unary operator
     n_uminus,
     // Arithmetic operator

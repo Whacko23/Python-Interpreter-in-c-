@@ -66,7 +66,8 @@ extern int tracker;
 extern int linenumber;
 extern bool firstline;
 
-
+//Used by interpreter
+extern bool newline;
 
 
 //Variable to store the last identifier encountered by lexer. Error symbol also uses the same variable
@@ -76,7 +77,8 @@ extern lextokens currenttoken;
 
 //Variable to store the last integer value encountered by the lexer
 extern int intvalue;
-//
+
+//Used by main
 extern string lineInput;
 
 extern char getch();

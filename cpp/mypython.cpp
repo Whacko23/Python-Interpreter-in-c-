@@ -10,6 +10,7 @@
 
 // #define LEXERTEST
 #define ASTTEST
+#define DEBUG
 
 using namespace std;
 
@@ -38,8 +39,9 @@ int main(int argc, const char *argv[])
             // Taking each line of the file as a string input
             getline(file, lineInput);
 
-            // DEEBUG
-            // cout << "     Current line = " << lineInput << endl;
+            #ifdef DEBUG
+            cout << "     Current line = " << lineInput << endl;
+            #endif
 
             tracker = -1;
             ch = getch();
@@ -301,9 +303,15 @@ int main(int argc, const char *argv[])
 
 #ifdef ASTTEST
         currenttoken = lexer();
+        #ifdef DEBUG
+        cout << " -------behind lexer-------" << endl;
+        #endif
         astptr parseetree = parser();
-        // printParserTree(parseetree);
-        // cout << " ---Parse tree done---" << endl;
+        #ifdef DEBUG
+        cout << " -------behind parser-------" << endl;
+        printParserTree(parseetree);
+        cout << " -------Parse tree done-------" << endl;
+        #endif
 
         interpret(parseetree);
 
