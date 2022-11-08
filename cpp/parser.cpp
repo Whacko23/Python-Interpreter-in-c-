@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 
-// #define DEEBUG
+#define DEEBUG
 
 
 int grammar_tracker = 1;
@@ -181,7 +181,7 @@ astptr whilestatement()
 
     astptr pbexp = NULL;
     astptr pwhile = NULL;
-    int currentline;
+    // int currentline;
 
     if (currenttoken != whilesym)
     {
@@ -193,7 +193,7 @@ astptr whilestatement()
         pbexp = booleanexpression();
         if (currenttoken == colonsym)
         {
-            currentline = linenumber;
+            // currentline = linenumber;
             currenttoken = lexer();
             pwhile = newnode(n_while, "while", pbexp, blockstatement(), NULL);
         }
@@ -265,14 +265,15 @@ astptr blockstatements()
 
     string firstdata = pfirst->astdata;
     string seconddata = "";
-    int findent = stoi(firstdata);
-    int sindent = 0;
+    // int findent = stoi(firstdata);
+    // int sindent = 0;
     astptr psecond;
+    
     while (true)
     {
         #ifdef DEEBUG
         cout << grammar_tracker<< " ---inside  block stmts loop---" << endl;
-        
+        cout << currenttoken << " cuttnet " << endl;
         grammar_tracker++;
         #endif
         
@@ -309,7 +310,7 @@ astptr blockstatements()
             seconddata = psecond->astdata;
             if (psecond->asttype == n_block_stmt || psecond->asttype == n_block_stmts)
             {
-                sindent = stoi(seconddata);
+                // sindent = stoi(seconddata);
             }
             pfirst = newnode(n_block_stmts, seconddata, pfirst, psecond, NULL);
         }
@@ -392,12 +393,6 @@ astptr argumentlist()
     return newnode(n_empty, "", NULL, NULL, NULL);
 };
 
-/*
-<combinedexpression> = list | expression | string
-*/
-astptr combinedexpression()
-{
-}
 
 /*
 <expr> -> [+ | -]<term> {(+ | -) <term>}
@@ -549,55 +544,9 @@ astptr factor()
     return pfirst;
 }
 
-/* if statement
-<ifstmt> -> if <boolexpr> colon <block statement> [else <statement>]
-//TODO <ifstmt> -> if (<boolexpr>) <statement> [else <statement>] --> Add () around boolexpr
-*/
-/*
-astptr ifstatement(){
-    astptr pfirst = NULL, bexp = NULL, elsee = NULL;
-    if (currenttoken != ifsym){
-        //TODO Errror not an if ststaement
-    } else {
-        currenttoken = cleanLexer();
-        bexp = booleanexpression();
-        if(currenttoken != colonsym){
-            //TODO Error expected ':' after if
-        } else {
-            //NOTE Does this need to consume another lex token?
-            currenttoken = lexer();
-            //TODO Make this as a block statement instead of checking for blocksym
-            if(currenttoken != blocksym){
-                //TODO Error expected identation
-            } else {
-                //NOTE Does this need to consume another lex token?
-                currenttoken = cleanLexer();
-                pfirst = statement();
-                if(currenttoken == elsesym){
-                    currenttoken = cleanLexer();
-                    if(currenttoken != colonsym){
-                        //TODO Expected ':'
-                    } else {
-                        currenttoken = lexer();
-                        //TODO Make this as a block statement instead of checking for blocksym
-                        if(currenttoken != blocksym){
-                            //TODO expected identation
-                        } else {
-                            currenttoken = cleanLexer();
-                            elsee = statement();
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return newnode(n_if, "", bexp, pfirst, elsee);
-}
-*/
 
 /* if statement
 <ifstmt> -> if <boolexpr> colon <block statement> [else <statement>]
-//TODO <ifstmt> -> if (<boolexpr>) <statement> [else <statement>] --> Add () around boolexpr
 */
 astptr ifstatement()
 {
@@ -607,7 +556,7 @@ astptr ifstatement()
     #endif
 
     astptr pfirst = NULL, bexp = NULL, elsee = NULL;
-    int currentindent = 0;
+    // int currentindent = 0;
     if (currenttoken != ifsym)
     {
         // TODO Errror not an if ststaement
@@ -769,15 +718,27 @@ astptr printstatement()
 */
 astptr booleanexpression()
 {
+    bool brackettracker=false;
     #ifdef DEEBUG
     cout << grammar_tracker<< " ---inside  bool exp ---" << endl;
     grammar_tracker++;
     #endif
 
     astptr exp1, exp2, bexp;
+    if(currenttoken==openbracketsym){
+        brackettracker=true;
+        currenttoken=cleanLexer();
+    } 
     exp1 = expression();
     exp2 = booleanoperation();
     bexp = expression();
+    if(brackettracker){
+        if(currenttoken==closebracketsym){
+            currenttoken=cleanLexer();
+        } else{
+            //TODO "missing )"
+        }
+    }
     return newnode(n_booleanexp, "", exp1, bexp, exp2);
 };
 
@@ -819,6 +780,7 @@ astptr booleanoperation()
         return newnode(n_le, "<=", NULL, NULL, NULL);
         break;
     default:
+        return newnode(n_error, " ", NULL, NULL, NULL);
         break;
     }
 }

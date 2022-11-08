@@ -36,11 +36,11 @@ lextokens lext(){
     if (ch == '"'){
         identifier = "";
         ch = getch();
-        while(tracker < lineInput.length()){
+        while(tracker < (int)lineInput.length()){
             identifier = identifier + ch;
             ch = getch();
             if(ch == '"') break;
-            if(tracker == lineInput.length() - 1){
+            if(tracker == (int)lineInput.length() - 1){
                 //TODO SyntaxError: EOL while scanning string literal
                 cout << "SyntaxError: EOL while scanning string literal" << endl;
                 break;
@@ -53,11 +53,11 @@ lextokens lext(){
     if (ch == '\''){
         identifier = "";
         ch = getch();
-        while(tracker < lineInput.length()){
+        while(tracker < (int)lineInput.length()){
             identifier = identifier + ch;
             ch = getch();
             if(ch == '\'') break;
-            if(tracker == lineInput.length() - 1){
+            if(tracker == (int)lineInput.length() - 1){
                 //TODO SyntaxError: EOL while scanning string literal
                 cout << "SyntaxError: EOL while scanning string literal" << endl;
                 break;
