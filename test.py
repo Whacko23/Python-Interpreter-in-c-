@@ -1,7 +1,7 @@
 i=6
 
 if i <=5 :
-    if i == 1:
+    if (i == 1):
         if i == 2:
             print("A: ",i)
         else:
@@ -22,3 +22,4 @@ else:
             print("G: ",i)
         else:
             print("H: ",i)
+print(2)

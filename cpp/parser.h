@@ -12,14 +12,12 @@ typedef enum
     n_assignment_list,
     n_assignment_int,
     n_simple_stmt,
-    n_compount_stmt,
+    // n_compount_stmt,
     n_booleanexp,
     n_print,
     n_prints,
     n_newline,
-    // Unary operator
     n_uminus,
-    // Arithmetic operator
     n_plus,
     n_minus,
     n_mul,
@@ -31,24 +29,17 @@ typedef enum
     n_le,
     n_gt,
     n_ge,
-    // Integer
     n_integer,
     n_string,
     n_list,
     // Variable
     n_id,
-    // Function call,
-    n_fcall,
-    // Argument list
-    n_args,
-    // Return statement
-    n_return,
-    // While
+    // n_fcall,
+    // n_args,
+    // n_return,
     n_while,
-    // If
     n_if,
     n_ifelse,
-    // Error
     n_error,
     n_empty,
     n_def,

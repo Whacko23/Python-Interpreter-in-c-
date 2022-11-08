@@ -10,7 +10,6 @@ map<string, string> string_identifiers;
 map<string, vector<double>> vector_identifiers;
 
 bool flag = false;
-bool newline = false;
 int previous_line = 1;
 int current_line = 1;
 
@@ -223,25 +222,23 @@ void interpret(astptr head)
         // cout << save_id << " = " << int_indefiers[save_id] << endl;
         break;
     case n_prints:
-        newline = false;
         left = head->p1;
         right = head->p2;
         interpret(left);
         if (right->asttype == n_integer || right->asttype == n_plus || right->asttype == n_minus || right->asttype == n_mul || right->asttype == n_div)
         {   
-            newline=true;
-            interpret(right);
             cout << " " << intvalue;
+            interpret(right);
         }
         else if (right->asttype == n_string)
         {   
-            newline=true;
-            interpret(right);
             cout << " " << identifier;
+            interpret(right);
         }
         else if (right->asttype == n_id)
         {
 
+            cout << " ";
             cout << int_indefiers[right->astdata] << endl;
         }
         break;
@@ -249,7 +246,6 @@ void interpret(astptr head)
         left = head->p1;
         if(current_line!=previous_line){
             cout<<endl;
-            previous_line==current_line;
         }
         if (left->asttype == n_integer || left->asttype == n_plus || left->asttype == n_minus || left->asttype == n_mul || left->asttype == n_div)
         {
@@ -263,7 +259,7 @@ void interpret(astptr head)
         }
         else if (n_id)
         {
-            cout << int_indefiers[left->astdata] << endl;
+            cout << int_indefiers[left->astdata];
         }
         break;
     }
