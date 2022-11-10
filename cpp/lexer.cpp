@@ -14,6 +14,7 @@ int vectorindex = 0;
 lextokens currenttoken;
 string lineInput;
 bool firstline = true;
+double currdouble;
 vector<token> vec;
 
 char getch(){

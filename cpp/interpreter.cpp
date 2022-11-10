@@ -213,6 +213,18 @@ void interpret(astptr head)
             flag = boolean_evaluate_string(bool_left_str, bool_right_str,mid->asttype);
         }
         break;
+    case n_listindex:
+        save_id = head->astdata;
+        left=head->p1;
+        temp = stoi(left->astdata);
+        get_vector_int(left->astdata);
+        if(notfound){
+            currdouble = int_indefiers[left->astdata];
+            break;
+        } else {
+            currdouble = current_vec_int[temp];
+        }
+        break;
     case n_assignment_list:
         left=head->p1;
         current_dataytpe = left->asttype;
@@ -276,6 +288,8 @@ void interpret(astptr head)
                 break;
             }
             print_vector_int();
+        } else if (current_dataytpe==n_listindex){
+            cout << currdouble;
         }
         break;
     }

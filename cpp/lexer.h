@@ -65,6 +65,8 @@ extern lextokens lexer();
 extern int tracker;
 extern int linenumber;
 extern bool firstline;
+extern double currdouble;
+
 
 
 //Variable to store the last identifier encountered by lexer. Error symbol also uses the same variable

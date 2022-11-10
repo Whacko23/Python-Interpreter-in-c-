@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-// #define DEEBUG
+#define DEEBUG
 
 
 int grammar_tracker = 1;
@@ -537,9 +537,10 @@ astptr factor()
             if(currenttoken!=intsym){
                 //TODO TypeError: list indices must be integers or slices, not str
             }else{
-                
+                pfirst = newnode(n_listindex_data,to_string(intvalue),NULL,NULL,NULL);
+                pfirst = newnode(n_listindex,temp, pfirst,NULL,NULL);
+                currenttoken = cleanLexer();
             }
-            currenttoken = cleanLexer();
         } else {
             //No need to call for new token since it has already been called before if statement
             pfirst = newnode(n_id, identifier, NULL, NULL, NULL);
@@ -828,7 +829,7 @@ astptr parser()
     grammar_tracker++;
     #endif
 
-    return statements();
+    return factor();
 };
 
 void printParserTree(astptr head)
@@ -848,6 +849,7 @@ void printParserTree(astptr head)
     case n_le:
     case n_ge:
     case n_list_int:
+    case n_listindex_data:
         cout << head->astdata << " ";
         cout << "*leaf* " << endl;
         break;
@@ -902,6 +904,7 @@ void printParserTree(astptr head)
         printParserTree(left);
         break;
     case n_print:
+    case n_listindex:
         left = head->p1;
         cout << head->astdata << " ";
         cout << "down" << endl;
@@ -928,6 +931,7 @@ void freeMemory(astptr head)
     case n_le:
     case n_ge:
     case n_list_int:
+    case n_listindex_data:
         delete head;
         break;
     case n_plus:
@@ -949,6 +953,10 @@ void freeMemory(astptr head)
     case n_block_stmt:
     case n_simple_stmt:
     case n_newline:
+    case n_listindex:
+    case n_assignment_list:
+    case n_assignment_int:
+    case n_print:
         left = head->p1;
         delete head;
         freeMemory(left);
@@ -961,17 +969,6 @@ void freeMemory(astptr head)
         freeMemory(left);
         freeMemory(mid);
         freeMemory(right);
-        break;
-    case n_assignment_list:
-    case n_assignment_int:
-        left = head->p1;
-        delete head;
-        freeMemory(left);
-        break;
-    case n_print:
-        left = head->p1;
-        delete head;
-        freeMemory(left);
         break;
     }
 }

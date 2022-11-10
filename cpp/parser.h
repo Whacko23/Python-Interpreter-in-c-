@@ -39,6 +39,7 @@ typedef enum
     n_string,
     n_list_int,
     n_listindex,
+    n_listindex_data,
     // Variable
     n_id,
     // n_fcall,
