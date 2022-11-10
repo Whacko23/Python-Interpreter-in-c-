@@ -217,13 +217,16 @@ void interpret(astptr head)
         save_id = head->astdata;
         left=head->p1;
         temp = stoi(left->astdata);
-        get_vector_int(left->astdata);
+        current_vec_int = get_vector_int(save_id);
+        print_vector_int();
+        cout << "save_id = " << save_id << " temp = " << temp << endl;
         if(notfound){
-            currdouble = int_indefiers[left->astdata];
+            intvalue = int_indefiers[left->astdata];
             break;
         } else {
-            currdouble = current_vec_int[temp];
+            intvalue = current_vec_int[temp];
         }
+        cout << "Inside list index" << intvalue;
         break;
     case n_assignment_list:
         left=head->p1;
@@ -289,7 +292,7 @@ void interpret(astptr head)
             }
             print_vector_int();
         } else if (current_dataytpe==n_listindex){
-            cout << currdouble;
+            cout << intvalue;
         }
         break;
     }

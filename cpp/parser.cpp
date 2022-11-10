@@ -36,9 +36,14 @@ astptr statements()
     #endif
 
     astptr pfirst = statement();
+    int i=1;
     while (true)
     {
-
+        if(i==10)break;
+        i++;
+        cout << "currenttoken";
+        print_current_lextoken(currenttoken);
+        cout << endl;
         if (currenttoken == eofsym){
             #ifdef DEEBUG
             cout << grammar_tracker << " ---exit  stmts loop---" << endl;
@@ -531,8 +536,8 @@ astptr factor()
     if (currenttoken == identifiersym)
     {
         temp = identifier;
-        currenttoken = cleanLexer();
-        if(currenttoken==openbracketsym){
+        currenttoken = lexer();
+        if(currenttoken==opensquaresym){
             currenttoken = cleanLexer();
             if(currenttoken!=intsym){
                 //TODO TypeError: list indices must be integers or slices, not str
@@ -540,6 +545,11 @@ astptr factor()
                 pfirst = newnode(n_listindex_data,to_string(intvalue),NULL,NULL,NULL);
                 pfirst = newnode(n_listindex,temp, pfirst,NULL,NULL);
                 currenttoken = cleanLexer();
+                if(currenttoken!=closesquaresym){
+                    //TODO SyntaxError: invalid syntax missing ']'
+                } else {
+                    currenttoken=cleanLexer();
+                }
             }
         } else {
             //No need to call for new token since it has already been called before if statement
@@ -829,7 +839,7 @@ astptr parser()
     grammar_tracker++;
     #endif
 
-    return factor();
+    return statements();
 };
 
 void printParserTree(astptr head)

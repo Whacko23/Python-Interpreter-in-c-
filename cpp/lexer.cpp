@@ -7,14 +7,13 @@
 //Declaring all the global variables
 char ch;
 string identifier;
-int intvalue;
+double intvalue;
 int tracker;
 int linenumber = 1;
 int vectorindex = 0;
 lextokens currenttoken;
 string lineInput;
 bool firstline = true;
-double currdouble;
 vector<token> vec;
 
 char getch(){
