@@ -3,18 +3,14 @@
 #define PARSER_CPP
 
 #include "parser.h"
-#include "lexer.h"
-#include "log.h"
-#include <vector>
-#include <string>
 
-#define DEEBUG
+// #define DEEBUG
 
 
 int grammar_tracker = 1;
 
 
-vector<int> int_vector;
+vector<double> int_vector;
 vector<string> string_vector;
 
 astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third)
@@ -327,13 +323,29 @@ astptr returnstatement()
 astptr list()
 {
     astptr pfirst;
+    string tempid;
     if (currenttoken == opensquaresym)
     {
         currenttoken = cleanLexer();
         if (currenttoken == intsym)
         {
+            /*
+            int tempvalue = intvalue;
+            currenttoken = cleanLexer();
+            if(currenttoken==closesquaresym){
+                pfirst = newnode(n_listindex,to_string(tempvalue), NULL, NULL, NULL);
+                currenttoken = cleanLexer();
+                return pfirst;
+            }
+            */
+
             while (true)
             {
+                if(currenttoken!=intsym){
+                    //TODO error type mismatch
+                }
+                int_vector.push_back(intvalue);
+                currenttoken = cleanLexer();
 
                 if (currenttoken == eofsym)
                 {
@@ -346,33 +358,42 @@ astptr list()
                 }
                 if (currenttoken == newlinesym)
                 {
+                    #ifdef DEEBUG
+                    cout << grammar_tracker << " ---exit list  loop by newline ----" << endl;
+                    grammar_tracker++;
+                    #endif
+                    //TODO error
                     linenumber++;
                     pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
                     currenttoken = cleanLexer();
                     break;
                 }
-                int_vector.push_back(intvalue);
-                currenttoken = cleanLexer();
 
                 if (currenttoken == closesquaresym)
                 {
+                    #ifdef DEEBUG
+                    cout << grammar_tracker << " ---exit list  loop by closebracker ----" << endl;
+                    grammar_tracker++;
+                    #endif
                     currenttoken = cleanLexer();
                     break;
                 }
-                if (currenttoken != commasym || currenttoken != closesquaresym)
-                {
+                if (currenttoken == commasym){
+                    currenttoken = cleanLexer();
+                } else {
                     cout << "Error in list function checking for comma or closed bracket" << endl;
                     // Display error
                     break;
                 }
-                currenttoken = cleanLexer();
-            }
+            }//: Exit while
+            tempid = add_vector(int_vector);
+            pfirst = newnode(n_list_int,tempid, NULL, NULL, NULL);
         }
         else if (currenttoken == doublequotesym || currenttoken == singlequotesym)
         {
         }
     }
-    return newnode(n_list, "", NULL, NULL, NULL);
+    return pfirst;
 };
 
 /*
@@ -494,7 +515,7 @@ astptr term()
 }
 
 /* factor
-<factor> -> id | integer | string | ( <expr> )
+<factor> -> id | arrayindex | integer | string | ( <expr> )
 */
 astptr factor()
 {
@@ -504,12 +525,25 @@ astptr factor()
     #endif
 
     astptr pfirst;
+    string temp;
 
     // cout << "Inside factor" << endl;
     if (currenttoken == identifiersym)
     {
-        pfirst = newnode(n_id, identifier, NULL, NULL, NULL);
+        temp = identifier;
         currenttoken = cleanLexer();
+        if(currenttoken==openbracketsym){
+            currenttoken = cleanLexer();
+            if(currenttoken!=intsym){
+                //TODO TypeError: list indices must be integers or slices, not str
+            }else{
+                
+            }
+            currenttoken = cleanLexer();
+        } else {
+            //No need to call for new token since it has already been called before if statement
+            pfirst = newnode(n_id, identifier, NULL, NULL, NULL);
+        }
     }
     else if (currenttoken == intsym)
     {
@@ -523,11 +557,11 @@ astptr factor()
     }
     else
     {
-        if (currenttoken == opensquaresym)
+        if (currenttoken == openbracketsym)
         {
             currenttoken = cleanLexer();
             pfirst = expression();
-            if (currenttoken == closesquaresym)
+            if (currenttoken == closebracketsym)
             {
                 currenttoken = cleanLexer();
             }
@@ -635,12 +669,14 @@ astptr assignment()
             currenttoken = cleanLexer();
             if (currenttoken == opensquaresym)
             {
-                currenttoken = cleanLexer();
+                //TODO check for list indexes as well
                 lis = list();
-                pfirst = newnode(n_assignment_list, identifier, lis, NULL, NULL);
+                pfirst = newnode(n_assignment_list, id, lis, NULL, NULL);
                 if (currenttoken != closesquaresym)
                 {
                     // TODO Expected ']'
+                } else{
+                    currenttoken = cleanLexer();
                 }
             }
             else
@@ -811,6 +847,7 @@ void printParserTree(astptr head)
     case n_lt:
     case n_le:
     case n_ge:
+    case n_list_int:
         cout << head->astdata << " ";
         cout << "*leaf* " << endl;
         break;
@@ -890,6 +927,7 @@ void freeMemory(astptr head)
     case n_lt:
     case n_le:
     case n_ge:
+    case n_list_int:
         delete head;
         break;
     case n_plus:
@@ -937,4 +975,202 @@ void freeMemory(astptr head)
         break;
     }
 }
+
+void print_current_lextoken(lextokens t){
+                switch(t){
+                    case intsym: cout << "Integer token = " << intvalue << endl; break;
+                    case whitespacesym: cout << "Whitespace token " << endl; break;
+                    case printsym: cout << "Print token " << endl; break;
+                    case blocksym: cout << "Block token "  << endl;
+                    case identifiersym: cout << "Identifier token = " << identifier  << endl; break;
+                    case whilesym: cout << "While token "  << endl; break;
+                    case eofsym: cout << "EOF token "  << endl; break;
+                    case ifsym: cout << "IF token "  << endl; break;
+                    case elsesym: cout << "Else token "  << endl; break;
+                    case elseifsym: cout << "Elseif token "  << endl; break;
+                    case defsym: cout << "Def token "  << endl; break;
+                    case returnsym: cout << "REturn token "  << endl; break;
+                    case semicolonsym: cout << "semicolon token "  << endl; break;
+                    case commasym: cout << "comma token "  << endl; break;
+                    case assignsym: cout << "assign token "  << endl; break;
+                    case errorsym: cout << "Error "  << identifier << " is unrecognized on line " << linenumber << " at character " << tracker << endl; break;
+                    case dividesym: cout << "divide token "  << endl; break;
+                    case openbracketsym: cout << "OpenBracker token "  << endl; break;
+                    case closebracketsym: cout << "CloseBracker token "  << endl; break;
+                    case plussym: cout << "Plus token "  << endl; break;
+                    case minussym: cout << "Minus token "  << endl; break;
+                    case multiplysym: cout << "multiply token "  << endl; break;
+                    case equalsym: cout << "Euqal token "  << endl; break;
+                    case leftanklesym: cout << "Left ankle token "  << endl; break;
+                    case rightanklesym: cout << "Right ankle token "  << endl; break;
+                    case colonsym: cout << "Colon token "  << endl; break;
+                    case commentsym: cout << "Comment token "  << endl; break;
+                    case singlequotesym: cout << "Single quote token = " << identifier << endl; break;
+                    case doublequotesym: cout << "Double quote token = " << identifier  << endl; break;
+                    case opensquaresym: cout << "Open sq bracket token "  << endl; break;
+                    case closesquaresym: cout << "Close sq bracket token "  << endl; break;
+                    case shebangsym: cout << "Shebang token "  << endl; break;
+                    case notequalsym: cout << "Not equal token "  << endl; break;
+                    case greaterorequalsym: cout << "Greater than or equal token "  << endl; break;
+                    case lessorequalsym: cout << "Less than or equal token "  << endl; break;
+                    case lessthansym: cout << "Less than token "  << endl; break;
+                    case greaterthansym: cout << "Greater than token "  << endl; break;
+                    case newlinesym: cout << "  New line "  << endl; break;
+                }
+};
+
+void print_current_parsetoken(nodetype n){
+    switch (n)
+    {
+        case n_statements:
+            cout << "n_statements" << endl;
+             break;
+        case n_statement:
+            cout << "n_statement" << endl;
+             break;
+        case n_assignment_list:
+            cout << "n_assignment_list" << endl;
+             break;
+        case n_assignment_int:
+            cout << "n_assignment_int" << endl;
+             break;
+        case n_simple_stmt:
+            cout << "n_simple_stmt" << endl;
+             break;
+        case n_booleanexp:
+            cout << "n_booleanexp" << endl;
+             break;
+        case n_print:
+            cout << "n_print" << endl;
+             break;
+        case n_prints:
+            cout << "n_prints" << endl;
+             break;
+        case n_newline:
+            cout << "n_newline" << endl;
+             break;
+        case n_uminus:
+            cout << "n_uminus" << endl;
+             break;
+        case n_plus:
+            cout << "n_plus" << endl;
+             break;
+        case n_minus:
+            cout << "n_minus" << endl;
+             break;
+        case n_mul:
+            cout << "n_mul" << endl;
+             break;
+        case n_div:
+            cout << "n_div" << endl;
+             break;
+        case n_eq:
+            cout << "n_eq" << endl;
+             break;
+        case n_ne:
+            cout << "n_ne" << endl;
+             break;
+        case n_lt:
+            cout << "n_lt" << endl;
+             break;
+        case n_le:
+            cout << "n_le" << endl;
+             break;
+        case n_gt:
+            cout << "n_gt" << endl;
+             break;
+        case n_ge:
+            cout << "n_ge" << endl;
+             break;
+        case n_integer:
+            cout << "n_integer" << endl;
+             break;
+        case n_string:
+            cout << "n_string" << endl;
+             break;
+        case n_list_int:
+            cout << "n_list_int" << endl;
+             break;
+        case n_listindex:
+            cout << "n_listindex" << endl;
+             break;
+        case n_id:
+            cout << "n_id" << endl;
+             break;
+        case n_while:
+            cout << "n_while" << endl;
+             break;
+        case n_if:
+            cout << "n_if" << endl;
+             break;
+        case n_ifelse:
+            cout << "n_ifelse" << endl;
+             break;
+        case n_error:
+            cout << "n_error" << endl;
+             break;
+        case n_empty:
+            cout << "n_empty" << endl;
+             break;
+        case n_def:
+            cout << "n_def" << endl;
+             break;
+        case n_block_stmt:
+            cout << "n_block_stmt" << endl;
+             break;
+        case n_block_stmts:
+            cout << "n_block_stmts" << endl;
+             break;
+    default:
+        break;
+    }
+};
+
+
+/*_________Interpreter______*/
+
+int vector_index = 0;
+map<string, double> int_indefiers;
+map<string, string> string_identifiers;
+map<string, vector<double>> vector_identifiers;
+bool notfound = false;
+vector<double> current_vec_int;
+vector<string> current_vec_str;
+
+string add_vector(vector<double> v){
+    vector_index++;
+    vector_identifiers.insert({to_string(vector_index),v});
+    return to_string(vector_index);
+}
+
+vector<double> get_vector_int(string s){
+    map<string, vector<double>>::iterator search = vector_identifiers.find(s);
+    vector<double> v;
+    if(search==vector_identifiers.end()){
+        //TODO not found
+        notfound=true;
+    } else {
+        v = search->second;
+    }
+
+    return v;
+}
+
+void print_vector_int(){
+    cout << "[";
+    for(int i=0; i<current_vec_int.size(); i++){
+        cout << current_vec_int[i];
+        if(i!=current_vec_int.size()-1){
+            cout << ",";
+        }
+        else{
+            cout << "]";
+        }
+    }
+};
+void print_vector_int(vector<double> v){
+    cout << "[";
+    for(auto itr : v)
+        cout << itr << " ";
+};
 #endif

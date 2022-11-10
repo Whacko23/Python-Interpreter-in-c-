@@ -3,6 +3,12 @@
 #define PARSER_H
 
 #include <string>
+#include <vector>
+#include <map>
+#include "lexer.h"
+#include "log.h"
+
+
 using namespace std;
 
 typedef enum
@@ -31,7 +37,8 @@ typedef enum
     n_ge,
     n_integer,
     n_string,
-    n_list,
+    n_list_int,
+    n_listindex,
     // Variable
     n_id,
     // n_fcall,
@@ -87,5 +94,19 @@ extern astptr parser();
 
 extern void printParserTree(astptr head);
 extern void freeMemory(astptr head);
+extern void print_current_lextoken(lextokens t);
+extern void print_current_parsetoken(nodetype n);
 
+/*_______Interpreter_______________*/
+extern map<string, double> int_indefiers;
+extern map<string, string> string_identifiers;
+extern map<string, vector<double>> vector_identifiers;
+extern string add_vector(vector<double> v);
+extern vector<double> get_vector_int(string s);
+extern bool notfound;
+extern void interpret(astptr head);
+extern void print_vector_int();
+extern void print_vector_int(vector<double> v);
+extern vector<double> current_vec_int;
+extern vector<string> current_vec_str;
 #endif
