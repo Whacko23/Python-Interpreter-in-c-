@@ -3,15 +3,13 @@
 #define INTERPRETER_CPP
 
 #include "interpreter.h"
-#include <map>
-#include <vector>
-map<string, double> int_indefiers;
-map<string, string> string_identifiers;
-map<string, vector<double>> vector_identifiers;
+
+
 
 bool flag = false;
 int previous_line = 1;
 int current_line = 1;
+
 
 bool boolean_evaluate_int(int l, int r, nodetype n){
     if(n == n_eq){
@@ -89,6 +87,10 @@ void interpret(astptr head)
         // cout << "identofier in switch: " << identifier << endl;
         intvalue = int_indefiers[identifier];
         // cout << "int  in switch: " << intvalue << endl;
+        break;
+    case n_list_int:
+        save_id = head->astdata;
+        current_vec_int = get_vector_int(save_id);
         break;
     case n_plus:
         temp = 0;
@@ -212,6 +214,14 @@ void interpret(astptr head)
         }
         break;
     case n_assignment_list:
+        left=head->p1;
+        current_dataytpe = left->asttype;
+        save_id = head->astdata;
+        interpret(left);
+        if(current_dataytpe==n_list_int){
+            vector_identifiers[save_id]=current_vec_int;
+        }
+        break;
     case n_assignment_int:
         left = head->p1;
         identifier = head->astdata;
@@ -244,22 +254,28 @@ void interpret(astptr head)
         break;
     case n_print:
         left = head->p1;
+        current_dataytpe = left->asttype;
         if(current_line!=previous_line){
             cout<<endl;
         }
-        if (left->asttype == n_integer || left->asttype == n_plus || left->asttype == n_minus || left->asttype == n_mul || left->asttype == n_div)
+        if (current_dataytpe == n_integer || current_dataytpe == n_plus || current_dataytpe == n_minus || current_dataytpe == n_mul || current_dataytpe == n_div)
         {
             interpret(left);
             cout << intvalue;
         }
-        else if (left->asttype == n_string)
+        else if (current_dataytpe == n_string)
         {
             interpret(left);
             cout << identifier;
         }
-        else if (n_id)
+        else if (current_dataytpe==n_id)
         {
-            cout << int_indefiers[left->astdata];
+            get_vector_int(left->astdata);
+            if(notfound){
+                cout << int_indefiers[left->astdata];
+                break;
+            }
+            print_vector_int();
         }
         break;
     }
