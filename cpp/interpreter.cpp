@@ -268,9 +268,6 @@ void interpret(astptr head)
     case n_print:
         left = head->p1;
         current_dataytpe = left->asttype;
-        if(current_line!=previous_line){
-            cout<<endl;
-        }
         if (current_dataytpe == n_integer || current_dataytpe == n_plus || current_dataytpe == n_minus || current_dataytpe == n_mul || current_dataytpe == n_div)
         {
             interpret(left);
@@ -293,6 +290,9 @@ void interpret(astptr head)
             interpret(left);
             cout << intvalue;
         }
+        if(current_line!=previous_line){
+            cout<<endl;
+        }
         break;
     case n_index_assign_data:
         left = head->p1;
@@ -304,10 +304,11 @@ void interpret(astptr head)
         temp = intvalue;
 
         save_id = left->astdata;
-        index = stoi(mid->astdata);
+        index = stod(mid->astdata);
 
         get_vector_int(save_id);
-
+        current_vec_int.at(index)=temp;
+        // current_vec_int.insert(current_vec_int.begin() + index, temp);
         break;
     }
     

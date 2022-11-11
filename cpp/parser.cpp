@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-#define DEEBUG
+// #define DEEBUG
 
 
 int grammar_tracker = 1;
@@ -1207,7 +1207,7 @@ void print_vector_int(){
     for(int i=0; i<current_vec_int.size(); i++){
         cout << current_vec_int[i];
         if(i!=current_vec_int.size()-1){
-            cout << ",";
+            cout << ", ";
         }
         else{
             cout << "]";

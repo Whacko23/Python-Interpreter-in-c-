@@ -106,6 +106,7 @@ extern map<string, double> int_indefiers;
 extern map<string, string> string_identifiers;
 extern map<string, vector<double>> vector_identifiers;
 extern string add_vector(vector<double> v);
+extern void modify_vector(int i, string s);
 extern vector<double> get_vector_int(string s);
 extern bool notfound;
 extern void interpret(astptr head);
