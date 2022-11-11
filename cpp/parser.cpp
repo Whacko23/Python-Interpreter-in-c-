@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-#define DEEBUG
+// #define DEEBUG
 
 
 int grammar_tracker = 1;
@@ -36,14 +36,14 @@ astptr statements()
     #endif
 
     astptr pfirst = statement();
-    int i=1;
+    // int i=1;
     while (true)
     {
-        if(i==10)break;
-        i++;
-        cout << "currenttoken";
-        print_current_lextoken(currenttoken);
-        cout << endl;
+        // if(i==10)break;
+        // i++;
+        // cout << "currenttoken";
+        // print_current_lextoken(currenttoken);
+        // cout << endl;
         if (currenttoken == eofsym){
             #ifdef DEEBUG
             cout << grammar_tracker << " ---exit  stmts loop---" << endl;
@@ -536,7 +536,7 @@ astptr factor()
     if (currenttoken == identifiersym)
     {
         temp = identifier;
-        currenttoken = lexer();
+        currenttoken = cleanLexer();
         if(currenttoken==opensquaresym){
             currenttoken = cleanLexer();
             if(currenttoken!=intsym){
@@ -565,6 +565,11 @@ astptr factor()
     {
         pfirst = newnode(n_string, identifier, NULL, NULL, NULL);
         currenttoken = cleanLexer();
+    }
+    else if (currenttoken == opensquaresym)
+    {
+        cout << "im here";
+        //TODO some work
     }
     else
     {
@@ -721,7 +726,6 @@ astptr assignment()
             {
 
                 exp = expression();
-
                 pfirst = newnode(n_assignment_int, id, exp, NULL, NULL);
             }
         }
@@ -1202,12 +1206,22 @@ vector<double> get_vector_int(string s){
     return v;
 }
 
+void modify_vector_int(string s, vector<double> v){
+    map<string, vector<double>>::iterator search = vector_identifiers.find(s);
+    if(search==vector_identifiers.end()){
+        //TODO not found
+        cout << "not found" << endl;
+    } else {
+        search->second = v;
+    }
+};
+
 void print_vector_int(){
     cout << "[";
-    for(int i=0; i<current_vec_int.size(); i++){
+    for(int i=0; i<(int)current_vec_int.size(); i++){
         cout << current_vec_int[i];
-        if(i!=current_vec_int.size()-1){
-            cout << ",";
+        if(i!=(int)current_vec_int.size()-1){
+            cout << ", ";
         }
         else{
             cout << "]";

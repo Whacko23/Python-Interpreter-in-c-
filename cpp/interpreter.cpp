@@ -9,6 +9,8 @@
 bool flag = false;
 int previous_line = 1;
 int current_line = 1;
+bool assign_list_variable = false;
+
 
 
 bool boolean_evaluate_int(int l, int r, nodetype n){
@@ -56,6 +58,7 @@ void interpret(astptr head)
     double temp, bool_exp_left, bool_exp_right;
     int index;
     string save_id, bool_left_str, bool_right_str;
+    vector<double> tempvec_double;
 
     nodetype current_dataytpe;
     
@@ -85,23 +88,34 @@ void interpret(astptr head)
     case n_id:
         identifier = head->astdata;
         current_dataytpe = n_id;
-        // cout << "identofier in switch: " << identifier << endl;
         intvalue = int_indefiers[identifier];
-        // cout << "int  in switch: " << intvalue << endl;
         break;
     case n_list_int:
         save_id = head->astdata;
         current_vec_int = get_vector_int(save_id);
+        // notfound=false;
         break;
     case n_plus:
         temp = 0;
         left = head->p1;
         right = head->p2;
-        interpret(left);
-        temp = temp + intvalue;
-        interpret(right);
-        temp = temp + intvalue;
-        intvalue = temp;
+        get_vector_int(left->astdata);
+        if(notfound){
+            interpret(left);
+            temp = temp + intvalue;
+            interpret(right);
+            temp = temp + intvalue;
+            intvalue = temp;
+            notfound = false;
+                break;
+        } else {
+            tempvec_double = current_vec_int;
+            get_vector_int(right->astdata);
+
+            tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
+            assign_list_variable = true;
+            // current_vec_int = tempvec_double;
+        }
         break;
     case n_minus:
         temp = 0;
@@ -238,11 +252,16 @@ void interpret(astptr head)
     case n_assignment_int:
         left = head->p1;
         identifier = head->astdata;
-        int_indefiers[identifier];
         save_id = identifier;
         interpret(left);
-        int_indefiers[save_id] = intvalue;
-        // cout << save_id << " = " << int_indefiers[save_id] << endl;
+        if(assign_list_variable==false){
+            // int_indefiers[identifier];
+            // interpret(left);
+            int_indefiers[save_id] = intvalue;
+        } else {
+            vector_identifiers[save_id] = current_vec_int;
+            assign_list_variable=false;
+        }
         break;
     case n_prints:
         left = head->p1;
@@ -262,15 +281,21 @@ void interpret(astptr head)
         {
 
             cout << " ";
-            cout << int_indefiers[right->astdata] << endl;
+            get_vector_int(right->astdata);
+            if(notfound){ 
+                cout << int_indefiers[right->astdata];
+                break;
+            }
+            print_vector_int();
+        } else if (right->asttype==n_listindex){
+            cout << " ";
+            interpret(right);
+            cout << intvalue;
         }
         break;
     case n_print:
         left = head->p1;
         current_dataytpe = left->asttype;
-        if(current_line!=previous_line){
-            cout<<endl;
-        }
         if (current_dataytpe == n_integer || current_dataytpe == n_plus || current_dataytpe == n_minus || current_dataytpe == n_mul || current_dataytpe == n_div)
         {
             interpret(left);
@@ -284,7 +309,7 @@ void interpret(astptr head)
         else if (current_dataytpe==n_id)
         {
             get_vector_int(left->astdata);
-            if(notfound){
+            if(notfound){ 
                 cout << int_indefiers[left->astdata];
                 break;
             }
@@ -292,6 +317,9 @@ void interpret(astptr head)
         } else if (current_dataytpe==n_listindex){
             interpret(left);
             cout << intvalue;
+        }
+        if(current_line!=previous_line){
+        cout<<endl;
         }
         break;
     case n_index_assign_data:
@@ -308,8 +336,17 @@ void interpret(astptr head)
 
         get_vector_int(save_id);
 
+        current_vec_int.at(index) = temp;
+        modify_vector_int(save_id, current_vec_int);
+
+        break;
+    case n_error: case n_def:
+    case n_empty: case n_index_assign_id:
+    case n_index_assign_index:
+    case n_uminus: case n_listindex_data:
         break;
     }
+
     
 }
 

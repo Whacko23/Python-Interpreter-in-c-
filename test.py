@@ -1,4 +1,11 @@
-a=[12,65,45,99]
-print(a)
-print(a[3]+a[1])
-print(2+6/4)
+#init l1
+l1 = [0]
+#init l2
+l2 = [0]
+l1[0] = 6
+print("l1: ", l1)
+print("l2: ", l2)
+l2[0] = 7
+#add l1 and l2
+l3 = l1+l2
+print(l3)
