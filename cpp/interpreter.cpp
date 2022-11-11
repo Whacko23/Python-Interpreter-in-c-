@@ -332,7 +332,7 @@ void interpret(astptr head)
         temp = intvalue;
 
         save_id = left->astdata;
-        index = stoi(mid->astdata);
+        index = stod(mid->astdata);
 
         get_vector_int(save_id);
 
