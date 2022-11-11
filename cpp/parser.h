@@ -40,6 +40,9 @@ typedef enum
     n_list_int,
     n_listindex,
     n_listindex_data,
+    n_index_assign_id,
+    n_index_assign_index,
+    n_index_assign_data,
     // Variable
     n_id,
     // n_fcall,

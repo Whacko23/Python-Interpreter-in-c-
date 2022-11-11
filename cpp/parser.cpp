@@ -98,7 +98,7 @@ astptr simple_stmt()
     cout << grammar_tracker<< " ---inside  simple stmts---" << endl;
     grammar_tracker++;
     #endif
-    astptr pfirst;
+    astptr pfirst = NULL;
     if (currenttoken == commentsym)
     {
         currenttoken = cleanLexer();
@@ -327,7 +327,7 @@ astptr returnstatement()
 // NOTE the previous function (assignment) has already checked for [] brackets
 astptr list()
 {
-    astptr pfirst;
+    astptr pfirst=NULL;
     string tempid;
     if (currenttoken == opensquaresym)
     {
@@ -432,8 +432,8 @@ astptr expression()
     grammar_tracker++;
     #endif
 
-    astptr pfirst; /* first pointer in the expr chain */
-    astptr term2;
+    astptr pfirst=NULL; /* first pointer in the expr chain */
+    astptr term2=NULL;
     int startingtoken;
     string tokendata;
     nodetype ntype;
@@ -529,7 +529,7 @@ astptr factor()
     grammar_tracker++;
     #endif
 
-    astptr pfirst;
+    astptr pfirst=NULL;
     string temp;
 
     // cout << "Inside factor" << endl;
@@ -661,7 +661,7 @@ astptr assignment()
     grammar_tracker++;
     #endif
 
-    astptr pfirst, lis, exp;
+    astptr pfirst=NULL, lis=NULL, exp=NULL,index_id=NULL, index_num=NULL;
     string id;
     if (currenttoken != identifiersym)
     {
@@ -671,6 +671,33 @@ astptr assignment()
     {
         id = identifier;
         currenttoken = cleanLexer();
+        if(currenttoken==opensquaresym){
+            currenttoken = cleanLexer();
+            if(currenttoken!=intsym){
+                //TODO TypeError: list indices must be integers or slices, not str
+            }else{
+                index_num = newnode(n_index_assign_index,to_string(intvalue),NULL,NULL,NULL);
+                index_id = newnode(n_index_assign_id,id, NULL,NULL,NULL);
+                currenttoken = cleanLexer();
+                if(currenttoken!=closesquaresym){
+                    //TODO SyntaxError: invalid syntax missing ']'
+                } else {
+                    currenttoken=cleanLexer();
+                }
+            }
+
+            if (currenttoken != assignsym) {
+                // TODO Expected assign symbol
+            } else {
+                currenttoken = cleanLexer();
+                exp = expression();
+                pfirst = newnode(n_index_assign_data, "", index_id, index_num , exp);
+            }
+        }
+        /*
+        id = identifier;
+        currenttoken = cleanLexer();
+        */
         if (currenttoken != assignsym)
         {
             // TODO Expected assign symbol
@@ -712,7 +739,7 @@ astptr printstatement()
     grammar_tracker++;
     #endif
 
-    astptr pfirst, expr;
+    astptr pfirst=NULL, expr=NULL;
     if (currenttoken != printsym)
     {
         // TODO Expected print
@@ -771,7 +798,7 @@ astptr booleanexpression()
     grammar_tracker++;
     #endif
 
-    astptr exp1, exp2, bexp;
+    astptr exp1=NULL, exp2=NULL, bexp=NULL;
     if(currenttoken==openbracketsym){
         brackettracker=true;
         currenttoken=cleanLexer();
@@ -860,6 +887,11 @@ void printParserTree(astptr head)
     case n_ge:
     case n_list_int:
     case n_listindex_data:
+    case n_index_assign_index:
+    case n_index_assign_id:
+    case n_error:
+    case n_empty:
+    case n_def:
         cout << head->astdata << " ";
         cout << "*leaf* " << endl;
         break;
@@ -896,6 +928,7 @@ void printParserTree(astptr head)
         printParserTree(left);
         break;
     case n_ifelse: case n_booleanexp:
+    case n_index_assign_data:
         left = head->p1;
         mid = head->p2;
         right = head->p3;
@@ -915,6 +948,7 @@ void printParserTree(astptr head)
         break;
     case n_print:
     case n_listindex:
+    case n_uminus:
         left = head->p1;
         cout << head->astdata << " ";
         cout << "down" << endl;
@@ -929,6 +963,7 @@ void freeMemory(astptr head)
 
     switch (head->asttype)
     {
+    case n_def:
     case n_id:
     case n_integer:
     case n_empty:
@@ -942,6 +977,8 @@ void freeMemory(astptr head)
     case n_ge:
     case n_list_int:
     case n_listindex_data:
+    case n_index_assign_index:
+    case n_index_assign_id:
         delete head;
         break;
     case n_plus:
@@ -967,11 +1004,13 @@ void freeMemory(astptr head)
     case n_assignment_list:
     case n_assignment_int:
     case n_print:
+    case n_uminus:
         left = head->p1;
         delete head;
         freeMemory(left);
         break;
     case n_ifelse: case n_booleanexp:
+    case n_index_assign_data:
         left = head->p1;
         mid = head->p2;
         right = head->p3;

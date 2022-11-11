@@ -53,7 +53,8 @@ void interpret(astptr head)
 {
     string current;
     astptr left, right, mid;
-    int temp, bool_exp_left, bool_exp_right;
+    double temp, bool_exp_left, bool_exp_right;
+    int index;
     string save_id, bool_left_str, bool_right_str;
 
     nodetype current_dataytpe;
@@ -218,15 +219,12 @@ void interpret(astptr head)
         left=head->p1;
         temp = stoi(left->astdata);
         current_vec_int = get_vector_int(save_id);
-        print_vector_int();
-        cout << "save_id = " << save_id << " temp = " << temp << endl;
         if(notfound){
             intvalue = int_indefiers[left->astdata];
             break;
         } else {
             intvalue = current_vec_int[temp];
         }
-        cout << "Inside list index" << intvalue;
         break;
     case n_assignment_list:
         left=head->p1;
@@ -292,10 +290,27 @@ void interpret(astptr head)
             }
             print_vector_int();
         } else if (current_dataytpe==n_listindex){
+            interpret(left);
             cout << intvalue;
         }
         break;
+    case n_index_assign_data:
+        left = head->p1;
+        mid = head->p2;
+        //right is the expression
+        right = head->p3;
+        
+        interpret(right);
+        temp = intvalue;
+
+        save_id = left->astdata;
+        index = stoi(mid->astdata);
+
+        get_vector_int(save_id);
+
+        break;
     }
+    
 }
 
 #endif
