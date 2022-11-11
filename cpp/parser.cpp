@@ -697,6 +697,7 @@ astptr assignment()
                 currenttoken = cleanLexer();
                 exp = expression();
                 pfirst = newnode(n_index_assign_data, "", index_id, index_num , exp);
+                return pfirst;
             }
         }
         /*

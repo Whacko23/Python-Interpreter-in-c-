@@ -1,18 +1,7 @@
 listX = [5,3,2,7,8,9]
-listY = [5,2,7,8,6,8]
-listZ = [5,4,6,5,2,8]
-
-sum1 = listX[0] + listY[0] + listZ[0]
-print("sum1 ", sum1)
-listA = [10,3,2,7,8,9]
-listB = [10,2,7,8,6,8]
-listC = [10,4,6,5,2,8]
-
-sum2 = listA[0] + listB[0] + listC[0]
-print("sum2 ", sum2)
-
-
-sums = sum1 + sum2
-
-
-print(sums)
+listY = [0,1,2,3,4,5]
+summa = listX[0] + listY[0]
+print("listX[0]", listX[0])
+print("listY[4]", listY[4])
+print("summa", summa)
+print("summb", listX[0] + listY[0])

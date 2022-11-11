@@ -323,13 +323,13 @@ void interpret(astptr head)
             interpret(right);
             cout << intvalue;
         }
-        if(current_line!=previous_line){
-            cout<<endl;
-        }        
         if(firstprint==true){
             cout << endl;
             firstprint=false;
-        }
+        } else if(current_line!=previous_line){
+            cout<<endl;
+        }        
+
         break;
     case n_print:
         left = head->p1;
@@ -352,8 +352,7 @@ void interpret(astptr head)
                 if(firstprint==true){
                     cout << endl;
                     firstprint=false;
-                }
-                if(current_line!=previous_line){
+                } else if(current_line!=previous_line){
                     cout<<endl;
                 } 
                 break;
