@@ -1,11 +1,18 @@
-#init l1
-l1 = [0]
-#init l2
-l2 = [0]
-l1[0] = 6
-print("l1: ", l1)
-print("l2: ", l2)
-l2[0] = 7
-#add l1 and l2
-l3 = l1+l2
-print(l3)
+listX = [5,3,2,7,8,9]
+listY = [5,2,7,8,6,8]
+listZ = [5,4,6,5,2,8]
+
+sum1 = listX[0] + listY[0] + listZ[0]
+print("sum1 ", sum1)
+listA = [10,3,2,7,8,9]
+listB = [10,2,7,8,6,8]
+listC = [10,4,6,5,2,8]
+
+sum2 = listA[0] + listB[0] + listC[0]
+print("sum2 ", sum2)
+
+
+sums = sum1 + sum2
+
+
+print(sums)

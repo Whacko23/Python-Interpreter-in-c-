@@ -10,6 +10,7 @@ bool flag = false;
 int previous_line = 1;
 int current_line = 1;
 bool assign_list_variable = false;
+bool firstprint = true;
 
 
 
@@ -264,9 +265,33 @@ void interpret(astptr head)
         }
         break;
     case n_prints:
-        left = head->p1;
+        left = head->p1->p1;
+        current_dataytpe = left->asttype;
+        if (current_dataytpe == n_integer || current_dataytpe == n_plus || current_dataytpe == n_minus || current_dataytpe == n_mul || current_dataytpe == n_div)
+        {
+            interpret(left);
+            cout << intvalue;
+        }
+        else if (current_dataytpe == n_string)
+        {
+            interpret(left);
+            cout << identifier;
+        }
+        else if (current_dataytpe==n_id)
+        {
+            get_vector_int(left->astdata);
+            if(notfound){ 
+                cout << int_indefiers[left->astdata];
+            } else{
+                print_vector_int();
+            }
+        } else if (current_dataytpe==n_listindex){
+            interpret(left);
+            cout << intvalue;
+        }
+
+
         right = head->p2;
-        interpret(left);
         if (right->asttype == n_integer || right->asttype == n_plus || right->asttype == n_minus || right->asttype == n_mul || right->asttype == n_div)
         {   
             cout << " " << intvalue;
@@ -284,6 +309,12 @@ void interpret(astptr head)
             get_vector_int(right->astdata);
             if(notfound){ 
                 cout << int_indefiers[right->astdata];
+                if(firstprint==true){
+                    cout << endl;
+                    firstprint=false;
+                } else if(current_line!=previous_line){
+                    cout<<endl;
+                } 
                 break;
             }
             print_vector_int();
@@ -291,6 +322,13 @@ void interpret(astptr head)
             cout << " ";
             interpret(right);
             cout << intvalue;
+        }
+        if(current_line!=previous_line){
+            cout<<endl;
+        }        
+        if(firstprint==true){
+            cout << endl;
+            firstprint=false;
         }
         break;
     case n_print:
@@ -311,6 +349,13 @@ void interpret(astptr head)
             get_vector_int(left->astdata);
             if(notfound){ 
                 cout << int_indefiers[left->astdata];
+                if(firstprint==true){
+                    cout << endl;
+                    firstprint=false;
+                }
+                if(current_line!=previous_line){
+                    cout<<endl;
+                } 
                 break;
             }
             print_vector_int();
@@ -318,7 +363,10 @@ void interpret(astptr head)
             interpret(left);
             cout << intvalue;
         }
-        if(current_line!=previous_line){
+        if(firstprint==true){
+            cout << endl;
+            firstprint=false;
+        } else if(current_line!=previous_line){
         cout<<endl;
         }
         break;
