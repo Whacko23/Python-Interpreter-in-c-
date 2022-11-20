@@ -201,7 +201,10 @@ void interpret(astptr head)
         left = head->p1;
         right = head->p2;
         interpret(left);
-        if(flag==true) interpret(right);
+        if(flag==true){
+            interpret(right);
+        } 
+        // cout << "n_if flag value = " << flag << endl;
         break;
     case n_block_stmts:
         left = head->p1;
@@ -225,8 +228,10 @@ void interpret(astptr head)
         right = head->p3;
         interpret(left);
         if(flag==true){
+            cout << "n_if flag true = " << flag << endl;
             interpret(mid);
         } else {
+            cout << "n_if flag true = " << flag << endl;
             interpret(right);
         }
         break;
@@ -234,6 +239,7 @@ void interpret(astptr head)
         left = head->p1;
         mid = head->p3;
         right = head->p2;
+
         //This takes into account of the order that n_booleaexp has booleanexpression, booleanexpression, boolean operator
         interpret(left);
         //NOTE this might cause problem for if string * int or string + int
@@ -257,6 +263,7 @@ void interpret(astptr head)
         //This is a boolean operator
         interpret(mid);
         if(current_dataytpe==n_integer){
+            cout << "inside boolexp left = " << bool_exp_left << "right = " << bool_exp_right << endl;
             flag = boolean_evaluate_int(bool_exp_left, bool_exp_right,mid->asttype); 
         } else if (current_dataytpe==n_string){
             flag = boolean_evaluate_string(bool_left_str, bool_right_str,mid->asttype);

@@ -397,6 +397,15 @@ astptr list()
         }
         else if (currenttoken == doublequotesym || currenttoken == singlequotesym)
         {
+            // currenttoken = cleanLexer();
+
+        }
+        else if(currenttoken == closesquaresym){
+            //The list is empty
+            int_vector.clear();
+            tempid=add_vector(int_vector);
+            pfirst = newnode(n_list_int,tempid, NULL, NULL, NULL);
+            currenttoken = cleanLexer();
         }
     }
     return pfirst;
@@ -680,11 +689,7 @@ astptr assignment()
         if(currenttoken==opensquaresym){
             currenttoken = cleanLexer();
             if(currenttoken!=intsym){
-                if(currenttoken==closebracketsym){
-
-                }else{
                 //TODO TypeError: list indices must be integers or slices, not str
-                }
             }else{
                 index_num = newnode(n_index_assign_index,to_string(intvalue),NULL,NULL,NULL);
                 index_id = newnode(n_index_assign_id,id, NULL,NULL,NULL);
@@ -1238,11 +1243,11 @@ void print_vector_int(){
         if(i!=(int)current_vec_int.size()-1){
             cout << ", ";
         }
-        else{
-            cout << "]";
-        }
     }
+    cout << "]";
+
 };
+
 void print_vector_int(vector<double> v){
     cout << "[";
     for(auto itr : v)
