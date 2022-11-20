@@ -1,25 +1,16 @@
-#Initialize list
-listX = [1,2,3,4,5]
-ListY = [7,8,9,10]
-listZ = []
+# sum all list heads
+listX = [5,3,2,7,8,9]
+listY = [5,2,7,8,6,8]
+listZ = [5,4,6,5,2,8]
 
-#Increment x
-x = 0 
-x = x+1
+sum1 = listX[0] + listY[0] + listZ[0]
 
-listZ = listX + ListY
-listZ[0] = listZ[0] + x
+listA = [10,3,2,7,8,9]
+listB = [10,2,7,8,6,8]
+listC = [10,4,6,5,2,8]
 
-x = x+1
-listZ[1] = listZ[1] + x
+sum2 = listA[0] + listB[0] + listC[0]
 
-x = x+1
-listZ[2] = listZ[2] + x
+sums = sum1 + sum2
 
-x = x+1
-listZ[3] = listZ[3] + x
-
-if x <= 3:
-    print(x)
-else:
-    print("listZ: ",listZ)
+print(sums)

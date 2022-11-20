@@ -116,7 +116,7 @@ void interpret(astptr head)
         // cout << "inside n_plus interpreter right n_type = ";
         // print_current_parsetoken(right->asttype);
         // cout << endl;
-        // //
+        //
         // current_vec_int.clear();
 
 
@@ -138,7 +138,15 @@ void interpret(astptr head)
             temp = intvalue;           
         } else if(left->asttype==n_list_int){
 
-        }   
+        } else if(left->asttype==n_plus){
+            interpret(left);
+            temp = temp + intvalue;
+            tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
+        } else {
+            interpret(left);
+            temp = intvalue;
+            notfound = false;
+        }
 
 
         if(right->asttype==n_id){
@@ -157,9 +165,23 @@ void interpret(astptr head)
             interpret(right);
             temp = temp + intvalue;  
             intvalue = temp;
-        } else {
+        } else if(right->asttype==n_list_int){
             
-        }   
+        } else if(right->asttype==n_plus){
+            interpret(right);
+            temp = temp + intvalue;  
+            intvalue = temp;
+            tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
+            current_vec_int = tempvec_double;
+
+        } else {
+            interpret(right);
+            temp = temp + intvalue;
+            intvalue = temp;
+            notfound = false;
+
+        }
+
         break;
     
    /*
@@ -415,9 +437,9 @@ void interpret(astptr head)
         left = head->p1;
 
         //
-        cout << "___________";
-        print_current_parsetoken(head->asttype);
-        cout << "___________";
+        // cout << "___________";
+        // print_current_parsetoken(left->asttype);
+        // cout << "___________" << endl;
 
         //
         current_dataytpe = left->asttype;
