@@ -392,6 +392,7 @@ astptr list()
                 }
             }//: Exit while
             tempid = add_vector(int_vector);
+            int_vector.clear();
             pfirst = newnode(n_list_int,tempid, NULL, NULL, NULL);
         }
         else if (currenttoken == doublequotesym || currenttoken == singlequotesym)
@@ -679,7 +680,11 @@ astptr assignment()
         if(currenttoken==opensquaresym){
             currenttoken = cleanLexer();
             if(currenttoken!=intsym){
+                if(currenttoken==closebracketsym){
+
+                }else{
                 //TODO TypeError: list indices must be integers or slices, not str
+                }
             }else{
                 index_num = newnode(n_index_assign_index,to_string(intvalue),NULL,NULL,NULL);
                 index_id = newnode(n_index_assign_id,id, NULL,NULL,NULL);
@@ -1172,6 +1177,15 @@ void print_current_parsetoken(nodetype n){
         case n_block_stmts:
             cout << "n_block_stmts" << endl;
              break;
+        case n_index_assign_data:
+            cout << "n_index_assign_data" <<endl;
+            break;
+        case n_index_assign_id:
+            cout << "n_index_assign_id" <<endl;
+            break;
+        case n_index_assign_index:
+            cout << "n_index_assign_index" <<endl;
+            break;
     default:
         break;
     }

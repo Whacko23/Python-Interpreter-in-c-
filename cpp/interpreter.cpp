@@ -93,14 +93,30 @@ void interpret(astptr head)
         break;
     case n_list_int:
         save_id = head->astdata;
+        // current_vec_int.clear();
         current_vec_int = get_vector_int(save_id);
+        // cout << "INside list_int save id = " << save_id<<endl;
+        // print_vector_int();
+        // cout << "-----" << endl;
         // notfound=false;
         break;
     case n_plus:
+    
         temp = 0;
         left = head->p1;
         right = head->p2;
-        get_vector_int(left->astdata);
+        // //
+        // cout << "inside n_plus interpreter left n_type = ";
+        // print_current_parsetoken(left->asttype);
+        // cout << endl;
+        // //
+        // //
+        // cout << "inside n_plus interpreter right n_type = ";
+        // print_current_parsetoken(right->asttype);
+        // cout << endl;
+        // //
+        // current_vec_int.clear();
+        current_vec_int=get_vector_int(left->astdata);
         if(notfound){
             interpret(left);
             temp = temp + intvalue;
@@ -108,16 +124,33 @@ void interpret(astptr head)
             temp = temp + intvalue;
             intvalue = temp;
             notfound = false;
-                break;
         } else {
             tempvec_double = current_vec_int;
-            get_vector_int(right->astdata);
+            // cout << "first vec" << " first data = " << left->astdata;
+            // print_vector_int(current_vec_int);
+            // cout << endl;
 
+            current_vec_int = get_vector_int(right->astdata);
+            // cout << "second vec" << " second data = " << right->astdata;
+            // print_vector_int(current_vec_int);
+            // cout << endl;
             tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
             assign_list_variable = true;
-            // current_vec_int = tempvec_double;
+            current_vec_int = tempvec_double;
         }
         break;
+    
+   /*
+        temp = 0;
+        left = head->p1;
+        right = head->p2;
+        interpret(left);
+        temp = temp + intvalue;
+        interpret(right);
+        temp = temp + intvalue;
+        intvalue = temp;
+        break;
+    */
     case n_minus:
         temp = 0;
         left = head->p1;
@@ -233,6 +266,8 @@ void interpret(astptr head)
         save_id = head->astdata;
         left=head->p1;
         temp = stoi(left->astdata);
+        // cout << "current index = " << temp << endl;
+        // current_vec_int.clear();
         current_vec_int = get_vector_int(save_id);
         if(notfound){
             intvalue = int_indefiers[left->astdata];
@@ -243,11 +278,12 @@ void interpret(astptr head)
         break;
     case n_assignment_list:
         left=head->p1;
-        current_dataytpe = left->asttype;
         save_id = head->astdata;
         interpret(left);
-        if(current_dataytpe==n_list_int){
+        if(left->asttype==n_list_int){
+            // current_vec_int=get_vector_int(left->astdata);
             vector_identifiers[save_id]=current_vec_int;
+            // current_vec_int.clear();  
         }
         break;
     case n_assignment_int:
@@ -255,11 +291,14 @@ void interpret(astptr head)
         identifier = head->astdata;
         save_id = identifier;
         interpret(left);
+
+
         if(assign_list_variable==false){
-            // int_indefiers[identifier];
+            int_indefiers[identifier];
             // interpret(left);
             int_indefiers[save_id] = intvalue;
         } else {
+            vector_identifiers[save_id];
             vector_identifiers[save_id] = current_vec_int;
             assign_list_variable=false;
         }
@@ -279,7 +318,8 @@ void interpret(astptr head)
         }
         else if (current_dataytpe==n_id)
         {
-            get_vector_int(left->astdata);
+            // current_vec_int.clear();
+            current_vec_int = get_vector_int(left->astdata);
             if(notfound){ 
                 cout << int_indefiers[left->astdata];
             } else{
@@ -306,7 +346,8 @@ void interpret(astptr head)
         {
 
             cout << " ";
-            get_vector_int(right->astdata);
+            // current_vec_int.clear();
+            current_vec_int = get_vector_int(right->astdata);
             if(notfound){ 
                 cout << int_indefiers[right->astdata];
                 if(firstprint==true){
@@ -333,6 +374,7 @@ void interpret(astptr head)
         break;
     case n_print:
         left = head->p1;
+
         current_dataytpe = left->asttype;
         if (current_dataytpe == n_integer || current_dataytpe == n_plus || current_dataytpe == n_minus || current_dataytpe == n_mul || current_dataytpe == n_div)
         {
@@ -346,7 +388,8 @@ void interpret(astptr head)
         }
         else if (current_dataytpe==n_id)
         {
-            get_vector_int(left->astdata);
+            // current_vec_int.clear();
+            current_vec_int=get_vector_int(left->astdata);
             if(notfound){ 
                 cout << int_indefiers[left->astdata];
                 if(firstprint==true){
@@ -375,20 +418,27 @@ void interpret(astptr head)
         //right is the expression
         right = head->p3;
         
+        //TODO check if right asttype ==
         interpret(right);
         temp = intvalue;
 
         save_id = left->astdata;
         index = stod(mid->astdata);
 
-        get_vector_int(save_id);
+        // current_vec_int.clear();
+        // current_vec_int = get_vector_int(save_id);
+        interpret(left);
+
 
         current_vec_int.at(index) = temp;
         modify_vector_int(save_id, current_vec_int);
 
         break;
+    case n_index_assign_id:
+        current_vec_int=get_vector_int(head->astdata);
+        break;
     case n_error: case n_def:
-    case n_empty: case n_index_assign_id:
+    case n_empty: 
     case n_index_assign_index:
     case n_uminus: case n_listindex_data:
         break;
