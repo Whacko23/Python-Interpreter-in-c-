@@ -107,7 +107,7 @@ void interpret(astptr head)
         temp = 0;
         left = head->p1;
         right = head->p2;
-        // //
+        //
         // cout << "inside n_plus interpreter left n_type = ";
         // print_current_parsetoken(left->asttype);
         // cout << endl;
@@ -118,28 +118,48 @@ void interpret(astptr head)
         // cout << endl;
         // //
         // current_vec_int.clear();
-        current_vec_int=get_vector_int(left->astdata);
-        if(notfound){
-            interpret(left);
-            temp = temp + intvalue;
-            interpret(right);
-            temp = temp + intvalue;
-            intvalue = temp;
-            notfound = false;
-        } else {
-            tempvec_double = current_vec_int;
-            // cout << "first vec" << " first data = " << left->astdata;
-            // print_vector_int(current_vec_int);
-            // cout << endl;
 
-            current_vec_int = get_vector_int(right->astdata);
-            // cout << "second vec" << " second data = " << right->astdata;
-            // print_vector_int(current_vec_int);
-            // cout << endl;
-            tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
-            assign_list_variable = true;
-            current_vec_int = tempvec_double;
-        }
+
+
+        if(left->asttype==n_id){
+            current_vec_int=get_vector_int(left->astdata);
+            if(notfound){
+                interpret(left);
+                temp = intvalue;
+                notfound = false;
+            } else {
+                tempvec_double = current_vec_int;
+                // cout << "first vec" << " first data = " << left->astdata;
+                // print_vector_int(current_vec_int);
+                // cout << endl;
+            }
+        } else if (left->asttype==n_integer || left->asttype==n_listindex){
+            interpret(left);
+            temp = intvalue;           
+        } else if(left->asttype==n_list_int){
+
+        }   
+
+
+        if(right->asttype==n_id){
+            current_vec_int=get_vector_int(right->astdata);
+            if(notfound){
+                interpret(right);
+                temp = temp + intvalue;
+                intvalue = temp;
+                notfound = false;
+            } else {
+                tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
+                assign_list_variable = true;
+                current_vec_int = tempvec_double;
+            }
+        } else if (right->asttype==n_integer || right->asttype==n_listindex){
+            interpret(right);
+            temp = temp + intvalue;  
+            intvalue = temp;
+        } else {
+            
+        }   
         break;
     
    /*
@@ -288,6 +308,7 @@ void interpret(astptr head)
         // current_vec_int.clear();
         current_vec_int = get_vector_int(save_id);
         if(notfound){
+            //TODO error
             intvalue = int_indefiers[left->astdata];
             break;
         } else {
@@ -393,6 +414,12 @@ void interpret(astptr head)
     case n_print:
         left = head->p1;
 
+        //
+        cout << "___________";
+        print_current_parsetoken(head->asttype);
+        cout << "___________";
+
+        //
         current_dataytpe = left->asttype;
         if (current_dataytpe == n_integer || current_dataytpe == n_plus || current_dataytpe == n_minus || current_dataytpe == n_mul || current_dataytpe == n_div)
         {
