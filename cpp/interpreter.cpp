@@ -11,10 +11,12 @@ int previous_line = 1;
 int current_line = 1;
 bool assign_list_variable = false;
 bool firstprint = true;
+nodetype current_dataytpe=n_empty;
 
 
 
-bool boolean_evaluate_int(int l, int r, nodetype n){
+
+bool boolean_evaluate_int(double l, double r, nodetype n){
     if(n == n_eq){
         if(l==r) return true;
     } else if (n == n_ne){
@@ -61,7 +63,6 @@ void interpret(astptr head)
     string save_id, bool_left_str, bool_right_str;
     vector<double> tempvec_double;
 
-    nodetype current_dataytpe;
     
     // cout << "Datatype " << head->asttype << " Data " << head->astdata << endl;
     switch (head->asttype)
@@ -88,7 +89,8 @@ void interpret(astptr head)
         break;
     case n_id:
         identifier = head->astdata;
-        current_dataytpe = n_id;
+        //Hardcoded n_integer
+        current_dataytpe = n_integer;
         intvalue = int_indefiers[identifier];
         break;
     case n_list_int:
@@ -228,10 +230,8 @@ void interpret(astptr head)
         right = head->p3;
         interpret(left);
         if(flag==true){
-            cout << "n_if flag true = " << flag << endl;
             interpret(mid);
         } else {
-            cout << "n_if flag true = " << flag << endl;
             interpret(right);
         }
         break;
@@ -243,31 +243,42 @@ void interpret(astptr head)
         //This takes into account of the order that n_booleaexp has booleanexpression, booleanexpression, boolean operator
         interpret(left);
         //NOTE this might cause problem for if string * int or string + int
-        if(left->asttype==n_integer){
+        /*
+        if(current_dataytpe==n_integer){
             bool_exp_left = intvalue;
             current_dataytpe = n_integer;
-        } else if (left->asttype==n_string){
+        } else if (current_dataytpe==n_string){
             bool_left_str = identifier;
             current_dataytpe = n_string;
         }
+        */
+        
+        bool_exp_left = intvalue;
 
         interpret(right);
+        bool_exp_right = intvalue;
 
-        if(right->asttype==n_integer){
+        /*
+        if(current_dataytpe==n_integer){
             bool_exp_right = intvalue;
             current_dataytpe = n_integer;
-        } else if (right->asttype==n_string){
+        } else if (current_dataytpe==n_string){
             current_dataytpe = n_string;
             bool_right_str = identifier;
         }
+        */
         //This is a boolean operator
         interpret(mid);
+        flag = boolean_evaluate_int(bool_exp_left, bool_exp_right,mid->asttype); 
+
+        /*
         if(current_dataytpe==n_integer){
             cout << "inside boolexp left = " << bool_exp_left << "right = " << bool_exp_right << endl;
             flag = boolean_evaluate_int(bool_exp_left, bool_exp_right,mid->asttype); 
         } else if (current_dataytpe==n_string){
             flag = boolean_evaluate_string(bool_left_str, bool_right_str,mid->asttype);
         }
+        */
         break;
     case n_listindex:
         save_id = head->astdata;

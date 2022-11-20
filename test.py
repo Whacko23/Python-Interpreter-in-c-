@@ -1,41 +1,36 @@
-# #Initialize list
-# listX = [1,2,3,4,5]
-# ListY = [7,8,9,10]
-# listZ = []
+#Initialize list
+listX = [1,2,3,4,5]
+ListY = [7,8,9,10]
+listZ = []
 
-# #Increment x
-# x = 0 
-# x = x+1
+#Increment x
+x = 0 
+x = x+1
 
-# listZ = listX + ListY
-# listZ[0] = x + listZ[0]
-# print("listZ[0]",listZ[0])
-# print("x = ",x)
+listZ = listX + ListY
+print(listZ)
 
-# x = x+1
-# print("before x = ",x)
-# listZ[1] = listZ[1] + x
-# print("listZ[1]",listZ[1])
-# print("x = ",x)
+listZ[0] = 5
+print("listZ[0]",listZ[0])
+print(listZ)
+
+x = x+1
+listZ[1] = listZ[1] + x
+print("listZ[1]",listZ[1])
+print(listZ)
 
 
-# x = x+1
-# print("before x = ",x)
-# listZ[2] = x + listZ[2] 
-# print("listZ[2]",listZ[2])
-# print("x = ",x)
+x = x+1
+listZ[2] = x + listZ[2] 
+print("listZ[2]",listZ[2])
+print(listZ)
 
-# x = x+1
-# print("before x = ",x)
-# listZ[3] = listZ[3] + x
-# print("listZ[3]",listZ[3])
-# print("x = ",x)
+x = x+1
+listZ[3] = listZ[3] + x
+print("listZ[3]",listZ[3])
+print(listZ)
 
-x=4
 if x <= 3:
-    print("ifblock")
-    print(x)
+  print(x)
 else:
-    print("elseblock")
-    #print(listZ)
-    print(x)
+  print(listZ)

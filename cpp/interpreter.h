@@ -11,6 +11,6 @@
 
 using namespace std;
 
-extern bool boolean_evaluate_int(int l, int r, nodetype n);
+extern bool boolean_evaluate_int(double l, double r, nodetype n);
 extern bool boolean_evaluate_string(string l, string r, nodetype n);
 #endif
