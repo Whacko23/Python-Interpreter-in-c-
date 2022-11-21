@@ -12,6 +12,7 @@ int grammar_tracker = 1;
 
 vector<double> int_vector;
 vector<string> string_vector;
+map<string, vector<string>> funct_args;
 
 astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third)
 {
@@ -412,10 +413,61 @@ astptr list()
 };
 
 /*
-<function> -> identifier {()| (<argumentlist>))} : <functionbody>
+This function does not have a return type defined
+<function> -> 'def' NAME '(' [params] ')' ':'  block
 */
 astptr funct()
 {
+    astptr pfirst=NULL;
+    string funct_name,arg1,arg2;
+    bool arg_found=false;
+
+    string_vector.clear();
+
+    currenttoken=cleanLexer();
+    if(currenttoken!=identifiersym){
+        //TODO throw error
+    } else {
+        funct_name = identifier;
+        currenttoken=cleanLexer();
+        if (currenttoken!=openbracketsym){
+            //TODO error
+        } else {
+            currenttoken=cleanLexer();
+            if(currenttoken==identifiersym){
+                //Function with arguments
+                arg1=identifier;
+                currenttoken=cleanLexer();
+                string_vector.push_back(arg1);
+                if(currenttoken==closebracketsym){
+                    //Function with one argument
+                    currenttoken=cleanLexer();
+                    //ADD function herezzzz
+                }else if (currenttoken==commasym){
+                    //Function with two argument
+                    currenttoken==cleanLexer();
+                    arg2=identifier;
+                    string_vector.push_back(arg2);
+                    currenttoken=cleanLexer();
+                    if(currenttoken==closesquaresym){
+                        currenttoken==cleanLexer();
+                        //ADD function herezzzz
+                    }else{
+                        //TODO throw error missing )
+                    }
+                } else {
+                    //TODO throw error
+                }
+            } else if (currenttoken==closebracketsym){
+                currenttoken=cleanLexer();
+                //This is a function with no parameter
+            } else{
+                //TODO Error missing )
+            }
+        }
+
+
+    }
     return newnode(n_empty, "", NULL, NULL, NULL);
 };
 

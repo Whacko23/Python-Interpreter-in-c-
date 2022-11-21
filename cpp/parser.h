@@ -45,7 +45,8 @@ typedef enum
     n_index_assign_data,
     // Variable
     n_id,
-    // n_fcall,
+    n_funct,
+    n_funct_arg,
     // n_args,
     // n_return,
     n_while,
@@ -115,4 +116,5 @@ extern void print_vector_int();
 extern void print_vector_int(vector<double> v);
 extern vector<double> current_vec_int;
 extern vector<string> current_vec_str;
+extern map<string, vector<string>> funct_args;
 #endif
