@@ -141,7 +141,7 @@ lextokens lexer(){
     string dat = current.data;
 
     if(tok==newlinesym) linenumber++;
-    if(tok==intsym) intvalue = stoi(dat);
+    if(tok==intsym) intvalue = stod(dat);
     if(tok==identifiersym || tok==singlequotesym || tok==doublequotesym) identifier = dat;
 
     vectorindex++;

@@ -45,10 +45,11 @@ typedef enum
     n_index_assign_data,
     // Variable
     n_id,
+    n_funct_definiton,
     n_funct,
     n_funct_arg,
     // n_args,
-    // n_return,
+    n_return,
     n_while,
     n_if,
     n_ifelse,
@@ -84,14 +85,13 @@ extern astptr whilestatement();
 extern astptr blockstatement();
 extern astptr blockstatements();
 extern astptr printstatement();
-extern astptr returnstatement();
-extern astptr expressiont();
+extern astptr expression();
 extern astptr term();
 extern astptr factor();
 extern astptr booleanexpression();
 extern astptr funct();
-extern astptr functionbody();
-extern astptr argumentlist();
+extern astptr returnstatement();
+// extern astptr argumentlist();
 extern astptr list();
 extern astptr booleanexpression();
 extern astptr booleanoperation();
@@ -117,4 +117,7 @@ extern void print_vector_int(vector<double> v);
 extern vector<double> current_vec_int;
 extern vector<string> current_vec_str;
 extern map<string, vector<string>> funct_args;
+extern string add_funct_args(vector<string> v);
+extern map<string, astptr> funct_definitions;
+extern void add_function_def(string n, astptr p);
 #endif

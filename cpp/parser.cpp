@@ -6,13 +6,16 @@
 
 // #define DEEBUG
 
-
+#ifdef DEEBUG
 int grammar_tracker = 1;
+#endif
 
 
 vector<double> int_vector;
 vector<string> string_vector;
 map<string, vector<string>> funct_args;
+map<string, astptr> funct_definitions;
+void add_function_def(string n, astptr p);
 
 astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third)
 {
@@ -320,14 +323,30 @@ astptr blockstatements()
     return pfirst;
 };
 
+/*
+<return> -> 'return' <expression>
+*/
 astptr returnstatement()
 {
-    return newnode(n_empty, "", NULL, NULL, NULL);
+    #ifdef DEEBUG
+    cout << grammar_tracker<< " ---inside  returnstatement()---" << endl;
+    grammar_tracker++;
+    #endif
+    astptr pfirst = NULL;
+    currenttoken = cleanLexer();
+
+    pfirst = expression();
+
+    return newnode(n_return, "", pfirst, NULL, NULL);
 };
 
 // NOTE the previous function (assignment) has already checked for [] brackets
 astptr list()
 {
+    #ifdef DEEBUG
+    cout << grammar_tracker<< " ---inside  list()---" << endl;
+    grammar_tracker++;
+    #endif
     astptr pfirst=NULL;
     string tempid;
     if (currenttoken == opensquaresym)
@@ -418,13 +437,20 @@ This function does not have a return type defined
 */
 astptr funct()
 {
+    #ifdef DEEBUG
+    cout << grammar_tracker<< " ---inside  funct---" << endl;
+    grammar_tracker++;
+    #endif
+
     astptr pfirst=NULL;
-    string funct_name,arg1,arg2;
+    string funct_name,arg1,arg2,arg_index;
     bool arg_found=false;
 
     string_vector.clear();
 
+    //This skips 'def' that is stored in currenttoken
     currenttoken=cleanLexer();
+
     if(currenttoken!=identifiersym){
         //TODO throw error
     } else {
@@ -439,19 +465,23 @@ astptr funct()
                 arg1=identifier;
                 currenttoken=cleanLexer();
                 string_vector.push_back(arg1);
+                arg_found = true;
                 if(currenttoken==closebracketsym){
                     //Function with one argument
                     currenttoken=cleanLexer();
-                    //ADD function herezzzz
+                    arg_index = add_funct_args(string_vector);
                 }else if (currenttoken==commasym){
                     //Function with two argument
                     currenttoken==cleanLexer();
+                    if(currenttoken!=identifiersym){
+                        //Todo throw error
+                    }
                     arg2=identifier;
                     string_vector.push_back(arg2);
                     currenttoken=cleanLexer();
                     if(currenttoken==closesquaresym){
                         currenttoken==cleanLexer();
-                        //ADD function herezzzz
+                        arg_index = add_funct_args(string_vector);
                     }else{
                         //TODO throw error missing )
                     }
@@ -464,23 +494,44 @@ astptr funct()
             } else{
                 //TODO Error missing )
             }
+
+            if(currenttoken!=colonsym){
+                //TODO Error missing :
+            } else if(currenttoken==colonsym){
+                currenttoken=cleanLexer();
+            }
+
+            if(currenttoken==newlinesym){
+                currenttoken=cleanLexer();
+            }
+
+            pfirst=blockstatements();
+            
+            if(arg_found){
+                pfirst = newnode(n_funct_arg,arg_index,pfirst,NULL,NULL);
+            } else {
+                pfirst = newnode(n_funct,"",pfirst,NULL,NULL);
+            }
+
+            add_function_def(funct_name,pfirst);
         }
 
 
     }
-    return newnode(n_empty, "", NULL, NULL, NULL);
+    return newnode(n_funct_definiton, funct_name, NULL, NULL, NULL);
 };
 
-astptr functionbody()
-{
-    return newnode(n_empty, "", NULL, NULL, NULL);
-};
+
+/*
+
+// NOTE Might do it later to support multiple arguments. 
+// Right now, used if-else to support upto 2 function arguments.
 
 astptr argumentlist()
 {
     return newnode(n_empty, "", NULL, NULL, NULL);
 };
-
+*/
 
 /*
 <expr> -> [+ | -]<term> {(+ | -) <term>}
@@ -1249,9 +1300,10 @@ void print_current_parsetoken(nodetype n){
 };
 
 
-/*_________Interpreter______*/
+/*_________Interpreter functions______*/
 
 int vector_index = 0;
+int function_arg_index = 0;
 map<string, double> int_indefiers;
 map<string, string> string_identifiers;
 map<string, vector<double>> vector_identifiers;
@@ -1264,6 +1316,18 @@ string add_vector(vector<double> v){
     vector_identifiers.insert({to_string(vector_index),v});
     return to_string(vector_index);
 }
+
+string add_funct_args(vector<string> v){
+    function_arg_index++;
+    funct_args.insert({to_string(function_arg_index),v});
+    return to_string(function_arg_index);
+};
+
+void add_function_def(string n, astptr p){
+    // funct_definitions[n]=p;
+    funct_definitions.insert({n,p});
+
+};
 
 vector<double> get_vector_int(string s){
     map<string, vector<double>>::iterator search = vector_identifiers.find(s);
