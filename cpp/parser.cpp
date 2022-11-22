@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-// #define DEEBUG
+#define DEEBUG
 
 #ifdef DEEBUG
 int grammar_tracker = 1;
@@ -66,7 +66,7 @@ astptr statements()
         }
         if (currenttoken == newlinesym)
         {
-            linenumber++;
+            // linenumber++;
             pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
             currenttoken = cleanLexer();
         }
@@ -124,7 +124,7 @@ astptr simple_stmt()
 
             if (currenttoken == newlinesym)
             {
-                linenumber++;
+                // linenumber++;
                 pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
                 currenttoken = cleanLexer();
 
@@ -311,7 +311,7 @@ astptr blockstatements()
         }
         if (currenttoken == newlinesym)
         {
-            linenumber++;
+            // linenumber++;
             pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
             currenttoken = lexer();
             if (currenttoken != whitespacesym){
@@ -401,7 +401,7 @@ astptr list()
                     grammar_tracker++;
                     #endif
                     //TODO error
-                    linenumber++;
+                    // linenumber++;
                     pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
                     currenttoken = cleanLexer();
                     break;
@@ -793,7 +793,7 @@ astptr ifstatement()
         {
             currenttoken = lexer();
             if (currenttoken == newlinesym){
-                linenumber++;
+                // linenumber++;
                 pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
                 currenttoken = lexer();
             }
@@ -806,7 +806,7 @@ astptr ifstatement()
                 {
                     currenttoken = lexer();
                     if (currenttoken == newlinesym){
-                        linenumber++;
+                        // linenumber++;
                         pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
                         currenttoken = lexer();
                     }

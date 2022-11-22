@@ -29,7 +29,7 @@ int main(int argc, const char *argv[])
 
     bool firstline = true;
 
-    linenumber = 0;
+    linenumber = 1;
 
     if (file)
     {

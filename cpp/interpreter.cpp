@@ -540,6 +540,11 @@ void interpret(astptr head)
         if(left==NULL){
             /*This is an function without argument*/
             mid = get_funct_head(save_id);
+            //
+            cout << "mid asttype = " ;
+            print_current_parsetoken(mid->asttype);
+            cout << endl;
+            //
             interpret(mid);
 
         }
