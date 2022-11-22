@@ -10,7 +10,7 @@ string identifier;
 double intvalue;
 int tracker;
 int linenumber = 1;
-int vectorindex = 0;
+int lexer_vectorindex = 0;
 lextokens currenttoken;
 string lineInput;
 bool firstline = true;
@@ -75,7 +75,7 @@ lextokens lext(){
             strinteger = strinteger + ch;
             ch = getch();
         }
-        intvalue = stoi(strinteger);
+        intvalue = stod(strinteger);
         return intsym;
     }
 
@@ -136,7 +136,7 @@ lextokens lext(){
 }
 
 lextokens lexer(){
-    token current = vec[vectorindex];
+    token current = vec[lexer_vectorindex];
     lextokens tok = current.tokentype;
     string dat = current.data;
 
@@ -144,7 +144,7 @@ lextokens lexer(){
     if(tok==intsym) intvalue = stod(dat);
     if(tok==identifiersym || tok==singlequotesym || tok==doublequotesym) identifier = dat;
 
-    vectorindex++;
+    lexer_vectorindex++;
     return tok;
 }
 lextokens cleanLexer(){

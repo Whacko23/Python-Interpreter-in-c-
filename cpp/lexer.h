@@ -64,6 +64,7 @@ extern lextokens lext();
 extern lextokens lexer();
 extern int tracker;
 extern int linenumber;
+extern int lexer_vectorindex;
 extern bool firstline;
 extern double currdouble;
 

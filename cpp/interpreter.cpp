@@ -6,11 +6,12 @@
 
 
 
-bool flag = false;
-int previous_line = 1;
-int current_line = 1;
-bool assign_list_variable = false;
-bool firstprint = true;
+int previous_line = 1,
+    current_line = 1;
+bool firstprint = true, 
+     function_return = false,
+     assign_list_variable = false,
+     flag = false;
 nodetype current_dataytpe=n_empty;
 
 
@@ -78,6 +79,7 @@ void interpret(astptr head)
     case n_newline:
         left = head->p1;
         interpret(left);
+        current_dataytpe = head->asttype;    
         break;
     case n_integer:
         intvalue = stoi(head->astdata);
@@ -101,6 +103,7 @@ void interpret(astptr head)
         // print_vector_int();
         // cout << "-----" << endl;
         // notfound=false;
+        current_dataytpe = head->asttype;
         break;
     case n_plus:
     
@@ -166,7 +169,7 @@ void interpret(astptr head)
             temp = temp + intvalue;  
             intvalue = temp;
         } else if(right->asttype==n_list_int){
-            
+           //This is for a = [1,2] + [3,4] 
         } else if(right->asttype==n_plus){
             interpret(right);
             temp = temp + intvalue;  
@@ -181,7 +184,7 @@ void interpret(astptr head)
             notfound = false;
 
         }
-
+        current_dataytpe = head->asttype;
         break;
     
    /*
@@ -204,6 +207,7 @@ void interpret(astptr head)
         interpret(right);
         temp = temp - intvalue;
         intvalue = temp;
+        current_dataytpe = head->asttype;
         break;
     case n_div:
         temp = 0;
@@ -222,6 +226,7 @@ void interpret(astptr head)
             temp = temp / intvalue;
         }
         intvalue = temp;
+        current_dataytpe = head->asttype;
         break;
     case n_mul:
         temp = 0;
@@ -232,6 +237,7 @@ void interpret(astptr head)
         interpret(right);
         temp = temp * intvalue;
         intvalue = temp;
+        current_dataytpe = head->asttype;
         break;
     case n_statements:
     case n_while:
@@ -239,6 +245,7 @@ void interpret(astptr head)
         right = head->p2;
         interpret(left);
         interpret(right);
+        current_dataytpe = head->asttype;
         break;
     case n_if:
         // cout << head->astdata << " ";
@@ -249,22 +256,26 @@ void interpret(astptr head)
             interpret(right);
         } 
         // cout << "n_if flag value = " << flag << endl;
+        current_dataytpe = head->asttype;
         break;
     case n_block_stmts:
         left = head->p1;
         right = head->p2;
         interpret(left);
         interpret(right);
+        current_dataytpe = head->asttype;
         break;
     case n_statement:
         current_line = stoi(head->astdata);
         left = head->p1;
         interpret(left);
+        current_dataytpe = head->asttype;
         break;
     case n_block_stmt:
     case n_simple_stmt:
         left = head->p1;
         interpret(left);
+        current_dataytpe = head->asttype;
         break;
     case n_ifelse: 
         left = head->p1;
@@ -276,6 +287,7 @@ void interpret(astptr head)
         } else {
             interpret(right);
         }
+        current_dataytpe = head->asttype;
         break;
     case n_booleanexp:
         left = head->p1;
@@ -321,6 +333,7 @@ void interpret(astptr head)
             flag = boolean_evaluate_string(bool_left_str, bool_right_str,mid->asttype);
         }
         */
+        current_dataytpe = head->asttype;
         break;
     case n_listindex:
         save_id = head->astdata;
@@ -336,6 +349,7 @@ void interpret(astptr head)
         } else {
             intvalue = current_vec_int[temp];
         }
+        current_dataytpe = head->asttype;
         break;
     case n_assignment_list:
         left=head->p1;
@@ -346,6 +360,7 @@ void interpret(astptr head)
             vector_identifiers[save_id]=current_vec_int;
             // current_vec_int.clear();  
         }
+        current_dataytpe = head->asttype;
         break;
     case n_assignment_int:
         left = head->p1;
@@ -363,6 +378,7 @@ void interpret(astptr head)
             vector_identifiers[save_id] = current_vec_int;
             assign_list_variable=false;
         }
+        current_dataytpe = head->asttype;
         break;
     case n_prints:
         left = head->p1->p1;
@@ -417,6 +433,7 @@ void interpret(astptr head)
                 } else if(current_line!=previous_line){
                     cout<<endl;
                 } 
+                current_dataytpe = head->asttype;
                 break;
             }
             print_vector_int();
@@ -431,7 +448,7 @@ void interpret(astptr head)
         } else if(current_line!=previous_line){
             cout<<endl;
         }        
-
+        current_dataytpe = head->asttype;
         break;
     case n_print:
         left = head->p1;
@@ -478,6 +495,7 @@ void interpret(astptr head)
         } else if(current_line!=previous_line){
         cout<<endl;
         }
+        current_dataytpe = head->asttype;
         break;
     case n_index_assign_data:
         left = head->p1;
@@ -499,10 +517,24 @@ void interpret(astptr head)
 
         current_vec_int.at(index) = temp;
         modify_vector_int(save_id, current_vec_int);
-
+        current_dataytpe = head->asttype;
         break;
     case n_index_assign_id:
         current_vec_int=get_vector_int(head->astdata);
+        current_dataytpe = head->asttype;
+        break;
+    case n_funct_definiton:
+        /*
+        Do nothing bc parser has already handled it 
+        on astptr funct()
+        */ 
+        current_dataytpe = head->asttype;
+        break;
+    case n_fcall:
+        save_id = head->astdata;
+        left = head->p1;
+        right = head->p2;
+        current_dataytpe = head->asttype;
         break;
     case n_error: case n_def:
     case n_empty: 

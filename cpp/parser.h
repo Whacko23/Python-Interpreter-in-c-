@@ -48,6 +48,7 @@ typedef enum
     n_funct_definiton,
     n_funct,
     n_funct_arg,
+    n_fcall,
     // n_args,
     n_return,
     n_while,
@@ -90,6 +91,7 @@ extern astptr term();
 extern astptr factor();
 extern astptr booleanexpression();
 extern astptr funct();
+extern astptr funct_call();
 extern astptr returnstatement();
 // extern astptr argumentlist();
 extern astptr list();

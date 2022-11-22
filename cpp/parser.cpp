@@ -35,22 +35,30 @@ astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third)
 astptr statements()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker << " ---inside  stmts ---" << endl;
+    cout << grammar_tracker << " ---inside  stmts --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
     astptr pfirst = statement();
-    // int i=1;
+    #ifdef DEEBUG
+    int i=1;
+    #endif
+
     while (true)
     {
-        // if(i==10)break;
-        // i++;
-        // cout << "currenttoken";
-        // print_current_lextoken(currenttoken);
-        // cout << endl;
+        #ifdef DEEBUG
+
+        if(i==20)break;
+        i++;
+        cout << "currenttoken";
+        print_current_lextoken(currenttoken);
+        cout << endl;
+        #endif
+
+
         if (currenttoken == eofsym){
             #ifdef DEEBUG
-            cout << grammar_tracker << " ---exit  stmts loop---" << endl;
+            cout << grammar_tracker << " ---exit  stmts loop--- line # " << linenumber << endl;
             grammar_tracker++;
             #endif
 
@@ -66,7 +74,7 @@ astptr statements()
         pfirst = newnode(n_statements, "", pfirst, statement(), NULL);
 
         #ifdef DEEBUG
-        cout << grammar_tracker << " ---inside  stmts loop---" << endl;
+        cout << grammar_tracker << " ---inside  stmts loop--- line # " << linenumber << endl;
         grammar_tracker++;
         #endif
     }
@@ -80,7 +88,7 @@ statement: compound_stmt  | simple_stmts
 astptr statement()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  stmt---" << endl;
+    cout << grammar_tracker<< " ---inside  stmt--- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -99,7 +107,7 @@ astptr simple_stmt()
 {
     // TODO Log("inside statement function: Parser")
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  simple stmts---" << endl;
+    cout << grammar_tracker<< " ---inside  simple stmts--- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
     astptr pfirst = NULL;
@@ -110,7 +118,7 @@ astptr simple_stmt()
         while (true)
         {   
             #ifdef DEEBUG
-            cout << grammar_tracker<< " ---inside  simple stmts loop---" << endl;
+            cout << grammar_tracker<< " ---inside  simple stmts loop--- line # " << linenumber << endl;
             grammar_tracker++;
             #endif
 
@@ -121,7 +129,7 @@ astptr simple_stmt()
                 currenttoken = cleanLexer();
 
                 #ifdef DEEBUG
-                cout << grammar_tracker << " ---exit simple stmts loop by newline ----" << endl;
+                cout << grammar_tracker << " ---exit simple stmts loop by newline ---- line # " << linenumber << endl;
                 grammar_tracker++;
                 #endif
 
@@ -130,7 +138,7 @@ astptr simple_stmt()
             else if (currenttoken == eofsym)
             {
                 #ifdef DEEBUG
-                cout << grammar_tracker << " ---exit simple stmts loop by eof ----" << endl;
+                cout << grammar_tracker << " ---exit simple stmts loop by eof ---- line # " << linenumber << endl;
                 grammar_tracker++;
                 #endif                  
                 break;
@@ -138,8 +146,13 @@ astptr simple_stmt()
             currenttoken = cleanLexer();
         }
     }
-    if (currenttoken == identifiersym)
-        return assignment();
+    if (currenttoken == identifiersym){
+        //Lookahead without consuming token used here
+        if(vec[lexer_vectorindex].tokentype==openbracketsym)
+            return funct_call();
+        else
+            return assignment();
+    }
     else if (currenttoken == printsym)
         return printstatement();
     else if (currenttoken == returnsym)
@@ -160,7 +173,7 @@ compound_stmt:
 astptr compound_stmt()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  compound stmts ---" << endl;
+    cout << grammar_tracker<< " ---inside  compound stmts --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -180,7 +193,7 @@ astptr compound_stmt()
 astptr whilestatement()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  while stmt ---" << endl;
+    cout << grammar_tracker<< " ---inside  while stmt --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -216,7 +229,7 @@ block statement: block <statement>
 astptr blockstatement()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  block stmt ---" << endl;
+    cout << grammar_tracker<< " ---inside  block stmt --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -232,13 +245,13 @@ astptr blockstatement()
     while (true)
     {
         #ifdef DEEBUG
-        cout << grammar_tracker<< " ---inside  block stmt loop---" << endl;
+        cout << grammar_tracker<< " ---inside  block stmt loop--- line # " << linenumber << endl;
         grammar_tracker++;
         #endif
 
         if (currenttoken != whitespacesym){
             #ifdef DEEBUG
-            cout << grammar_tracker<< " ---exit  block stmt loop not whitespace---" << endl;
+            cout << grammar_tracker<< " ---exit  block stmt loop not whitespace--- line # " << linenumber << endl;
             grammar_tracker++;
             #endif
 
@@ -259,7 +272,7 @@ astptr blockstatement()
 astptr blockstatements()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  block stmts ---" << endl;
+    cout << grammar_tracker<< " ---inside  block stmts --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -277,21 +290,21 @@ astptr blockstatements()
     while (true)
     {
         #ifdef DEEBUG
-        cout << grammar_tracker<< " ---inside  block stmts loop---" << endl;
+        cout << grammar_tracker<< " ---inside  block stmts loop--- line # " << linenumber << endl;
         cout << currenttoken << " cuttnet " << endl;
         grammar_tracker++;
         #endif
         
         if (currenttoken == eofsym){
                 #ifdef DEEBUG
-                cout << grammar_tracker << " ---exit block stmt loop by eof ----" << endl;
+                cout << grammar_tracker << " ---exit block stmt loop by eof ---- line # " << linenumber << endl;
                 grammar_tracker++;
                 #endif
             break;
         }
         if (currenttoken == elsesym){
                 #ifdef DEEBUG
-                cout << grammar_tracker << " ---exit block stmt loop by else ----" << endl;
+                cout << grammar_tracker << " ---exit block stmt loop by else ---- line # " << linenumber << endl;
                 grammar_tracker++;
                 #endif
             break;
@@ -304,7 +317,7 @@ astptr blockstatements()
             if (currenttoken != whitespacesym){
 
                 #ifdef DEEBUG
-                cout << grammar_tracker << " ---exit block stmts loop by newline & not whitespace----" << endl;
+                cout << grammar_tracker << " ---exit block stmts loop by newline & not whitespace---- line # " << linenumber << endl;
                 grammar_tracker++;
                 #endif
 
@@ -329,7 +342,7 @@ astptr blockstatements()
 astptr returnstatement()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  returnstatement()---" << endl;
+    cout << grammar_tracker<< " ---inside  returnstatement()--- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
     astptr pfirst = NULL;
@@ -344,7 +357,7 @@ astptr returnstatement()
 astptr list()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  list()---" << endl;
+    cout << grammar_tracker<< " ---inside  list()--- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
     astptr pfirst=NULL;
@@ -375,7 +388,7 @@ astptr list()
                 if (currenttoken == eofsym)
                 {
                     #ifdef DEEBUG
-                    cout << grammar_tracker << " ---exit list  loop by eof ----" << endl;
+                    cout << grammar_tracker << " ---exit list  loop by eof ---- line # " << linenumber << endl;
                     grammar_tracker++;
                     #endif
 
@@ -384,7 +397,7 @@ astptr list()
                 if (currenttoken == newlinesym)
                 {
                     #ifdef DEEBUG
-                    cout << grammar_tracker << " ---exit list  loop by newline ----" << endl;
+                    cout << grammar_tracker << " ---exit list  loop by newline ---- line # " << linenumber << endl;
                     grammar_tracker++;
                     #endif
                     //TODO error
@@ -397,7 +410,7 @@ astptr list()
                 if (currenttoken == closesquaresym)
                 {
                     #ifdef DEEBUG
-                    cout << grammar_tracker << " ---exit list  loop by closebracker ----" << endl;
+                    cout << grammar_tracker << " ---exit list  loop by closebracker ---- line # " << linenumber << endl;
                     grammar_tracker++;
                     #endif
                     currenttoken = cleanLexer();
@@ -406,7 +419,7 @@ astptr list()
                 if (currenttoken == commasym){
                     currenttoken = cleanLexer();
                 } else {
-                    cout << "Error in list function checking for comma or closed bracket" << endl;
+                    cout << "Error in list function checking for comma or closed bracket line # " << linenumber << endl;
                     // Display error
                     break;
                 }
@@ -438,7 +451,7 @@ This function does not have a return type defined
 astptr funct()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  funct---" << endl;
+    cout << grammar_tracker<< " ---inside  funct--- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -472,7 +485,7 @@ astptr funct()
                     arg_index = add_funct_args(string_vector);
                 }else if (currenttoken==commasym){
                     //Function with two argument
-                    currenttoken==cleanLexer();
+                    currenttoken=cleanLexer();
                     if(currenttoken!=identifiersym){
                         //Todo throw error
                     }
@@ -480,7 +493,7 @@ astptr funct()
                     string_vector.push_back(arg2);
                     currenttoken=cleanLexer();
                     if(currenttoken==closesquaresym){
-                        currenttoken==cleanLexer();
+                        currenttoken=cleanLexer();
                         arg_index = add_funct_args(string_vector);
                     }else{
                         //TODO throw error missing )
@@ -534,6 +547,44 @@ astptr argumentlist()
 */
 
 /*
+<f call> -> <identifier> '(' [<factor> [','<factor>]] ')'
+*/
+
+//Function call is made to handle upto two arguments during calll
+astptr funct_call(){
+    #ifdef DEEBUG
+    cout << grammar_tracker<< " ---inside  funct call --- line # " << linenumber << endl;
+    grammar_tracker++;
+    #endif
+
+    string id = identifier;
+    astptr arg1=NULL, arg2=NULL;
+
+    //This consumes '('
+    currenttoken=lexer();
+    
+    currenttoken=cleanLexer();
+
+    if (currenttoken!=closebracketsym){
+        arg1=factor();
+        if(currenttoken==commasym){
+            currenttoken=cleanLexer();
+            arg2=factor();
+        }
+    } 
+
+    if (currenttoken==closebracketsym){
+        currenttoken=cleanLexer();
+    } else {
+        //TODO missing ')' error
+
+    }
+
+    return newnode(n_fcall, id, arg1,arg2,NULL);
+};
+
+
+/*
 <expr> -> [+ | -]<term> {(+ | -) <term>}
 */
 astptr expression()
@@ -541,7 +592,7 @@ astptr expression()
 
     // TODO Log("inside expression function: Parser")
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  expression---" << endl;
+    cout << grammar_tracker<< " ---inside  expression--- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -567,7 +618,7 @@ astptr expression()
     while ((currenttoken == plussym) || (currenttoken == minussym))
     {
         #ifdef DEEBUG
-        cout << grammar_tracker<< " ---inside  expression loop ---" << endl;
+        cout << grammar_tracker<< " ---inside  expression loop --- line # " << linenumber << endl;
         grammar_tracker++;
         #endif
 
@@ -596,7 +647,7 @@ astptr term()
 {
 
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  term---" << endl;
+    cout << grammar_tracker<< " ---inside  term--- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -610,7 +661,7 @@ astptr term()
     while ((currenttoken == multiplysym) || (currenttoken == dividesym))
     {
         #ifdef DEEBUG
-        cout << grammar_tracker<< " ---inside  term loop---" << endl;
+        cout << grammar_tracker<< " ---inside  term loop--- line # " << linenumber << endl;
         grammar_tracker++;
         #endif
 
@@ -633,12 +684,12 @@ astptr term()
 }
 
 /* factor
-<factor> -> id | arrayindex | integer | string | ( <expr> )
+<factor> -> id | arrayindex e.g. a[0] | integer | string | function call e.g. hello("world") |( <expr> )
 */
 astptr factor()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  factor ---" << endl;
+    cout << grammar_tracker<< " ---inside  factor --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -649,6 +700,12 @@ astptr factor()
     if (currenttoken == identifiersym)
     {
         temp = identifier;
+        //Lookahead without consuming token used here
+       
+        if((vec[lexer_vectorindex].tokentype)==openbracketsym){
+            return funct_call();
+        }
+
         currenttoken = cleanLexer();
         if(currenttoken==opensquaresym){
             currenttoken = cleanLexer();
@@ -714,7 +771,7 @@ astptr factor()
 astptr ifstatement()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  if stmt ---" << endl;
+    cout << grammar_tracker<< " ---inside  if stmt --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -775,74 +832,69 @@ astptr ifstatement()
 astptr assignment()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  assignment ---" << endl;
+    cout << grammar_tracker<< " ---inside  assignment --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
     astptr pfirst=NULL, lis=NULL, exp=NULL,index_id=NULL, index_num=NULL;
     string id;
-    if (currenttoken != identifiersym)
+
+    id = identifier;
+    currenttoken = cleanLexer();
+
+    //This is for the list index e.g. a[0] in a[0] = 1
+    if(currenttoken==opensquaresym){
+        currenttoken = cleanLexer();
+        if(currenttoken!=intsym){
+            //TODO TypeError: list indices must be integers or slices, not str
+        }else{
+            index_num = newnode(n_index_assign_index,to_string(intvalue),NULL,NULL,NULL);
+            index_id = newnode(n_index_assign_id,id, NULL,NULL,NULL);
+            currenttoken = cleanLexer();
+            if(currenttoken!=closesquaresym){
+                //TODO SyntaxError: invalid syntax missing ']'
+            } else {
+                currenttoken=cleanLexer();
+            }
+        }
+        if (currenttoken != assignsym) {
+            // TODO Expected assign symbol
+        } else {
+            currenttoken = cleanLexer();
+            exp = expression();
+            pfirst = newnode(n_index_assign_data, "", index_id, index_num , exp);
+            return pfirst;
+        }
+    }
+    /*
+    id = identifier;
+    currenttoken = cleanLexer();
+    */
+    if (currenttoken != assignsym)
     {
-        // TODO Expected identifier
+        // TODO Expected assign symbol
     }
     else
     {
-        id = identifier;
         currenttoken = cleanLexer();
-        if(currenttoken==opensquaresym){
-            currenttoken = cleanLexer();
-            if(currenttoken!=intsym){
-                //TODO TypeError: list indices must be integers or slices, not str
-            }else{
-                index_num = newnode(n_index_assign_index,to_string(intvalue),NULL,NULL,NULL);
-                index_id = newnode(n_index_assign_id,id, NULL,NULL,NULL);
-                currenttoken = cleanLexer();
-                if(currenttoken!=closesquaresym){
-                    //TODO SyntaxError: invalid syntax missing ']'
-                } else {
-                    currenttoken=cleanLexer();
-                }
-            }
-
-            if (currenttoken != assignsym) {
-                // TODO Expected assign symbol
-            } else {
-                currenttoken = cleanLexer();
-                exp = expression();
-                pfirst = newnode(n_index_assign_data, "", index_id, index_num , exp);
-                return pfirst;
-            }
-        }
-        /*
-        id = identifier;
-        currenttoken = cleanLexer();
-        */
-        if (currenttoken != assignsym)
+        if (currenttoken == opensquaresym)
         {
-            // TODO Expected assign symbol
+            //TODO check for list indexes as well
+            lis = list();
+            pfirst = newnode(n_assignment_list, id, lis, NULL, NULL);
+            if (currenttoken != closesquaresym)
+            {
+                // TODO Expected ']'
+            } else{
+                currenttoken = cleanLexer();
+            }
         }
         else
         {
-            currenttoken = cleanLexer();
-            if (currenttoken == opensquaresym)
-            {
-                //TODO check for list indexes as well
-                lis = list();
-                pfirst = newnode(n_assignment_list, id, lis, NULL, NULL);
-                if (currenttoken != closesquaresym)
-                {
-                    // TODO Expected ']'
-                } else{
-                    currenttoken = cleanLexer();
-                }
-            }
-            else
-            {
-
-                exp = expression();
-                pfirst = newnode(n_assignment_int, id, exp, NULL, NULL);
-            }
+            exp = expression();
+            pfirst = newnode(n_assignment_int, id, exp, NULL, NULL);
         }
+        
     }
     return pfirst;
 };
@@ -853,7 +905,7 @@ astptr assignment()
 astptr printstatement()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  print stmt ---" << endl;
+    cout << grammar_tracker<< " ---inside  print stmt --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -881,7 +933,7 @@ astptr printstatement()
             {
 
                 #ifdef DEEBUG
-                cout << " ---inside  print stmt loop ---" << endl;
+                cout << " ---inside  print stmt loop --- line # " << linenumber << endl;
                 #endif
 
 
@@ -912,7 +964,7 @@ astptr booleanexpression()
 {
     bool brackettracker=false;
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  bool exp ---" << endl;
+    cout << grammar_tracker<< " ---inside  bool exp --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -941,7 +993,7 @@ astptr booleanexpression()
 astptr booleanoperation()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  bool op ---" << endl;
+    cout << grammar_tracker<< " ---inside  bool op --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -980,7 +1032,7 @@ astptr booleanoperation()
 astptr parser()
 {
     #ifdef DEEBUG
-    cout << grammar_tracker<< " ---inside  parser() ---" << endl;
+    cout << grammar_tracker<< " ---inside  parser() --- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
 
@@ -1010,7 +1062,10 @@ void printParserTree(astptr head)
     case n_error:
     case n_empty:
     case n_def:
-        cout << head->astdata << " ";
+    case n_funct_definiton:
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        cout << " " << head->astdata << " ";
         cout << "*leaf* " << endl;
         break;
     case n_plus:
@@ -1021,28 +1076,38 @@ void printParserTree(astptr head)
     case n_while:
     case n_prints:
     case n_if:
-        cout << head->astdata << " ";
+    case n_fcall:
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+
+        cout << " "<< head->astdata << " ";
         left = head->p1;
         right = head->p2;
-        cout << "left " << endl;
+        cout << " left " << endl;
         printParserTree(left);
-        cout << "right " << endl;
+        cout << " right " << endl;
         printParserTree(right);
         break;
     case n_block_stmts:
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
         left = head->p1;
         right = head->p2;
-        cout << "left " << endl;
+        cout << " left " << endl;
         printParserTree(left);
-        cout << "right " << endl;
+        cout << " right " << endl;
         printParserTree(right);
         break;
     case n_statement:
     case n_block_stmt:
     case n_simple_stmt:
     case n_newline:
+    case n_return:
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+
         left = head->p1;
-        cout << "down " << endl;
+        cout << " down " << endl;
         printParserTree(left);
         break;
     case n_ifelse: case n_booleanexp:
@@ -1050,28 +1115,36 @@ void printParserTree(astptr head)
         left = head->p1;
         mid = head->p2;
         right = head->p3;
-        cout << "left " << endl;
+        cout << " left " << endl;
         printParserTree(left);
-        cout << "mid " << endl;
+        cout << " mid " << endl;
         printParserTree(mid);
-        cout << "right " << endl;
+        cout << " right " << endl;
         printParserTree(right);
         break;
     case n_assignment_list:
     case n_assignment_int:
-        cout << head->astdata << " = ";
+    case n_funct:
+    case n_funct_arg:
+
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+
+        cout << " " << head->astdata << " = ";
         left = head->p1;
-        cout << "down " << endl;
+        cout << " down " << endl;
         printParserTree(left);
         break;
     case n_print:
     case n_listindex:
     case n_uminus:
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
         left = head->p1;
         cout << head->astdata << " ";
-        cout << "down" << endl;
+        cout << " down" << endl;
         printParserTree(left);
-        break;
+        break;        
     }
 }
 
@@ -1097,6 +1170,7 @@ void freeMemory(astptr head)
     case n_listindex_data:
     case n_index_assign_index:
     case n_index_assign_id:
+    case n_funct_definiton:
         delete head;
         break;
     case n_plus:
@@ -1108,6 +1182,7 @@ void freeMemory(astptr head)
     case n_prints:
     case n_block_stmts:
     case n_if:
+    case n_fcall:
         left = head->p1;
         right = head->p2;
         delete head;
@@ -1123,6 +1198,9 @@ void freeMemory(astptr head)
     case n_assignment_int:
     case n_print:
     case n_uminus:
+    case n_funct:
+    case n_funct_arg:
+    case n_return:
         left = head->p1;
         delete head;
         freeMemory(left);
@@ -1294,8 +1372,25 @@ void print_current_parsetoken(nodetype n){
         case n_index_assign_index:
             cout << "n_index_assign_index" <<endl;
             break;
-    default:
-        break;
+         case n_return:
+            cout << "n_return" <<endl;
+            break;
+        case n_fcall:
+            cout << "n_fcall" <<endl;
+            break;
+        case n_funct:
+            cout << "n_funct" <<endl;
+            break;
+         case n_funct_arg:
+            cout << "n_funct_arg" <<endl;
+            break;
+         case n_funct_definiton:
+            cout << "n_funct_definiton" <<endl;
+            break;
+          case n_listindex_data:
+            cout << "n_listindex_data" <<endl;
+            break;
+               
     }
 };
 
