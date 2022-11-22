@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-#define DEEBUG
+// #define DEEBUG
 
 #ifdef DEEBUG
 int grammar_tracker = 1;
@@ -1101,7 +1101,6 @@ void printParserTree(astptr head)
     case n_statement:
     case n_block_stmt:
     case n_simple_stmt:
-    case n_newline:
     case n_return:
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
@@ -1143,6 +1142,10 @@ void printParserTree(astptr head)
         left = head->p1;
         cout << head->astdata << " ";
         cout << " down" << endl;
+        printParserTree(left);
+        break;
+    case n_newline:
+        left = head->p1;
         printParserTree(left);
         break;        
     }

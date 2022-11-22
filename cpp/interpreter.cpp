@@ -4,6 +4,7 @@
 
 #include "interpreter.h"
 
+#define TREE
 
 
 int previous_line = 1,
@@ -74,6 +75,10 @@ void interpret(astptr head)
     case n_lt:
     case n_le:
     case n_ge:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         current_dataytpe = head->asttype;
         break;
     case n_newline:
@@ -84,16 +89,37 @@ void interpret(astptr head)
     case n_integer:
         intvalue = stoi(head->astdata);
         current_dataytpe= n_integer;
+
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        cout << " = " << intvalue << " *leaf* ";
+        #endif
+
         break;
     case n_string:
         identifier = head->astdata;
         current_dataytpe = n_string;
+
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        cout << " = " << identifier << " *leaf* ";
+        #endif
+
         break;
     case n_id:
         identifier = head->astdata;
-        //Hardcoded n_integer
+        //Hardcoded n_integer, could be list as well
         current_dataytpe = n_integer;
         intvalue = int_indefiers[identifier];
+
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        cout << " = " << identifier << " *leaf* ";
+        #endif
+
         break;
     case n_list_int:
         save_id = head->astdata;
@@ -104,9 +130,20 @@ void interpret(astptr head)
         // cout << "-----" << endl;
         // notfound=false;
         current_dataytpe = head->asttype;
+
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        cout <<" *leaf* ";
+        #endif
+
         break;
     case n_plus:
     
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         temp = 0;
         left = head->p1;
         right = head->p2;
@@ -127,6 +164,9 @@ void interpret(astptr head)
         if(left->asttype==n_id){
             current_vec_int=get_vector_int(left->astdata);
             if(notfound){
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif                
                 interpret(left);
                 temp = intvalue;
                 notfound = false;
@@ -137,15 +177,24 @@ void interpret(astptr head)
                 // cout << endl;
             }
         } else if (left->asttype==n_integer || left->asttype==n_listindex){
+            #ifdef TREE
+            cout << " left " << endl;
+            #endif 
             interpret(left);
             temp = intvalue;           
         } else if(left->asttype==n_list_int){
 
         } else if(left->asttype==n_plus){
+            #ifdef TREE
+            cout << " left " << endl;
+            #endif 
             interpret(left);
             temp = temp + intvalue;
             tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
         } else {
+            #ifdef TREE
+            cout << " left " << endl;
+            #endif 
             interpret(left);
             temp = intvalue;
             notfound = false;
@@ -155,6 +204,9 @@ void interpret(astptr head)
         if(right->asttype==n_id){
             current_vec_int=get_vector_int(right->astdata);
             if(notfound){
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
                 interpret(right);
                 temp = temp + intvalue;
                 intvalue = temp;
@@ -165,12 +217,18 @@ void interpret(astptr head)
                 current_vec_int = tempvec_double;
             }
         } else if (right->asttype==n_integer || right->asttype==n_listindex){
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
             interpret(right);
             temp = temp + intvalue;  
             intvalue = temp;
         } else if(right->asttype==n_list_int){
            //This is for a = [1,2] + [3,4] 
         } else if(right->asttype==n_plus){
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
             interpret(right);
             temp = temp + intvalue;  
             intvalue = temp;
@@ -178,6 +236,9 @@ void interpret(astptr head)
             current_vec_int = tempvec_double;
 
         } else {
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
             interpret(right);
             temp = temp + intvalue;
             intvalue = temp;
@@ -199,22 +260,43 @@ void interpret(astptr head)
         break;
     */
     case n_minus:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
+
         temp = 0;
         left = head->p1;
         right = head->p2;
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif 
         interpret(left);
         temp = temp + intvalue;
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
         interpret(right);
         temp = temp - intvalue;
         intvalue = temp;
         current_dataytpe = head->asttype;
         break;
     case n_div:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         temp = 0;
         left = head->p1;
         right = head->p2;
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif 
         interpret(left);
         temp = temp + intvalue;
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
         interpret(right);
         if (intvalue == 0)
         {
@@ -229,11 +311,21 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;
         break;
     case n_mul:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         temp = 0;
         left = head->p1;
         right = head->p2;
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif 
         interpret(left);
         temp = temp + intvalue;
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
         interpret(right);
         temp = temp * intvalue;
         intvalue = temp;
@@ -241,60 +333,124 @@ void interpret(astptr head)
         break;
     case n_statements:
     case n_while:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left = head->p1;
         right = head->p2;
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif 
         interpret(left);
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
         interpret(right);
         current_dataytpe = head->asttype;
         break;
     case n_if:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         // cout << head->astdata << " ";
         left = head->p1;
         right = head->p2;
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif  
         interpret(left);
         if(flag==true){
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
             interpret(right);
         } 
         // cout << "n_if flag value = " << flag << endl;
         current_dataytpe = head->asttype;
         break;
     case n_block_stmts:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left = head->p1;
         right = head->p2;
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif 
         interpret(left);
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
         interpret(right);
         current_dataytpe = head->asttype;
         break;
     case n_statement:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         current_line = stoi(head->astdata);
         left = head->p1;
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
         interpret(left);
         current_dataytpe = head->asttype;
         break;
     case n_block_stmt:
     case n_simple_stmt:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left = head->p1;
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
         interpret(left);
         current_dataytpe = head->asttype;
         break;
     case n_ifelse: 
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left = head->p1;
         mid = head->p2;
         right = head->p3;
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif 
         interpret(left);
         if(flag==true){
+                #ifdef TREE
+                cout << " mid " << endl;
+                #endif 
             interpret(mid);
         } else {
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
             interpret(right);
         }
         current_dataytpe = head->asttype;
         break;
     case n_booleanexp:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left = head->p1;
         mid = head->p3;
         right = head->p2;
 
         //This takes into account of the order that n_booleaexp has booleanexpression, booleanexpression, boolean operator
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif 
         interpret(left);
         //NOTE this might cause problem for if string * int or string + int
         /*
@@ -308,7 +464,9 @@ void interpret(astptr head)
         */
         
         bool_exp_left = intvalue;
-
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
         interpret(right);
         bool_exp_right = intvalue;
 
@@ -322,6 +480,9 @@ void interpret(astptr head)
         }
         */
         //This is a boolean operator
+                #ifdef TREE
+                cout << " mid " << endl;
+                #endif 
         interpret(mid);
         flag = boolean_evaluate_int(bool_exp_left, bool_exp_right,mid->asttype); 
 
@@ -336,6 +497,10 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;
         break;
     case n_listindex:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         save_id = head->astdata;
         left=head->p1;
         temp = stoi(left->astdata);
@@ -352,8 +517,15 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;
         break;
     case n_assignment_list:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left=head->p1;
         save_id = head->astdata;
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
         interpret(left);
         if(left->asttype==n_list_int){
             // current_vec_int=get_vector_int(left->astdata);
@@ -363,9 +535,16 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;
         break;
     case n_assignment_int:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left = head->p1;
         identifier = head->astdata;
         save_id = identifier;
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
         interpret(left);
 
 
@@ -381,15 +560,25 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;
         break;
     case n_prints:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left = head->p1->p1;
         current_dataytpe = left->asttype;
         if (current_dataytpe == n_integer || current_dataytpe == n_plus || current_dataytpe == n_minus || current_dataytpe == n_mul || current_dataytpe == n_div)
         {
+            #ifdef TREE
+            cout << " left " << endl;
+            #endif
             interpret(left);
             cout << intvalue;
         }
         else if (current_dataytpe == n_string)
         {
+            #ifdef TREE
+            cout << " left " << endl;
+            #endif
             interpret(left);
             cout << identifier;
         }
@@ -403,6 +592,9 @@ void interpret(astptr head)
                 print_vector_int();
             }
         } else if (current_dataytpe==n_listindex){
+            #ifdef TREE
+            cout << " left " << endl;
+            #endif
             interpret(left);
             cout << intvalue;
         }
@@ -412,11 +604,17 @@ void interpret(astptr head)
         if (right->asttype == n_integer || right->asttype == n_plus || right->asttype == n_minus || right->asttype == n_mul || right->asttype == n_div)
         {   
             cout << " " << intvalue;
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
             interpret(right);
         }
         else if (right->asttype == n_string)
         {   
             cout << " " << identifier;
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
             interpret(right);
         }
         else if (right->asttype == n_id)
@@ -439,6 +637,9 @@ void interpret(astptr head)
             print_vector_int();
         } else if (right->asttype==n_listindex){
             cout << " ";
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
             interpret(right);
             cout << intvalue;
         }
@@ -451,6 +652,10 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;
         break;
     case n_print:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left = head->p1;
 
         //
@@ -462,11 +667,17 @@ void interpret(astptr head)
         current_dataytpe = left->asttype;
         if (current_dataytpe == n_integer || current_dataytpe == n_plus || current_dataytpe == n_minus || current_dataytpe == n_mul || current_dataytpe == n_div)
         {
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
             interpret(left);
             cout << intvalue;
         }
         else if (current_dataytpe == n_string)
         {
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
             interpret(left);
             cout << identifier;
         }
@@ -486,6 +697,9 @@ void interpret(astptr head)
             }
             print_vector_int();
         } else if (current_dataytpe==n_listindex){
+            #ifdef TREE
+            cout << " down " << endl;
+            #endif 
             interpret(left);
             cout << intvalue;
         }
@@ -498,12 +712,19 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;
         break;
     case n_index_assign_data:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         left = head->p1;
         mid = head->p2;
         //right is the expression
         right = head->p3;
         
         //TODO check if right asttype ==
+                #ifdef TREE
+                cout << " right " << endl;
+                #endif 
         interpret(right);
         temp = intvalue;
 
@@ -512,6 +733,9 @@ void interpret(astptr head)
 
         // current_vec_int.clear();
         // current_vec_int = get_vector_int(save_id);
+                #ifdef TREE
+                cout << " left " << endl;
+                #endif 
         interpret(left);
 
 
@@ -520,10 +744,18 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;
         break;
     case n_index_assign_id:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         current_vec_int=get_vector_int(head->astdata);
         current_dataytpe = head->asttype;
         break;
     case n_funct_definiton:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         /*
         Do nothing bc parser has already handled it 
         on astptr funct()
@@ -534,6 +766,10 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;
         break;
     case n_fcall:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         save_id = head->astdata;
         left = head->p1;
         right = head->p2;
@@ -545,6 +781,9 @@ void interpret(astptr head)
             print_current_parsetoken(mid->asttype);
             cout << endl;
             //
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
             interpret(mid);
 
         }
@@ -554,6 +793,10 @@ void interpret(astptr head)
     case n_empty: 
     case n_index_assign_index:
     case n_uminus: case n_listindex_data:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
         break;
     }
 
