@@ -122,4 +122,5 @@ extern map<string, vector<string>> funct_args;
 extern string add_funct_args(vector<string> v);
 extern map<string, astptr> funct_definitions;
 extern void add_function_def(string n, astptr p);
+extern astptr get_funct_head(string s);
 #endif

@@ -1182,12 +1182,18 @@ void freeMemory(astptr head)
     case n_prints:
     case n_block_stmts:
     case n_if:
-    case n_fcall:
         left = head->p1;
         right = head->p2;
         delete head;
         freeMemory(left);
         freeMemory(right);
+        break;
+    case n_fcall:
+        left = head->p1;
+        right = head->p2;
+        delete head;
+        if (left!=NULL) freeMemory(left);
+        if (right!=NULL) freeMemory(right);
         break;
     case n_statement:
     case n_block_stmt:
@@ -1417,6 +1423,18 @@ string add_funct_args(vector<string> v){
     funct_args.insert({to_string(function_arg_index),v});
     return to_string(function_arg_index);
 };
+
+astptr get_funct_head(string s){
+    map<string, astptr>::iterator search = funct_definitions.find(s);
+    astptr v=NULL;
+    if(search==funct_definitions.end()){
+        //TODO not found
+        notfound=true;
+    } else {
+        v = search->second;
+    }
+    return v;   
+}
 
 void add_function_def(string n, astptr p){
     // funct_definitions[n]=p;

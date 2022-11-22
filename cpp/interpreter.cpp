@@ -527,6 +527,9 @@ void interpret(astptr head)
         /*
         Do nothing bc parser has already handled it 
         on astptr funct()
+
+        The parser has saved the head of the function
+        pointer in a map with its name as the key
         */ 
         current_dataytpe = head->asttype;
         break;
@@ -534,6 +537,12 @@ void interpret(astptr head)
         save_id = head->astdata;
         left = head->p1;
         right = head->p2;
+        if(left==NULL){
+            /*This is an function without argument*/
+            mid = get_funct_head(save_id);
+            interpret(mid);
+
+        }
         current_dataytpe = head->asttype;
         break;
     case n_error: case n_def:
