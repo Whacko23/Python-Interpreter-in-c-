@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-// #define DEEBUG
+#define DEEBUG
 
 #ifdef DEEBUG
 int grammar_tracker = 1;
@@ -68,7 +68,7 @@ astptr statements()
         {
             // linenumber++;
             pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
-            currenttoken = cleanLexer();
+            currenttoken = lexer();
         }
 
         pfirst = newnode(n_statements, "", pfirst, statement(), NULL);
@@ -126,7 +126,7 @@ astptr simple_stmt()
             {
                 // linenumber++;
                 pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
-                currenttoken = cleanLexer();
+                currenttoken = lexer();
 
                 #ifdef DEEBUG
                 cout << grammar_tracker << " ---exit simple stmts loop by newline ---- line # " << linenumber << endl;
@@ -231,6 +231,8 @@ astptr blockstatement()
     #ifdef DEEBUG
     cout << grammar_tracker<< " ---inside  block stmt --- line # " << linenumber << endl;
     grammar_tracker++;
+    cout << "         currenttoken inside block stmt = ";
+    print_current_lextoken(currenttoken);
     #endif
 
     astptr pfirst;
@@ -291,7 +293,8 @@ astptr blockstatements()
     {
         #ifdef DEEBUG
         cout << grammar_tracker<< " ---inside  block stmts loop--- line # " << linenumber << endl;
-        cout << currenttoken << " cuttnet " << endl;
+        cout << " . currenttoken ";
+        print_current_lextoken(currenttoken);
         grammar_tracker++;
         #endif
         
@@ -403,7 +406,7 @@ astptr list()
                     //TODO error
                     // linenumber++;
                     pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
-                    currenttoken = cleanLexer();
+                    currenttoken = lexer();
                     break;
                 }
 
@@ -515,7 +518,7 @@ astptr funct()
             }
 
             if(currenttoken==newlinesym){
-                currenttoken=cleanLexer();
+                currenttoken=lexer();
             }
 
             pfirst=blockstatements();
@@ -524,6 +527,13 @@ astptr funct()
                 pfirst = newnode(n_funct_arg,arg_index,pfirst,NULL,NULL);
             } else {
                 pfirst = newnode(n_funct,"",pfirst,NULL,NULL);
+
+                // //
+                // cout << "&&&&&&&&&&&&Pirnt parse tree inside funct"<< endl;
+                // printParserTree(pfirst);
+                // cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"<< endl;
+
+                // //
             }
 
             add_function_def(funct_name,pfirst);
@@ -709,9 +719,30 @@ astptr factor()
         currenttoken = cleanLexer();
         if(currenttoken==opensquaresym){
             currenttoken = cleanLexer();
-            if(currenttoken!=intsym){
-                //TODO TypeError: list indices must be integers or slices, not str
-            }else{
+            if(currenttoken==identifiersym){
+                //"notice me senpai"
+                // deals with identifier as an index eg example = examples[i]
+                
+                /*
+                Note the first node p1 is pointing to an empty nodetype
+                This is to differentiate between n_list index integer i.e. examples[1]
+                with n_list index identifier i.e. examples[a]
+
+                The compiler will check if p1 is pointing to NULL or not
+                If p1 is pointing to NULL, then the given node is for integer
+                else the given pointer is idetifier
+                */
+                pfirst = newnode(n_empty,"",NULL,NULL,NULL);
+                //this saves the identifier
+                pfirst = newnode(n_listindex_data,identifier,pfirst,NULL,NULL);
+                pfirst = newnode(n_listindex,temp, pfirst,NULL,NULL);
+                currenttoken = cleanLexer();
+                if(currenttoken!=closesquaresym){
+                    //TODO SyntaxError: invalid syntax missing ']'
+                } else {
+                    currenttoken=cleanLexer();
+                }                
+            }else if (currenttoken==intsym){
                 pfirst = newnode(n_listindex_data,to_string(intvalue),NULL,NULL,NULL);
                 pfirst = newnode(n_listindex,temp, pfirst,NULL,NULL);
                 currenttoken = cleanLexer();
@@ -720,6 +751,8 @@ astptr factor()
                 } else {
                     currenttoken=cleanLexer();
                 }
+            } else {
+                //TODO error
             }
         } else {
             //No need to call for new token since it has already been called before if statement
@@ -1056,7 +1089,6 @@ void printParserTree(astptr head)
     case n_le:
     case n_ge:
     case n_list_int:
-    case n_listindex_data:
     case n_index_assign_index:
     case n_index_assign_id:
     case n_error:
@@ -1068,6 +1100,18 @@ void printParserTree(astptr head)
         cout << " " << head->astdata << " ";
         cout << "*leaf* " << endl;
         break;
+    case n_listindex_data:
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+
+        if(head->p1!=NULL){
+
+        }else{
+            
+        }
+        cout << " " << head->astdata << " ";
+        cout << "*leaf* " << endl;
+        break;    
     case n_plus:
     case n_minus:
     case n_div:
@@ -1170,12 +1214,18 @@ void freeMemory(astptr head)
     case n_le:
     case n_ge:
     case n_list_int:
-    case n_listindex_data:
     case n_index_assign_index:
     case n_index_assign_id:
     case n_funct_definiton:
         delete head;
         break;
+    case n_listindex_data:
+        if(head->p1!=NULL){
+            left=head->p1;
+            delete left;
+        }
+        delete head;
+        break;   
     case n_plus:
     case n_minus:
     case n_div:
@@ -1434,6 +1484,7 @@ astptr get_funct_head(string s){
         //TODO not found
         notfound=true;
     } else {
+        notfound=false;
         v = search->second;
     }
     return v;   
@@ -1452,6 +1503,7 @@ vector<double> get_vector_int(string s){
         //TODO not found
         notfound=true;
     } else {
+        notfound=false;
         v = search->second;
     }
 

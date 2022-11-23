@@ -4,7 +4,7 @@
 
 #include "interpreter.h"
 
-#define TREE
+// #define TREE
 
 
 int previous_line = 1,
@@ -60,10 +60,14 @@ void interpret(astptr head)
 {
     string current;
     astptr left, right, mid;
-    double temp, bool_exp_left, bool_exp_right;
+    double temp =0,
+           bool_exp_left=0, 
+           bool_exp_right=0;
     int index;
-    string save_id, bool_left_str, bool_right_str;
+    string save_id, bool_left_str, bool_right_str, temp_str;
     vector<double> tempvec_double;
+    nodetype bool_left_type = n_empty,
+             bool_right_type = n_empty;
 
     
     // cout << "Datatype " << head->asttype << " Data " << head->astdata << endl;
@@ -111,8 +115,15 @@ void interpret(astptr head)
     case n_id:
         identifier = head->astdata;
         //Hardcoded n_integer, could be list as well
-        current_dataytpe = n_integer;
-        intvalue = int_indefiers[identifier];
+        current_vec_int=get_vector_int(identifier);
+        if(notfound){
+            current_dataytpe = n_integer;
+            intvalue = int_indefiers[identifier];
+        } else {
+            current_dataytpe = n_list_int;
+        }
+        
+
 
         #ifdef TREE
         cout << "token type = ";
@@ -452,48 +463,52 @@ void interpret(astptr head)
                 cout << " left " << endl;
                 #endif 
         interpret(left);
+
+        bool_left_type = current_dataytpe;
+
         //NOTE this might cause problem for if string * int or string + int
-        /*
-        if(current_dataytpe==n_integer){
-            bool_exp_left = intvalue;
-            current_dataytpe = n_integer;
-        } else if (current_dataytpe==n_string){
-            bool_left_str = identifier;
-            current_dataytpe = n_string;
-        }
-        */
         
-        bool_exp_left = intvalue;
+        if(bool_left_type==n_integer){
+            bool_exp_left = intvalue;
+        } else if (bool_left_type==n_string){
+            bool_left_str = identifier;
+        }
+        
                 #ifdef TREE
                 cout << " right " << endl;
                 #endif 
         interpret(right);
-        bool_exp_right = intvalue;
+        
+        bool_right_type = current_dataytpe;
 
-        /*
-        if(current_dataytpe==n_integer){
+
+        if(bool_right_type==n_integer){
             bool_exp_right = intvalue;
-            current_dataytpe = n_integer;
-        } else if (current_dataytpe==n_string){
-            current_dataytpe = n_string;
+        } else if (bool_right_type==n_string){
             bool_right_str = identifier;
         }
-        */
+        
         //This is a boolean operator
                 #ifdef TREE
                 cout << " mid " << endl;
                 #endif 
         interpret(mid);
         flag = boolean_evaluate_int(bool_exp_left, bool_exp_right,mid->asttype); 
+        //
+            cout << " . current flag == " << flag;
 
-        /*
-        if(current_dataytpe==n_integer){
+        //
+        
+
+        //comaprison between string and int not supported
+        //will add support later
+        if(bool_right_type==n_integer){
             cout << "inside boolexp left = " << bool_exp_left << "right = " << bool_exp_right << endl;
             flag = boolean_evaluate_int(bool_exp_left, bool_exp_right,mid->asttype); 
-        } else if (current_dataytpe==n_string){
+        } else if (bool_right_type==n_string){
             flag = boolean_evaluate_string(bool_left_str, bool_right_str,mid->asttype);
         }
-        */
+        
         current_dataytpe = head->asttype;
         break;
     case n_listindex:
@@ -503,7 +518,18 @@ void interpret(astptr head)
         #endif
         save_id = head->astdata;
         left=head->p1;
-        temp = stoi(left->astdata);
+
+        if(left->p1==NULL){
+            temp = stoi(left->astdata);
+        } else {
+            /*
+            this is an identifier
+                    *id* in "a = fe[id]"
+            */
+            temp_str = left->astdata;
+            temp = int_indefiers[temp_str];
+        }
+
         // cout << "current index = " << temp << endl;
         // current_vec_int.clear();
         current_vec_int = get_vector_int(save_id);
@@ -684,6 +710,7 @@ void interpret(astptr head)
         else if (current_dataytpe==n_id)
         {
             // current_vec_int.clear();
+            
             current_vec_int=get_vector_int(left->astdata);
             if(notfound){ 
                 cout << int_indefiers[left->astdata];
@@ -707,7 +734,7 @@ void interpret(astptr head)
             cout << endl;
             firstprint=false;
         } else if(current_line!=previous_line){
-        cout<<endl;
+            cout<<endl;
         }
         current_dataytpe = head->asttype;
         break;

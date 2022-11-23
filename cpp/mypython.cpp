@@ -10,7 +10,7 @@
 
 // #define LEXERTEST
 #define ASTTEST
-// #define DEBUG
+#define DEBUG
 
 using namespace std;
 

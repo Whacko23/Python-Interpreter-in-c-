@@ -1,7 +1,18 @@
-def printer():
-  print("hello worll")
-  a=2+3
+# list, function
 
-#printer()
-b = [5,3,4,5,0]
-print(b)
+def IncrementIterator(itr):
+    itr = itr + 1
+    return itr
+
+#initialize
+elements = [3,6,9]
+i = 1
+
+#increment
+# i = IncrementIterator(i)
+
+#print
+print("i=",i)
+print(elements)
+element = elements[i]
+print("ith element=",element)
