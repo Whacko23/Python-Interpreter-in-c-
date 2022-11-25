@@ -1,18 +1,14 @@
-# list, function
+i=8
 
-def IncrementIterator(itr):
-    itr = itr + 1
-    return itr
+def printer():
+    i = 5
+    print("inside fun = ",i)
 
-#initialize
-elements = [3,6,9]
-i = 1
+a= [2,3,4]
+# Fix this list below, it shows as [2,3,4,4]
+# a= [2,3,4,]
 
-#increment
-# i = IncrementIterator(i)
-
-#print
-print("i=",i)
-print(elements)
-element = elements[i]
-print("ith element=",element)
+print("list = ",a)
+printer()
+print("outside fun = ",i)
+printer()

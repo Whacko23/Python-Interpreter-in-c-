@@ -105,22 +105,25 @@ extern void print_current_lextoken(lextokens t);
 extern void print_current_parsetoken(nodetype n);
 
 /*_______Interpreter_______________*/
+//Data structures & variables
 extern map<string, double> int_indefiers;
 extern map<string, string> string_identifiers;
 extern map<string, vector<double>> vector_identifiers;
+extern bool notfound;
+extern vector<double> current_vec_int;
+extern map<string, vector<string>> funct_args;
+extern vector<string> current_vec_str;
+extern map<string, astptr> funct_definitions;
+
+//Functions
 extern string add_vector(vector<double> v);
 extern void modify_vector(int i, string s);
 extern vector<double> get_vector_int(string s);
 extern void modify_vector_int(string s, vector<double> v);
-extern bool notfound;
 extern void interpret(astptr head);
 extern void print_vector_int();
-extern void print_vector_int(vector<double> v);
-extern vector<double> current_vec_int;
-extern vector<string> current_vec_str;
-extern map<string, vector<string>> funct_args;
 extern string add_funct_args(vector<string> v);
-extern map<string, astptr> funct_definitions;
+extern void print_vector_int(vector<double> v);
 extern void add_function_def(string n, astptr p);
 extern astptr get_funct_head(string s);
 #endif

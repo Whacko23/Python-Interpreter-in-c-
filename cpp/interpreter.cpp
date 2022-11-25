@@ -6,18 +6,96 @@
 
 // #define TREE
 
-
+//variables
 int previous_line = 1,
     current_line = 1;
 bool firstprint = true, 
      function_return = false,
      assign_list_variable = false,
-     flag = false;
+     flag = false,
+     inside_funct = false,
+     funct_found = false;
+
 nodetype current_dataytpe=n_empty;
 
+environment current_funct_env;
 
 
+/*
+    The funct_scope is useful for nested function or recursive function
+    So for a single function, a global variable for environment will suffice
+    
+    Hence, it is commented down below 
 
+
+// map<string, environment> funct_scope;
+
+
+environment get_env(string funct_name){
+    map<string, environment>::iterator search = funct_scope.find(funct_name);
+    environment env;
+    if(search==funct_scope.end()){
+        funct_found=false;
+    } else {
+        funct_found=true;
+        env = search->second;
+    }
+
+    return env;
+};
+
+void create_env(string funct_name){
+
+};
+
+void inject_int(string funct_name, double i){
+};
+
+void inject_list(string funct_name, vector<double> l){
+
+};
+*/
+
+void reset_env(){
+    current_funct_env.integers.clear();
+    current_funct_env.lists.clear();
+}
+
+
+void inject_int(string variable, double i){
+    current_funct_env.integers.insert({variable, i});
+};
+
+void inject_list(string variable, vector<double> l){
+    current_funct_env.lists.insert({variable, l});
+};
+
+extern double get_funct_int(string variable){
+    double d=0;
+    map<string, double>::iterator search = current_funct_env.integers.find(variable);
+    if(search==current_funct_env.integers.end()){
+        notfound=true;
+    } else {
+        notfound=false;
+        d = search->second;
+    }
+    return d;
+};
+
+extern vector<double> get_funct_list(string variable){
+    vector<double> d;
+    map<string, vector<double>>::iterator search = current_funct_env.lists.find(variable);
+    if(search==current_funct_env.lists.end()){
+        notfound=true;
+    } else {
+        notfound=false;
+        d = search->second;
+    }
+    return d;
+};
+
+
+//evaluation helper
 bool boolean_evaluate_int(double l, double r, nodetype n){
     if(n == n_eq){
         if(l==r) return true;
@@ -38,6 +116,7 @@ bool boolean_evaluate_int(double l, double r, nodetype n){
     return false;
 };
 
+//evaluation helper
 bool boolean_evaluate_string(string l, string r, nodetype n){
 
     if(n == n_eq){
@@ -91,7 +170,7 @@ void interpret(astptr head)
         current_dataytpe = head->asttype;    
         break;
     case n_integer:
-        intvalue = stoi(head->astdata);
+        intvalue = stod(head->astdata);
         current_dataytpe= n_integer;
 
         #ifdef TREE
@@ -114,16 +193,27 @@ void interpret(astptr head)
         break;
     case n_id:
         identifier = head->astdata;
-        //Hardcoded n_integer, could be list as well
-        current_vec_int=get_vector_int(identifier);
-        if(notfound){
-            current_dataytpe = n_integer;
-            intvalue = int_indefiers[identifier];
-        } else {
-            current_dataytpe = n_list_int;
-        }
         
-
+        if(inside_funct){
+            current_vec_int = get_funct_list(identifier);
+            if(notfound){
+                current_dataytpe = n_integer;
+                intvalue = get_funct_int(identifier);
+                if(notfound){
+                    //TODO ERROR
+                }
+            } else {
+                current_dataytpe = n_list_int;
+            }
+        } else {
+            current_vec_int=get_vector_int(identifier);
+            if(notfound){
+                current_dataytpe = n_integer;
+                intvalue = int_indefiers[identifier];
+            } else {
+                current_dataytpe = n_list_int;
+            }
+        }
 
         #ifdef TREE
         cout << "token type = ";
@@ -554,9 +644,11 @@ void interpret(astptr head)
                 #endif 
         interpret(left);
         if(left->asttype==n_list_int){
-            // current_vec_int=get_vector_int(left->astdata);
-            vector_identifiers[save_id]=current_vec_int;
-            // current_vec_int.clear();  
+            if(inside_funct){
+                inject_list(save_id,current_vec_int);
+            } else {
+                vector_identifiers[save_id]=current_vec_int;
+            }
         }
         current_dataytpe = head->asttype;
         break;
@@ -575,13 +667,19 @@ void interpret(astptr head)
 
 
         if(assign_list_variable==false){
-            int_indefiers[identifier];
-            // interpret(left);
-            int_indefiers[save_id] = intvalue;
+            if(inside_funct){
+                inject_int(save_id,intvalue);
+            } else {
+                int_indefiers[save_id] = intvalue;
+            }
         } else {
-            vector_identifiers[save_id];
-            vector_identifiers[save_id] = current_vec_int;
-            assign_list_variable=false;
+            if(inside_funct){
+                inject_list(save_id, current_vec_int);
+            } else {
+                vector_identifiers[save_id] = current_vec_int;
+                assign_list_variable=false;
+            }
+
         }
         current_dataytpe = head->asttype;
         break;
@@ -647,20 +745,33 @@ void interpret(astptr head)
         {
 
             cout << " ";
-            // current_vec_int.clear();
-            current_vec_int = get_vector_int(right->astdata);
-            if(notfound){ 
-                cout << int_indefiers[right->astdata];
-                if(firstprint==true){
-                    cout << endl;
-                    firstprint=false;
-                } else if(current_line!=previous_line){
-                    cout<<endl;
-                } 
-                current_dataytpe = head->asttype;
-                break;
-            }
-            print_vector_int();
+            if(inside_funct){
+                current_vec_int = get_funct_list(right->astdata);
+                if(notfound){ 
+                    cout << get_funct_int(right->astdata);
+                    if(firstprint==true){
+                        cout << endl;
+                        firstprint=false;
+                    } else if(current_line!=previous_line){
+                        cout<<endl;
+                    } 
+                    break;
+                }
+                print_vector_int();
+            } else {
+                current_vec_int=get_vector_int(right->astdata);
+                if(notfound){ 
+                    cout << int_indefiers[right->astdata];
+                    if(firstprint==true){
+                        cout << endl;
+                        firstprint=false;
+                    } else if(current_line!=previous_line){
+                        cout<<endl;
+                    } 
+                    break;
+                }
+                print_vector_int();
+            }           
         } else if (right->asttype==n_listindex){
             cout << " ";
                 #ifdef TREE
@@ -709,20 +820,34 @@ void interpret(astptr head)
         }
         else if (current_dataytpe==n_id)
         {
-            // current_vec_int.clear();
-            
-            current_vec_int=get_vector_int(left->astdata);
-            if(notfound){ 
-                cout << int_indefiers[left->astdata];
-                if(firstprint==true){
-                    cout << endl;
-                    firstprint=false;
-                } else if(current_line!=previous_line){
-                    cout<<endl;
-                } 
-                break;
-            }
-            print_vector_int();
+            if(inside_funct){
+                current_vec_int = get_funct_list(identifier);
+                if(notfound){ 
+                    cout << get_funct_int(identifier);
+                    if(firstprint==true){
+                        cout << endl;
+                        firstprint=false;
+                    } else if(current_line!=previous_line){
+                        cout<<endl;
+                    } 
+                    break;
+                }
+                print_vector_int();
+            } else {
+                current_vec_int=get_vector_int(left->astdata);
+                if(notfound){ 
+                    cout << int_indefiers[left->astdata];
+                    if(firstprint==true){
+                        cout << endl;
+                        firstprint=false;
+                    } else if(current_line!=previous_line){
+                        cout<<endl;
+                    } 
+                    break;
+                }
+                print_vector_int();
+            }           
+
         } else if (current_dataytpe==n_listindex){
             #ifdef TREE
             cout << " down " << endl;
@@ -802,12 +927,15 @@ void interpret(astptr head)
         right = head->p2;
         if(left==NULL){
             /*This is an function without argument*/
+
+            //getting funciton parse tree
             mid = get_funct_head(save_id);
-            //
-            cout << "mid asttype = " ;
-            print_current_parsetoken(mid->asttype);
-            cout << endl;
-            //
+            // printParserTree(mid);
+
+            if(mid->asttype!=n_funct){
+                //TODO error. takes 0 positional arguments but 1 was given
+                //EXIT here
+            }
                 #ifdef TREE
                 cout << " down " << endl;
                 #endif 
@@ -816,6 +944,23 @@ void interpret(astptr head)
         }
         current_dataytpe = head->asttype;
         break;
+    case n_funct:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif 
+
+        mid = head->p1;
+        // printParserTree(mid);
+
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
+        inside_funct=true;
+        reset_env();
+        interpret(mid);
+        inside_funct=false;
+        break;  
     case n_error: case n_def:
     case n_empty: 
     case n_index_assign_index:
