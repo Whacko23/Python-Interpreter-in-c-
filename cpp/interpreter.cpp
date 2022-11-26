@@ -930,7 +930,7 @@ void interpret(astptr head)
 
             //getting funciton parse tree
             mid = get_funct_head(save_id);
-            // printParserTree(mid);
+            printParserTree(mid);
 
             if(mid->asttype!=n_funct){
                 //TODO error. takes 0 positional arguments but 1 was given
@@ -940,7 +940,9 @@ void interpret(astptr head)
                 cout << " down " << endl;
                 #endif 
             interpret(mid);
-
+            
+        } else {
+            
         }
         current_dataytpe = head->asttype;
         break;
@@ -960,7 +962,15 @@ void interpret(astptr head)
         reset_env();
         interpret(mid);
         inside_funct=false;
-        break;  
+        break; 
+    case n_funct_arg:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif 
+
+        
+        break;
     case n_error: case n_def:
     case n_empty: 
     case n_index_assign_index:

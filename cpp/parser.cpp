@@ -485,7 +485,7 @@ astptr funct()
                 if(currenttoken==closebracketsym){
                     //Function with one argument
                     currenttoken=cleanLexer();
-                    arg_index = add_funct_args(string_vector);
+                    add_funct_args(funct_name, string_vector);
                 }else if (currenttoken==commasym){
                     //Function with two argument
                     currenttoken=cleanLexer();
@@ -497,7 +497,7 @@ astptr funct()
                     currenttoken=cleanLexer();
                     if(currenttoken==closesquaresym){
                         currenttoken=cleanLexer();
-                        arg_index = add_funct_args(string_vector);
+                        add_funct_args(funct_name, string_vector);
                     }else{
                         //TODO throw error missing )
                     }
@@ -524,7 +524,7 @@ astptr funct()
             pfirst=blockstatements();
             
             if(arg_found){
-                pfirst = newnode(n_funct_arg,arg_index,pfirst,NULL,NULL);
+                pfirst = newnode(n_funct_arg,"",pfirst,NULL,NULL);
             } else {
                 pfirst = newnode(n_funct,"",pfirst,NULL,NULL);
 
@@ -1487,11 +1487,22 @@ string add_vector(vector<double> v){
     return to_string(vector_index);
 }
 
-string add_funct_args(vector<string> v){
-    function_arg_index++;
-    funct_args.insert({to_string(function_arg_index),v});
-    return to_string(function_arg_index);
+void add_funct_args(string fname, vector<string> v){
+    funct_args.insert({fname,v});
 };
+
+vector<string> get_funct_args(string fname){
+    map<string, vector<string>>::iterator search = funct_args.find(fname);
+    vector<string> v;
+    if(search==funct_args.end()){
+        //TODO not found
+        notfound=true;
+    } else {
+        notfound=false;
+        v = search->second;
+    }
+    return v;  
+}
 
 astptr get_funct_head(string s){
     map<string, astptr>::iterator search = funct_definitions.find(s);
