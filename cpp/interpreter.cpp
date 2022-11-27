@@ -539,6 +539,10 @@ void interpret(astptr head)
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
         #endif
+        if(inside_funct){
+            lineInsideFunction++;
+        }
+
         current_line = stoi(head->astdata);
         left = head->p1;
                 #ifdef TREE
@@ -1044,6 +1048,8 @@ void interpret(astptr head)
         print_current_parsetoken(head->asttype);
         #endif 
 
+        
+        function_def_line_start = stoi(head->astdata);
         mid = head->p1;
         // printParserTree(mid);
 
@@ -1052,6 +1058,7 @@ void interpret(astptr head)
                 #endif 
         inside_funct=true;
         reset_env();
+        lineInsideFunction =0;
         interpret(mid);
         inside_funct=false;
         break; 
@@ -1060,11 +1067,13 @@ void interpret(astptr head)
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
         #endif 
+        function_def_line_start = stoi(head->astdata);
 
         //this is the head of the function pointer
         mid = head->p1;
         inside_funct=true;
         reset_env();
+        lineInsideFunction =0;
 
         if(arg2 == NULL){
             //only one param

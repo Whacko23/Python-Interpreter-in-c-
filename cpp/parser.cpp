@@ -17,7 +17,8 @@ map<string, vector<string>> funct_args;
 map<string, astptr> funct_definitions;
 void add_function_def(string n, astptr p);
 astptr parseetree;
-
+int lineInsideFunction = 1,
+    function_def_line_start = 0;
 
 astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third)
 {
@@ -482,6 +483,7 @@ astptr funct()
     cout << grammar_tracker<< " ---inside  funct--- line # " << linenumber << endl;
     grammar_tracker++;
     #endif
+    function_def_line_start = linenumber;
 
     astptr pfirst=NULL;
     string funct_name,arg1,arg2;
@@ -550,9 +552,10 @@ astptr funct()
             pfirst=blockstatements();
             
             if(arg_found){
-                pfirst = newnode(n_funct_arg,"",pfirst,NULL,NULL);
+                pfirst = newnode(n_funct_arg,to_string(function_def_line_start),pfirst,NULL,NULL);
             } else {
-                pfirst = newnode(n_funct,"",pfirst,NULL,NULL);
+                pfirst = newnode(n_funct,to_string(function_def_line_start),pfirst,NULL,NULL);
+
 
                 // //
                 // cout << "&&&&&&&&&&&&Pirnt parse tree inside funct"<< endl;
@@ -1594,10 +1597,11 @@ void print_vector_int(vector<double> v){
 };
 
 void exitProgram(){
+    cout << "Traceback (most recent call last):" <<endl;
     cout << " line " <<linenumber <<", in "<<"<module>"<<endl;
-    // if(inside_funct){
-    //     cout << " line " <<linenumber <<", in "<<curr_fname<<endl;
-    // }
+    if(inside_funct){
+        cout << " line " <<lineInsideFunction + function_def_line_start <<", in "<<curr_fname<<endl;
+    }
     cout << errorMsg <<endl;
     freeMemory(parseetree);
     exit(-1);

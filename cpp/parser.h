@@ -118,6 +118,8 @@ extern vector<string> current_vec_str;
 extern map<string, astptr> funct_definitions;
 extern bool inside_funct;
 extern string curr_fname;
+extern int lineInsideFunction;
+extern int function_def_line_start;
 
 
 //Functions
