@@ -73,7 +73,6 @@ typedef struct tnode
 
 extern astptr newnode(nodetype n, int s, astptr first, astptr second, astptr third);
 
-extern astptr generate_ast();
 extern astptr statements();
 extern astptr statement();
 extern astptr simple_stmt();

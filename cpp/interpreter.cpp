@@ -16,6 +16,9 @@ bool firstprint = true,
      inside_funct = false,
      funct_found = false;
 
+astptr  arg1=NULL, 
+        arg2=NULL;
+
 nodetype current_dataytpe=n_empty;
 
 environment current_funct_env;
@@ -63,11 +66,14 @@ void reset_env(){
 
 
 void inject_int(string variable, double i){
-    current_funct_env.integers.insert({variable, i});
+    // current_funct_env.integers.insert({variable, i});
+    current_funct_env.integers[variable] = i;
+    
 };
 
 void inject_list(string variable, vector<double> l){
-    current_funct_env.lists.insert({variable, l});
+    // current_funct_env.lists.insert({variable, l});
+    current_funct_env.lists[variable] = l;
 };
 
 extern double get_funct_int(string variable){
@@ -199,6 +205,7 @@ void interpret(astptr head)
             if(notfound){
                 current_dataytpe = n_integer;
                 intvalue = get_funct_int(identifier);
+
                 if(notfound){
                     //TODO ERROR
                 }
@@ -225,7 +232,11 @@ void interpret(astptr head)
     case n_list_int:
         save_id = head->astdata;
         // current_vec_int.clear();
-        current_vec_int = get_vector_int(save_id);
+        if(inside_funct){
+            current_vec_int = get_funct_list(save_id);
+        } else {
+            current_vec_int = get_vector_int(save_id);
+        }
         // cout << "INside list_int save id = " << save_id<<endl;
         // print_vector_int();
         // cout << "-----" << endl;
@@ -261,9 +272,13 @@ void interpret(astptr head)
         // current_vec_int.clear();
 
 
-
         if(left->asttype==n_id){
-            current_vec_int=get_vector_int(left->astdata);
+
+            if(inside_funct){
+                current_vec_int = get_funct_list(left->astdata);
+            } else {
+                current_vec_int=get_vector_int(left->astdata);
+            }
             if(notfound){
                 #ifdef TREE
                 cout << " left " << endl;
@@ -284,7 +299,7 @@ void interpret(astptr head)
             interpret(left);
             temp = intvalue;           
         } else if(left->asttype==n_list_int){
-
+            //This is for a = [1,2,3] + [4,5,6]
         } else if(left->asttype==n_plus){
             #ifdef TREE
             cout << " left " << endl;
@@ -303,7 +318,11 @@ void interpret(astptr head)
 
 
         if(right->asttype==n_id){
-            current_vec_int=get_vector_int(right->astdata);
+            if(inside_funct){
+                current_vec_int = get_funct_list(right->astdata);
+            } else {
+                current_vec_int=get_vector_int(right->astdata);
+            }
             if(notfound){
                 #ifdef TREE
                 cout << " right " << endl;
@@ -585,7 +604,7 @@ void interpret(astptr head)
         interpret(mid);
         flag = boolean_evaluate_int(bool_exp_left, bool_exp_right,mid->asttype); 
         //
-            cout << " . current flag == " << flag;
+            // cout << " . current flag == " << flag;
 
         //
         
@@ -593,7 +612,7 @@ void interpret(astptr head)
         //comaprison between string and int not supported
         //will add support later
         if(bool_right_type==n_integer){
-            cout << "inside boolexp left = " << bool_exp_left << "right = " << bool_exp_right << endl;
+            // cout << "inside boolexp left = " << bool_exp_left << "right = " << bool_exp_right << endl;
             flag = boolean_evaluate_int(bool_exp_left, bool_exp_right,mid->asttype); 
         } else if (bool_right_type==n_string){
             flag = boolean_evaluate_string(bool_left_str, bool_right_str,mid->asttype);
@@ -617,15 +636,27 @@ void interpret(astptr head)
                     *id* in "a = fe[id]"
             */
             temp_str = left->astdata;
-            temp = int_indefiers[temp_str];
+            if(inside_funct){
+                temp = get_funct_int(temp_str);
+            } else {
+                temp = int_indefiers[temp_str];
+            }
         }
 
         // cout << "current index = " << temp << endl;
         // current_vec_int.clear();
-        current_vec_int = get_vector_int(save_id);
+        if(inside_funct){
+            current_vec_int = get_funct_list(save_id);
+        } else {
+            current_vec_int = get_vector_int(save_id);
+        }
         if(notfound){
             //TODO error
-            intvalue = int_indefiers[left->astdata];
+            if(inside_funct){
+                intvalue = get_funct_int(left->astdata);
+            } else {
+                intvalue = int_indefiers[left->astdata];
+            }
             break;
         } else {
             intvalue = current_vec_int[temp];
@@ -665,7 +696,6 @@ void interpret(astptr head)
                 #endif 
         interpret(left);
 
-
         if(assign_list_variable==false){
             if(inside_funct){
                 inject_int(save_id,intvalue);
@@ -675,6 +705,7 @@ void interpret(astptr head)
         } else {
             if(inside_funct){
                 inject_list(save_id, current_vec_int);
+                assign_list_variable=false;
             } else {
                 vector_identifiers[save_id] = current_vec_int;
                 assign_list_variable=false;
@@ -709,9 +740,20 @@ void interpret(astptr head)
         else if (current_dataytpe==n_id)
         {
             // current_vec_int.clear();
-            current_vec_int = get_vector_int(left->astdata);
+                    // cout << "----------Notice  me senpai ???" << endl;
+
+            if(inside_funct){
+                current_vec_int = get_funct_list(left->astdata);
+            }else {
+                current_vec_int = get_vector_int(left->astdata);
+            }
             if(notfound){ 
-                cout << int_indefiers[left->astdata];
+                if(inside_funct){
+                    // cout << "--------Did you call me???" << endl;
+                    cout << get_funct_int(left->astdata);
+                } else {
+                    cout << int_indefiers[left->astdata];
+                }
             } else{
                 print_vector_int();
             }
@@ -821,9 +863,9 @@ void interpret(astptr head)
         else if (current_dataytpe==n_id)
         {
             if(inside_funct){
-                current_vec_int = get_funct_list(identifier);
+                current_vec_int = get_funct_list(left->astdata);
                 if(notfound){ 
-                    cout << get_funct_int(identifier);
+                    cout << get_funct_int(left->astdata);
                     if(firstprint==true){
                         cout << endl;
                         firstprint=false;
@@ -892,7 +934,11 @@ void interpret(astptr head)
 
 
         current_vec_int.at(index) = temp;
-        modify_vector_int(save_id, current_vec_int);
+        if(inside_funct){
+            inject_list(save_id, current_vec_int);
+        } else {
+            modify_vector_int(save_id, current_vec_int);
+        }
         current_dataytpe = head->asttype;
         break;
     case n_index_assign_id:
@@ -900,7 +946,11 @@ void interpret(astptr head)
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
         #endif
-        current_vec_int=get_vector_int(head->astdata);
+        if(inside_funct){
+            current_vec_int=get_funct_list(head->astdata);
+        } else {
+            current_vec_int=get_vector_int(head->astdata);
+        }
         current_dataytpe = head->asttype;
         break;
     case n_funct_definiton:
@@ -930,7 +980,7 @@ void interpret(astptr head)
 
             //getting funciton parse tree
             mid = get_funct_head(save_id);
-            printParserTree(mid);
+            // printParserTree(mid);
 
             if(mid->asttype!=n_funct){
                 //TODO error. takes 0 positional arguments but 1 was given
@@ -940,9 +990,20 @@ void interpret(astptr head)
                 cout << " down " << endl;
                 #endif 
             interpret(mid);
-            
+
         } else {
+            current_vec_str = get_funct_args(save_id);
+            mid = get_funct_head(save_id);
+
+            arg1 = left;
+            arg2 = right;
+            // printParserTree(mid);
+
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
             
+            interpret(mid);
         }
         current_dataytpe = head->asttype;
         break;
@@ -969,6 +1030,51 @@ void interpret(astptr head)
         print_current_parsetoken(head->asttype);
         #endif 
 
+        //this is the head of the function pointer
+        mid = head->p1;
+        inside_funct=true;
+        reset_env();
+
+        if(arg2 == NULL){
+            //only one param
+            if(current_vec_str.size()!=1){
+                //TODO Error, only one param passed
+            }
+            //
+            switch (arg1->asttype)
+            {
+            case n_integer:
+                inject_int(current_vec_str[0],stod(arg1->astdata));
+                break;
+            case n_string:
+                // pass the string straight thru
+                break;
+            case n_id:
+                current_vec_int=get_vector_int(arg1->astdata);
+                if(notfound){
+                    current_dataytpe = n_integer;
+                    intvalue = int_indefiers[arg1->astdata];
+                    inject_int(current_vec_str[0],intvalue);
+                } else {
+                    current_dataytpe = n_list_int;
+                    inject_list(current_vec_str[0], current_vec_int);
+                }                
+                break;
+            default:
+                // cout << "Argument is not valid" << endl;
+                break;
+            }
+            //
+        } else {
+            //two param
+            if(arg1==NULL){
+                //TODO Error, no param passed
+            }
+        }
+        interpret(mid);
+        inside_funct = false;
+        break;
+    case n_return:
         
         break;
     case n_error: case n_def:
@@ -980,9 +1086,7 @@ void interpret(astptr head)
         print_current_parsetoken(head->asttype);
         #endif
         break;
-    }
-
-    
+    }   
 }
 
 #endif

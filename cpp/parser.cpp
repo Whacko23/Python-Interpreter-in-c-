@@ -101,7 +101,7 @@ astptr statement()
 }
 
 /*
-<statement> : := <assignment> | <printstatement> | <returnstatement> | empty
+<simple statement> : := <assignment> | <function call> | <printstatement> | <returnstatement> | empty
 */
 astptr simple_stmt()
 {
@@ -148,8 +148,9 @@ astptr simple_stmt()
     }
     if (currenttoken == identifiersym){
         //Lookahead without consuming token used here
-        if(vec[lexer_vectorindex].tokentype==openbracketsym)
+        if(vec[lexer_vectorindex].tokentype==openbracketsym){
             return funct_call();
+        }
         else
             return assignment();
     }
@@ -1483,12 +1484,14 @@ vector<string> current_vec_str;
 
 string add_vector(vector<double> v){
     vector_index++;
-    vector_identifiers.insert({to_string(vector_index),v});
+    // vector_identifiers.insert({to_string(vector_index),v});
+    vector_identifiers[to_string(vector_index)]=v;
     return to_string(vector_index);
 }
 
 void add_funct_args(string fname, vector<string> v){
-    funct_args.insert({fname,v});
+    // funct_args.insert({fname,v});
+    funct_args[fname] = v;
 };
 
 vector<string> get_funct_args(string fname){
@@ -1518,8 +1521,8 @@ astptr get_funct_head(string s){
 }
 
 void add_function_def(string n, astptr p){
-    // funct_definitions[n]=p;
-    funct_definitions.insert({n,p});
+    funct_definitions[n]=p;
+    // funct_definitions.insert({n,p});
 
 };
 
