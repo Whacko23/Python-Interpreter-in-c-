@@ -19,6 +19,10 @@ bool firstprint = true,
 astptr  arg1=NULL, 
         arg2=NULL;
 
+double returnint;
+
+vector<double> returnlist;
+
 nodetype current_dataytpe=n_empty;
 
 environment current_funct_env;
@@ -211,6 +215,9 @@ void interpret(astptr head)
                 }
             } else {
                 current_dataytpe = n_list_int;
+                cout << "list found. id = " << identifier ;
+                print_vector_int();
+                cout << endl;
             }
         } else {
             current_vec_int=get_vector_int(identifier);
@@ -232,15 +239,16 @@ void interpret(astptr head)
     case n_list_int:
         save_id = head->astdata;
         // current_vec_int.clear();
-        if(inside_funct){
-            current_vec_int = get_funct_list(save_id);
-        } else {
-            current_vec_int = get_vector_int(save_id);
-        }
-        // cout << "INside list_int save id = " << save_id<<endl;
-        // print_vector_int();
-        // cout << "-----" << endl;
-        // notfound=false;
+
+        /*
+            Inside function bool in not used bc
+            when the vector is saved inside the parser,
+            it links a temporary int int with the list
+            instead of the actual variable
+        */
+        current_vec_int = get_vector_int(save_id);
+
+
         current_dataytpe = head->asttype;
 
         #ifdef TREE
@@ -668,6 +676,9 @@ void interpret(astptr head)
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
         #endif
+
+        current_dataytpe = head->asttype;
+
         left=head->p1;
         save_id = head->astdata;
                 #ifdef TREE
@@ -681,7 +692,6 @@ void interpret(astptr head)
                 vector_identifiers[save_id]=current_vec_int;
             }
         }
-        current_dataytpe = head->asttype;
         break;
     case n_assignment_int:
         #ifdef TREE
@@ -980,7 +990,7 @@ void interpret(astptr head)
 
             //getting funciton parse tree
             mid = get_funct_head(save_id);
-            // printParserTree(mid);
+            printParserTree(mid);
 
             if(mid->asttype!=n_funct){
                 //TODO error. takes 0 positional arguments but 1 was given
@@ -1005,6 +1015,8 @@ void interpret(astptr head)
             
             interpret(mid);
         }
+        intvalue = returnint;
+        current_vec_int = returnlist;
         current_dataytpe = head->asttype;
         break;
     case n_funct:
@@ -1070,11 +1082,80 @@ void interpret(astptr head)
             if(arg1==NULL){
                 //TODO Error, no param passed
             }
+
+            //First param
+            switch (arg1->asttype)
+            {
+            case n_integer:
+                inject_int(current_vec_str[0],stod(arg1->astdata));
+                break;
+            case n_string:
+                // pass the string straight thru
+                break;
+            case n_id:
+                current_vec_int=get_vector_int(arg1->astdata);
+                if(notfound){
+                    current_dataytpe = n_integer;
+                    intvalue = int_indefiers[arg1->astdata];
+                    inject_int(current_vec_str[0],intvalue);
+                } else {
+                    current_dataytpe = n_list_int;
+                    inject_list(current_vec_str[0], current_vec_int);
+                }                
+                break;
+            default:
+                // cout << "Argument is not valid" << endl;
+                break;
+            }
+
+            //Second param
+            switch (arg2->asttype)
+            {
+            case n_integer:
+                inject_int(current_vec_str[1],stod(arg2->astdata));
+                break;
+            case n_string:
+                // pass the string straight thru
+                break;
+            case n_id:
+                current_vec_int=get_vector_int(arg2->astdata);
+                if(notfound){
+                    current_dataytpe = n_integer;
+                    intvalue = int_indefiers[arg2->astdata];
+                    inject_int(current_vec_str[1],intvalue);
+                } else {
+                    current_dataytpe = n_list_int;
+                    inject_list(current_vec_str[1], current_vec_int);
+                }                
+                break;
+            default:
+                // cout << "Argument is not valid" << endl;
+                break;
+            }
         }
         interpret(mid);
         inside_funct = false;
         break;
     case n_return:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif 
+
+        left = head->p1;
+                #ifdef TREE
+                cout << " down " << endl;
+                #endif 
+        interpret(left);
+
+        if(current_dataytpe==n_integer){
+            returnint = intvalue;
+        } else if(current_dataytpe==n_list_int){
+            cout << "List returned =";
+            print_vector_int();
+            cout <<endl;
+            returnlist = current_vec_int;
+        }
         
         break;
     case n_error: case n_def:

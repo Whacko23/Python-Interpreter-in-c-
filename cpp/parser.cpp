@@ -352,7 +352,15 @@ astptr returnstatement()
     astptr pfirst = NULL;
     currenttoken = cleanLexer();
 
+    /*
+    This statement useful for return 2+3 
+    However, to keep the interpreter for n_return simple,
+    factor() is used instead of expression
+
     pfirst = expression();
+
+    */
+    pfirst = factor();
 
     return newnode(n_return, "", pfirst, NULL, NULL);
 };
@@ -460,7 +468,7 @@ astptr funct()
     #endif
 
     astptr pfirst=NULL;
-    string funct_name,arg1,arg2,arg_index;
+    string funct_name,arg1,arg2;
     bool arg_found=false;
 
     string_vector.clear();
@@ -496,7 +504,8 @@ astptr funct()
                     arg2=identifier;
                     string_vector.push_back(arg2);
                     currenttoken=cleanLexer();
-                    if(currenttoken==closesquaresym){
+
+                    if(currenttoken==closebracketsym){
                         currenttoken=cleanLexer();
                         add_funct_args(funct_name, string_vector);
                     }else{
@@ -772,7 +781,7 @@ astptr factor()
     }
     else if (currenttoken == opensquaresym)
     {
-        cout << "im here";
+        cout << "----------im here---------";
         //TODO some work
     }
     else

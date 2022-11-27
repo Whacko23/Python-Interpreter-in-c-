@@ -1,15 +1,26 @@
-def addConstant(x):
-    val = 3
-    print(x)
-    x = x + val
-    print(x)
-    print("x = ", x)
+def f(i):
+ i=i+100
+ return i
 
-listA = [2,4,6,8,10]
-listB = [3,6,9,12,15]
-listC = [4,8,12,16,20]
+# notice one variable returned to make it simple
+def add(x,y):
+ z=x+y
+ return z
 
+# TA can change these values to negative, positive
+x=1
+y=0
+sum=add(x,y)
 
-x = 0
-x = 20
-addConstant(2)
+if sum<1:
+  sum=-1
+else:
+  if x<0:
+    sum=sum+1
+  else:
+    sum=sum+sum
+
+print("sum: ",sum)
+
+sum=sum+f(100)
+print("sum: ",sum)
