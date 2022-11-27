@@ -19,7 +19,6 @@ typedef struct function_env {
 //Variables
 extern bool funct_found;
 extern environment current_funct_env;
-extern bool inside_funct;
 
 //Data structures
 // extern map<string, environment> funct_scope;

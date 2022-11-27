@@ -1,26 +1,19 @@
-def f(i):
- i=i+100
- return i
+def IncrementIterator(itr):
+    itr = itr + 1
+    return itr
+    
+def add(val):
+    x = [1,2,3,4,5]
+    #TYPE ERROR
+    #cout an error
+    temp = x + val
+    print(temp)
+    
 
-# notice one variable returned to make it simple
-def add(x,y):
- z=x+y
- return z
+#initialize
+elements = [3,6,9]
+i = 0
 
-# TA can change these values to negative, positive
-x=1
-y=0
-sum=add(x,y)
-
-if sum<1:
-  sum=-1
-else:
-  if x<0:
-    sum=sum+1
-  else:
-    sum=sum+sum
-
-print("sum: ",sum)
-
-sum=sum+f(100)
-print("sum: ",sum)
+#increment
+i = IncrementIterator(i)
+add(i)

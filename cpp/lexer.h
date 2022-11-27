@@ -68,6 +68,7 @@ extern int lexer_vectorindex;
 extern bool firstline;
 extern double currdouble;
 
+extern string errorMsg;
 
 
 //Variable to store the last identifier encountered by lexer. Error symbol also uses the same variable

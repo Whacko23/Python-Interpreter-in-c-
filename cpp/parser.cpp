@@ -16,6 +16,8 @@ vector<string> string_vector;
 map<string, vector<string>> funct_args;
 map<string, astptr> funct_definitions;
 void add_function_def(string n, astptr p);
+astptr parseetree;
+
 
 astptr newnode(nodetype n, string s, astptr first, astptr second, astptr third)
 {
@@ -126,7 +128,7 @@ astptr simple_stmt()
             {
                 // linenumber++;
                 pfirst = newnode(n_newline, "", pfirst, NULL, NULL);
-                currenttoken = lexer();
+                // currenttoken = lexer();
 
                 #ifdef DEEBUG
                 cout << grammar_tracker << " ---exit simple stmts loop by newline ---- line # " << linenumber << endl;
@@ -289,13 +291,27 @@ astptr blockstatements()
     // int findent = stoi(firstdata);
     // int sindent = 0;
     astptr psecond;
-    
+
+    #ifdef DEEBUG
+    int i=1;
+    #endif 
+
     while (true)
     {
         #ifdef DEEBUG
+        if(i==20)break;
+        i++;
         cout << grammar_tracker<< " ---inside  block stmts loop--- line # " << linenumber << endl;
         cout << " . currenttoken ";
         print_current_lextoken(currenttoken);
+        cout << endl;
+
+        //
+        cout << " previous token = ";
+        print_current_lextoken(vec[lexer_vectorindex-1].tokentype);
+        cout << " second next token = ";
+        print_current_lextoken(vec[lexer_vectorindex+1].tokentype);
+        //
         grammar_tracker++;
         #endif
         
@@ -1576,4 +1592,15 @@ void print_vector_int(vector<double> v){
     for(auto itr : v)
         cout << itr << " ";
 };
+
+void exitProgram(){
+    cout << " line " <<linenumber <<", in "<<"<module>"<<endl;
+    // if(inside_funct){
+    //     cout << " line " <<linenumber <<", in "<<curr_fname<<endl;
+    // }
+    cout << errorMsg <<endl;
+    freeMemory(parseetree);
+    exit(-1);
+};
+
 #endif

@@ -191,7 +191,7 @@ int main(int argc, const char *argv[])
         #ifdef DEBUG
         cout << " -------behind lexer-------" << endl;
         #endif
-        astptr parseetree = parser();
+        parseetree = parser();
         #ifdef DEBUG
         cout << " -------behind parser-------" << endl;
         printParserTree(parseetree);

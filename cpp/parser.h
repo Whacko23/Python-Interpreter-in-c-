@@ -73,6 +73,9 @@ typedef struct tnode
 
 extern astptr newnode(nodetype n, int s, astptr first, astptr second, astptr third);
 
+extern astptr parseetree;
+
+
 extern astptr statements();
 extern astptr statement();
 extern astptr simple_stmt();
@@ -113,6 +116,9 @@ extern vector<double> current_vec_int;
 extern map<string, vector<string>> funct_args;
 extern vector<string> current_vec_str;
 extern map<string, astptr> funct_definitions;
+extern bool inside_funct;
+extern string curr_fname;
+
 
 //Functions
 extern string add_vector(vector<double> v);
@@ -126,4 +132,6 @@ extern vector<string> get_funct_args(string fname);
 extern void print_vector_int(vector<double> v);
 extern void add_function_def(string n, astptr p);
 extern astptr get_funct_head(string s);
+
+extern void exitProgram();
 #endif

@@ -6,14 +6,15 @@
 #include <iostream>
 //Declaring all the global variables
 char ch;
-string identifier;
-double intvalue;
-int tracker;
-int linenumber = 1;
-int lexer_vectorindex = 0;
-lextokens currenttoken;
-string lineInput;
 bool firstline = true;
+string identifier,
+       lineInput,
+       errorMsg;
+double intvalue;
+int tracker,
+    linenumber = 1,
+    lexer_vectorindex = 0;
+lextokens currenttoken;
 vector<token> vec;
 
 char getch(){

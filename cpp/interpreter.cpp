@@ -16,6 +16,8 @@ bool firstprint = true,
      inside_funct = false,
      funct_found = false;
 
+string curr_fname;
+
 astptr  arg1=NULL, 
         arg2=NULL;
 
@@ -92,7 +94,7 @@ extern double get_funct_int(string variable){
     return d;
 };
 
-extern vector<double> get_funct_list(string variable){
+vector<double> get_funct_list(string variable){
     vector<double> d;
     map<string, vector<double>>::iterator search = current_funct_env.lists.find(variable);
     if(search==current_funct_env.lists.end()){
@@ -155,8 +157,8 @@ void interpret(astptr head)
     int index;
     string save_id, bool_left_str, bool_right_str, temp_str;
     vector<double> tempvec_double;
-    nodetype bool_left_type = n_empty,
-             bool_right_type = n_empty;
+    nodetype left_nodetype = n_empty,
+             right_nodetype = n_empty;
 
     
     // cout << "Datatype " << head->asttype << " Data " << head->astdata << endl;
@@ -294,8 +296,10 @@ void interpret(astptr head)
                 interpret(left);
                 temp = intvalue;
                 notfound = false;
+                left_nodetype = n_integer;
             } else {
                 tempvec_double = current_vec_int;
+                left_nodetype = n_list_int;
                 // cout << "first vec" << " first data = " << left->astdata;
                 // print_vector_int(current_vec_int);
                 // cout << endl;
@@ -305,7 +309,8 @@ void interpret(astptr head)
             cout << " left " << endl;
             #endif 
             interpret(left);
-            temp = intvalue;           
+            temp = intvalue;   
+            left_nodetype = n_integer;
         } else if(left->asttype==n_list_int){
             //This is for a = [1,2,3] + [4,5,6]
         } else if(left->asttype==n_plus){
@@ -315,11 +320,13 @@ void interpret(astptr head)
             interpret(left);
             temp = temp + intvalue;
             tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
+            left_nodetype=current_dataytpe;
         } else {
             #ifdef TREE
             cout << " left " << endl;
             #endif 
             interpret(left);
+            left_nodetype=current_dataytpe;
             temp = intvalue;
             notfound = false;
         }
@@ -339,10 +346,12 @@ void interpret(astptr head)
                 temp = temp + intvalue;
                 intvalue = temp;
                 notfound = false;
+                right_nodetype = n_integer;
             } else {
                 tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
                 assign_list_variable = true;
                 current_vec_int = tempvec_double;
+                right_nodetype = n_list_int;
             }
         } else if (right->asttype==n_integer || right->asttype==n_listindex){
                 #ifdef TREE
@@ -351,8 +360,10 @@ void interpret(astptr head)
             interpret(right);
             temp = temp + intvalue;  
             intvalue = temp;
+            right_nodetype = n_integer;
         } else if(right->asttype==n_list_int){
            //This is for a = [1,2] + [3,4] 
+           right_nodetype = n_list_int;
         } else if(right->asttype==n_plus){
                 #ifdef TREE
                 cout << " right " << endl;
@@ -362,7 +373,7 @@ void interpret(astptr head)
             intvalue = temp;
             tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
             current_vec_int = tempvec_double;
-
+            right_nodetype = n_list_int;
         } else {
                 #ifdef TREE
                 cout << " right " << endl;
@@ -371,8 +382,16 @@ void interpret(astptr head)
             temp = temp + intvalue;
             intvalue = temp;
             notfound = false;
+            right_nodetype = n_list_int;
 
         }
+        
+        if(right_nodetype!=left_nodetype){
+            errorMsg = "TypeError: can only concatenate list (not \"int\") to list";
+            exitProgram();
+
+        }
+
         current_dataytpe = head->asttype;
         break;
     
@@ -581,13 +600,13 @@ void interpret(astptr head)
                 #endif 
         interpret(left);
 
-        bool_left_type = current_dataytpe;
+        left_nodetype = current_dataytpe;
 
         //NOTE this might cause problem for if string * int or string + int
         
-        if(bool_left_type==n_integer){
+        if(left_nodetype==n_integer){
             bool_exp_left = intvalue;
-        } else if (bool_left_type==n_string){
+        } else if (left_nodetype==n_string){
             bool_left_str = identifier;
         }
         
@@ -596,12 +615,12 @@ void interpret(astptr head)
                 #endif 
         interpret(right);
         
-        bool_right_type = current_dataytpe;
+        right_nodetype = current_dataytpe;
 
 
-        if(bool_right_type==n_integer){
+        if(right_nodetype==n_integer){
             bool_exp_right = intvalue;
-        } else if (bool_right_type==n_string){
+        } else if (right_nodetype==n_string){
             bool_right_str = identifier;
         }
         
@@ -619,10 +638,10 @@ void interpret(astptr head)
 
         //comaprison between string and int not supported
         //will add support later
-        if(bool_right_type==n_integer){
+        if(right_nodetype==n_integer){
             // cout << "inside boolexp left = " << bool_exp_left << "right = " << bool_exp_right << endl;
             flag = boolean_evaluate_int(bool_exp_left, bool_exp_right,mid->asttype); 
-        } else if (bool_right_type==n_string){
+        } else if (right_nodetype==n_string){
             flag = boolean_evaluate_string(bool_left_str, bool_right_str,mid->asttype);
         }
         
@@ -669,7 +688,7 @@ void interpret(astptr head)
         } else {
             intvalue = current_vec_int[temp];
         }
-        current_dataytpe = head->asttype;
+        current_dataytpe = n_integer;
         break;
     case n_assignment_list:
         #ifdef TREE
@@ -982,14 +1001,14 @@ void interpret(astptr head)
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
         #endif
-        save_id = head->astdata;
+        curr_fname = head->astdata;
         left = head->p1;
         right = head->p2;
         if(left==NULL){
             /*This is an function without argument*/
 
             //getting funciton parse tree
-            mid = get_funct_head(save_id);
+            mid = get_funct_head(curr_fname);
             printParserTree(mid);
 
             if(mid->asttype!=n_funct){
@@ -1002,8 +1021,8 @@ void interpret(astptr head)
             interpret(mid);
 
         } else {
-            current_vec_str = get_funct_args(save_id);
-            mid = get_funct_head(save_id);
+            current_vec_str = get_funct_args(curr_fname);
+            mid = get_funct_head(curr_fname);
 
             arg1 = left;
             arg2 = right;
@@ -1158,7 +1177,10 @@ void interpret(astptr head)
         }
         
         break;
-    case n_error: case n_def:
+    case n_error: 
+        exitProgram();
+        break;
+    case n_def:
     case n_empty: 
     case n_index_assign_index:
     case n_uminus: case n_listindex_data:
