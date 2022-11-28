@@ -166,6 +166,9 @@ int main(int argc, const char *argv[])
                 case greaterthansym:
                     vec.push_back(newtoken(greaterthansym, ">"));
                     break;
+                case lensym:
+                    vec.push_back(newtoken(lensym, "len"));
+                    break;                
                 case newlinesym:
                     cout << "  New line " << endl;
                     break;
@@ -201,7 +204,8 @@ int main(int argc, const char *argv[])
 
         interpret(parseetree);
 
-        freeMemory(parseetree);
+        // freeMemory(parseetree);
+        // freeFunctionMemory();
         // cout << " ---End of program---" << endl;
 #endif
     }

@@ -1186,6 +1186,36 @@ void interpret(astptr head)
         }
         
         break;
+    case n_len:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif 
+        save_id = head->astdata;
+
+        if(inside_funct){
+            current_vec_int = get_funct_list(save_id);
+        }  else {
+            current_vec_int = get_vector_int(save_id);
+        }
+
+        if(notfound){
+            if(inside_funct){
+                intvalue = get_funct_int(save_id);
+                if(notfound){
+                    errorMsg="TypeError: object of type 'int' has no len()";
+                    exitProgram();
+                } else {
+                    errorMsg="NameError: name '" + save_id + "' is not defined";  
+                    exitProgram();
+                }
+            }
+        }
+
+        intvalue = current_vec_int.size();
+        current_dataytpe = n_integer;
+
+        break;
     case n_error: 
         exitProgram();
         break;

@@ -104,6 +104,7 @@ lextokens lext(){
         else if (identifier == "return") {currenttoken = returnsym;}
         else if (identifier == "while") {currenttoken = whilesym;}
         else if (identifier == "def") {currenttoken = defsym;}
+        else if (identifier == "len") {currenttoken = lensym;}
         else {currenttoken = identifiersym;}
 
         return currenttoken;

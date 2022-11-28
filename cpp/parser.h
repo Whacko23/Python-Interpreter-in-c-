@@ -38,11 +38,13 @@ typedef enum
     n_integer,
     n_string,
     n_list_int,
+    n_list_id,
     n_listindex,
     n_listindex_data,
     n_index_assign_id,
     n_index_assign_index,
     n_index_assign_data,
+    n_len,
     // Variable
     n_id,
     n_funct_definiton,
@@ -134,6 +136,7 @@ extern vector<string> get_funct_args(string fname);
 extern void print_vector_int(vector<double> v);
 extern void add_function_def(string n, astptr p);
 extern astptr get_funct_head(string s);
+extern void freeFunctionMemory();
 
 extern void exitProgram();
 #endif

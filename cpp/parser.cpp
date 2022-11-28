@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-// #define DEEBUG
+#define DEEBUG
 
 #ifdef DEEBUG
 int grammar_tracker = 1;
@@ -51,7 +51,7 @@ astptr statements()
     {
         #ifdef DEEBUG
 
-        if(i==20)break;
+        if(i==40)break;
         i++;
         cout << "currenttoken";
         print_current_lextoken(currenttoken);
@@ -300,7 +300,7 @@ astptr blockstatements()
     while (true)
     {
         #ifdef DEEBUG
-        if(i==20)break;
+        if(i==40)break;
         i++;
         cout << grammar_tracker<< " ---inside  block stmts loop--- line # " << linenumber << endl;
         cout << " . currenttoken ";
@@ -391,9 +391,48 @@ astptr list()
     #endif
     astptr pfirst=NULL;
     string tempid;
+    bool idInsideList=false;
+    int tempint;
     if (currenttoken == opensquaresym)
     {
         currenttoken = cleanLexer();
+
+        /*
+        Performing lookahead without consuming tokens
+        to see if the list contains identifiers
+        eg list = [2,x,y,x+1,3,6]
+
+        if yes then idInsideList is set to true
+
+        */
+        tempint = lexer_vectorindex - 1;
+
+        while(!idInsideList){
+
+            if(vec[tempint].tokentype==identifiersym){
+                idInsideList=true;
+            } else if(vec[tempint].tokentype==closesquaresym){
+                break;
+            } else if(vec[tempint].tokentype==newlinesym){
+                break;
+            } 
+            tempint++;        
+        }
+
+        if(idInsideList){
+            while(true){
+                if(currenttoken==newlinesym){
+                    //TODO Error ] not found
+                    break;
+                } else if (currenttoken==closesquaresym){
+                    //TODO
+                    break;
+                }
+                
+                currenttoken=cleanLexer();
+            }
+        }
+
         if (currenttoken == intsym)
         {
             /*
@@ -723,7 +762,7 @@ astptr term()
 }
 
 /* factor
-<factor> -> id | arrayindex e.g. a[0] | integer | string | function call e.g. hello("world") |( <expr> )
+<factor> -> id  | arrayindex e.g. a[0] | integer | string | function call e.g. hello("world") | len(list) | ( <expr> )
 */
 astptr factor()
 {
@@ -802,6 +841,25 @@ astptr factor()
     {
         cout << "----------im here---------";
         //TODO some work
+    }
+    else if (currenttoken == lensym){
+        currenttoken=cleanLexer();
+        if(currenttoken!=openbracketsym){
+            //TODO error missing (
+        } else {
+            currenttoken=cleanLexer();
+            if(currenttoken!=identifiersym){
+                //TODO error need an id
+            } else {
+                pfirst = newnode(n_len, identifier, NULL, NULL, NULL);
+                currenttoken=cleanLexer();
+                if(currenttoken!=closebracketsym){
+                    //TODO missing )
+                } else {
+                    currenttoken = cleanLexer();
+                }
+            }
+        }
     }
     else
     {
@@ -1123,6 +1181,7 @@ void printParserTree(astptr head)
     case n_error:
     case n_empty:
     case n_def:
+    case n_len:
     case n_funct_definiton:
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
@@ -1252,6 +1311,7 @@ void freeMemory(astptr head)
     case n_empty:
     case n_error:
     case n_string:
+    case n_len:
     case n_eq:
     case n_ne:
     case n_gt:
@@ -1322,6 +1382,14 @@ void freeMemory(astptr head)
     }
 }
 
+void freeFunctionMemory(){
+    map<string, astptr>::iterator it;
+
+    for (it=funct_definitions.begin(); it != funct_definitions.end(); it++){
+        freeMemory(it->second);
+    }
+}
+
 void print_current_lextoken(lextokens t){
                 switch(t){
                     case intsym: cout << "Integer token = " << intvalue << endl; break;
@@ -1362,6 +1430,8 @@ void print_current_lextoken(lextokens t){
                     case lessthansym: cout << "Less than token "  << endl; break;
                     case greaterthansym: cout << "Greater than token "  << endl; break;
                     case newlinesym: cout << "  New line "  << endl; break;
+                    case lensym: cout << "  len token "  << endl; break;
+
                 }
 };
 
@@ -1494,6 +1564,9 @@ void print_current_parsetoken(nodetype n){
           case n_listindex_data:
             cout << "n_listindex_data" <<endl;
             break;
+        case n_len:
+            cout << "n_len" <<endl;
+            break;           
                
     }
 };
@@ -1604,6 +1677,7 @@ void exitProgram(){
     }
     cout << errorMsg <<endl;
     freeMemory(parseetree);
+    freeFunctionMemory();
     exit(-1);
 };
 

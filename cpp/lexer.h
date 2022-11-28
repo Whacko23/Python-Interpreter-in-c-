@@ -20,6 +20,7 @@ typedef enum{
     elsesym,
     elseifsym,
     defsym,
+    lensym,
     returnsym,
     whilesym,
     semicolonsym,
