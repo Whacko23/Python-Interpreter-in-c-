@@ -15,7 +15,7 @@ vector<double> int_vector;
 vector<string> string_vector;
 map<string, vector<string>> funct_args;
 map<string, astptr> funct_definitions;
-void add_function_def(string n, astptr p);
+map<string, vector<astptr>> vector_with_id;
 astptr parseetree;
 int lineInsideFunction = 1,
     function_def_line_start = 0;
@@ -393,6 +393,8 @@ astptr list()
     string tempid;
     bool idInsideList=false;
     int tempint;
+    vector<astptr> temp_v;
+
     if (currenttoken == opensquaresym)
     {
         currenttoken = cleanLexer();
@@ -415,7 +417,9 @@ astptr list()
                 break;
             } else if(vec[tempint].tokentype==newlinesym){
                 break;
-            } 
+            } else if (vec[tempint].tokentype==eofsym){
+                break;
+            }
             tempint++;        
         }
 
@@ -427,10 +431,23 @@ astptr list()
                 } else if (currenttoken==closesquaresym){
                     //TODO
                     break;
+                } else if (currenttoken==eofsym){
+                    //TODO Error
+                    break;
+                } else if (currenttoken==intsym){
+                    pfirst = newnode(n_integer,to_string(intvalue),NULL,NULL,NULL);
+                    temp_v.push_back(pfirst);
+                    break;
+                } else if (currenttoken==identifiersym){
+                    pfirst = newnode(n_id,identifier,NULL,NULL,NULL);
+                    temp_v.push_back(pfirst);
+                    break;
                 }
                 
                 currenttoken=cleanLexer();
             }
+
+
         }
 
         if (currenttoken == intsym)
@@ -1589,6 +1606,14 @@ string add_vector(vector<double> v){
     vector_identifiers[to_string(vector_index)]=v;
     return to_string(vector_index);
 }
+
+string add_idVector(vector<astptr> v){
+    vector_index++;
+    // vector_identifiers.insert({to_string(vector_index),v});
+    vector_with_id[to_string(vector_index)]=v;
+    return to_string(vector_index);
+};
+
 
 void add_funct_args(string fname, vector<string> v){
     // funct_args.insert({fname,v});

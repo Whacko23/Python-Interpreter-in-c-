@@ -113,6 +113,7 @@ extern void print_current_parsetoken(nodetype n);
 extern map<string, double> int_indefiers;
 extern map<string, string> string_identifiers;
 extern map<string, vector<double>> vector_identifiers;
+extern map<string, vector<astptr>> vector_with_id;
 extern bool notfound;
 extern vector<double> current_vec_int;
 extern map<string, vector<string>> funct_args;
@@ -126,6 +127,7 @@ extern int function_def_line_start;
 
 //Functions
 extern string add_vector(vector<double> v);
+extern string add_idVector(vector<astptr> v);
 extern void modify_vector(int i, string s);
 extern vector<double> get_vector_int(string s);
 extern void modify_vector_int(string s, vector<double> v);
