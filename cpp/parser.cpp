@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-#define DEEBUG
+// #define DEEBUG
 
 #ifdef DEEBUG
 int grammar_tracker = 1;
@@ -377,7 +377,7 @@ astptr returnstatement()
     pfirst = expression();
 
     */
-    pfirst = factor();
+    pfirst = expression();
 
     return newnode(n_return, "", pfirst, NULL, NULL);
 };
@@ -437,17 +437,18 @@ astptr list()
                 } else if (currenttoken==intsym){
                     pfirst = newnode(n_integer,to_string(intvalue),NULL,NULL,NULL);
                     temp_v.push_back(pfirst);
-                    break;
                 } else if (currenttoken==identifiersym){
                     pfirst = newnode(n_id,identifier,NULL,NULL,NULL);
                     temp_v.push_back(pfirst);
-                    break;
                 }
                 
                 currenttoken=cleanLexer();
             }
+            currenttoken = cleanLexer();
 
-
+            tempid = add_idVector(temp_v);
+            pfirst = newnode(n_list_id, tempid, NULL,NULL,NULL);
+            return pfirst;
         }
 
         if (currenttoken == intsym)
@@ -1029,6 +1030,7 @@ astptr assignment()
         else
         {
             exp = expression();
+ 
             pfirst = newnode(n_assignment_int, id, exp, NULL, NULL);
         }
         
@@ -1193,6 +1195,7 @@ void printParserTree(astptr head)
     case n_le:
     case n_ge:
     case n_list_int:
+    case n_list_id:
     case n_index_assign_index:
     case n_index_assign_id:
     case n_error:
@@ -1336,6 +1339,7 @@ void freeMemory(astptr head)
     case n_le:
     case n_ge:
     case n_list_int:
+    case n_list_id:
     case n_index_assign_index:
     case n_index_assign_id:
     case n_funct_definiton:
@@ -1583,7 +1587,10 @@ void print_current_parsetoken(nodetype n){
             break;
         case n_len:
             cout << "n_len" <<endl;
-            break;           
+            break; 
+        case n_list_id:
+            cout << "n_list_id" <<endl;
+            break;                   
                
     }
 };
@@ -1665,6 +1672,20 @@ vector<double> get_vector_int(string s){
 
     return v;
 }
+
+vector<astptr> get_vector_id(string s){
+    map<string, vector<astptr>>::iterator search = vector_with_id.find(s);
+    vector<astptr> v;
+    if(search==vector_with_id.end()){
+        //TODO not found
+        notfound=true;
+    } else {
+        notfound=false;
+        v = search->second;
+    }
+
+    return v;
+};
 
 void modify_vector_int(string s, vector<double> v){
     map<string, vector<double>>::iterator search = vector_identifiers.find(s);

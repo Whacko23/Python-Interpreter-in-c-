@@ -23,7 +23,8 @@ astptr  arg1=NULL,
 
 double returnint;
 
-vector<double> returnlist;
+vector<double> temp_vec,
+               returnlist;
 
 nodetype current_dataytpe=n_empty;
 
@@ -157,6 +158,7 @@ void interpret(astptr head)
     int index;
     string save_id, bool_left_str, bool_right_str, temp_str;
     vector<double> tempvec_double;
+    vector<astptr> temp_ptr_vec;
     nodetype left_nodetype = n_empty,
              right_nodetype = n_empty;
 
@@ -184,7 +186,7 @@ void interpret(astptr head)
     case n_integer:
         intvalue = stod(head->astdata);
         current_dataytpe= n_integer;
-
+        assign_list_variable = false;
         #ifdef TREE
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
@@ -195,6 +197,7 @@ void interpret(astptr head)
     case n_string:
         identifier = head->astdata;
         current_dataytpe = n_string;
+        assign_list_variable = false;
 
         #ifdef TREE
         cout << "token type = ";
@@ -211,23 +214,25 @@ void interpret(astptr head)
             if(notfound){
                 current_dataytpe = n_integer;
                 intvalue = get_funct_int(identifier);
+                assign_list_variable = false;
 
                 if(notfound){
                     //TODO ERROR
                 }
             } else {
                 current_dataytpe = n_list_int;
-                cout << "list found. id = " << identifier ;
-                print_vector_int();
-                cout << endl;
+                assign_list_variable = true;
+
             }
         } else {
             current_vec_int=get_vector_int(identifier);
             if(notfound){
                 current_dataytpe = n_integer;
                 intvalue = int_indefiers[identifier];
+                assign_list_variable = false;
             } else {
                 current_dataytpe = n_list_int;
+                assign_list_variable = true;
             }
         }
 
@@ -297,9 +302,13 @@ void interpret(astptr head)
                 temp = intvalue;
                 notfound = false;
                 left_nodetype = n_integer;
+                assign_list_variable = false;
+
             } else {
                 tempvec_double = current_vec_int;
                 left_nodetype = n_list_int;
+                assign_list_variable = true;
+
                 // cout << "first vec" << " first data = " << left->astdata;
                 // print_vector_int(current_vec_int);
                 // cout << endl;
@@ -313,6 +322,8 @@ void interpret(astptr head)
             left_nodetype = n_integer;
         } else if(left->asttype==n_list_int){
             //This is for a = [1,2,3] + [4,5,6]
+            assign_list_variable = true;
+
         } else if(left->asttype==n_plus){
             #ifdef TREE
             cout << " left " << endl;
@@ -347,11 +358,15 @@ void interpret(astptr head)
                 intvalue = temp;
                 notfound = false;
                 right_nodetype = n_integer;
+                assign_list_variable = false;
+
             } else {
                 tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
                 assign_list_variable = true;
                 current_vec_int = tempvec_double;
                 right_nodetype = n_list_int;
+                assign_list_variable = true;
+
             }
         } else if (right->asttype==n_integer || right->asttype==n_listindex){
                 #ifdef TREE
@@ -364,6 +379,8 @@ void interpret(astptr head)
         } else if(right->asttype==n_list_int){
            //This is for a = [1,2] + [3,4] 
            right_nodetype = n_list_int;
+            assign_list_variable = true;
+
         } else if(right->asttype==n_plus){
                 #ifdef TREE
                 cout << " right " << endl;
@@ -708,7 +725,7 @@ void interpret(astptr head)
                 cout << " down " << endl;
                 #endif 
         interpret(left);
-        if(left->asttype==n_list_int){
+        if(left->asttype==n_list_int || left->asttype==n_list_id){
             if(inside_funct){
                 inject_list(save_id,current_vec_int);
             } else {
@@ -729,13 +746,16 @@ void interpret(astptr head)
                 #endif 
         interpret(left);
 
+
         if(assign_list_variable==false){
+
             if(inside_funct){
                 inject_int(save_id,intvalue);
             } else {
                 int_indefiers[save_id] = intvalue;
             }
         } else {
+
             if(inside_funct){
                 inject_list(save_id, current_vec_int);
                 assign_list_variable=false;
@@ -802,7 +822,7 @@ void interpret(astptr head)
         right = head->p2;
         if (right->asttype == n_integer || right->asttype == n_plus || right->asttype == n_minus || right->asttype == n_mul || right->asttype == n_div)
         {   
-            cout << " " << intvalue;
+            cout << " " << intvalue; 
                 #ifdef TREE
                 cout << " right " << endl;
                 #endif 
@@ -1176,14 +1196,9 @@ void interpret(astptr head)
                 #endif 
         interpret(left);
 
-        if(current_dataytpe==n_integer){
-            returnint = intvalue;
-        } else if(current_dataytpe==n_list_int){
-            cout << "List returned =";
-            print_vector_int();
-            cout <<endl;
-            returnlist = current_vec_int;
-        }
+        returnint = intvalue;
+        returnlist = current_vec_int;
+ 
         
         break;
     case n_len:
@@ -1213,8 +1228,30 @@ void interpret(astptr head)
         }
 
         intvalue = current_vec_int.size();
+        
         current_dataytpe = n_integer;
 
+        break;
+    case n_list_id:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
+        save_id = head->astdata;
+        temp_ptr_vec = get_vector_id(save_id);
+
+        temp_vec.clear();
+        
+        for(vector<astptr>::iterator it=temp_ptr_vec.begin(); it!=temp_ptr_vec.end(); it++){
+            interpret(*it);
+            temp_vec.push_back(intvalue);
+        }
+
+        current_vec_int = temp_vec;
+
+
+        assign_list_variable = true;
+        current_dataytpe = n_list_int;
         break;
     case n_error: 
         exitProgram();

@@ -130,6 +130,7 @@ extern string add_vector(vector<double> v);
 extern string add_idVector(vector<astptr> v);
 extern void modify_vector(int i, string s);
 extern vector<double> get_vector_int(string s);
+extern vector<astptr> get_vector_id(string s);
 extern void modify_vector_int(string s, vector<double> v);
 extern void interpret(astptr head);
 extern void print_vector_int();
