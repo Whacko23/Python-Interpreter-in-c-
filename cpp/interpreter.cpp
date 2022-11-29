@@ -176,12 +176,10 @@ void interpret(astptr head)
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
         #endif
-        current_dataytpe = head->asttype;
         break;
     case n_newline:
         left = head->p1;
         interpret(left);
-        current_dataytpe = head->asttype;    
         break;
     case n_integer:
         intvalue = stod(head->astdata);
@@ -323,6 +321,8 @@ void interpret(astptr head)
         } else if(left->asttype==n_list_int){
             //This is for a = [1,2,3] + [4,5,6]
             assign_list_variable = true;
+            left_nodetype = n_list_int;
+
 
         } else if(left->asttype==n_plus){
             #ifdef TREE
@@ -341,6 +341,7 @@ void interpret(astptr head)
             temp = intvalue;
             notfound = false;
         }
+
 
 
         if(right->asttype==n_id){
@@ -390,26 +391,28 @@ void interpret(astptr head)
             intvalue = temp;
             tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
             current_vec_int = tempvec_double;
-            right_nodetype = n_list_int;
+            right_nodetype=current_dataytpe;
+
         } else {
                 #ifdef TREE
                 cout << " right " << endl;
                 #endif 
             interpret(right);
+            right_nodetype=current_dataytpe;
             temp = temp + intvalue;
             intvalue = temp;
             notfound = false;
-            right_nodetype = n_list_int;
-
         }
         
         if(right_nodetype!=left_nodetype){
             errorMsg = "TypeError: can only concatenate list (not \"int\") to list";
             exitProgram();
 
+        } else {
+            current_dataytpe = left_nodetype;
         }
 
-        current_dataytpe = head->asttype;
+        // current_dataytpe = head->asttype;
         break;
     
    /*
@@ -443,7 +446,7 @@ void interpret(astptr head)
         interpret(right);
         temp = temp - intvalue;
         intvalue = temp;
-        current_dataytpe = head->asttype;
+        current_dataytpe = n_integer;
         break;
     case n_div:
         #ifdef TREE
@@ -472,7 +475,7 @@ void interpret(astptr head)
             temp = temp / intvalue;
         }
         intvalue = temp;
-        current_dataytpe = head->asttype;
+        current_dataytpe = n_integer;
         break;
     case n_mul:
         #ifdef TREE
@@ -493,7 +496,7 @@ void interpret(astptr head)
         interpret(right);
         temp = temp * intvalue;
         intvalue = temp;
-        current_dataytpe = head->asttype;
+        current_dataytpe = n_integer;
         break;
     case n_statements:
     case n_while:
@@ -511,7 +514,6 @@ void interpret(astptr head)
                 cout << " right " << endl;
                 #endif 
         interpret(right);
-        current_dataytpe = head->asttype;
         break;
     case n_if:
         #ifdef TREE
@@ -532,7 +534,6 @@ void interpret(astptr head)
             interpret(right);
         } 
         // cout << "n_if flag value = " << flag << endl;
-        current_dataytpe = head->asttype;
         break;
     case n_block_stmts:
         #ifdef TREE
@@ -549,7 +550,6 @@ void interpret(astptr head)
                 cout << " right " << endl;
                 #endif 
         interpret(right);
-        current_dataytpe = head->asttype;
         break;
     case n_statement:
         #ifdef TREE
@@ -566,7 +566,6 @@ void interpret(astptr head)
                 cout << " down " << endl;
                 #endif 
         interpret(left);
-        current_dataytpe = head->asttype;
         break;
     case n_block_stmt:
     case n_simple_stmt:
@@ -579,7 +578,6 @@ void interpret(astptr head)
                 cout << " down " << endl;
                 #endif 
         interpret(left);
-        current_dataytpe = head->asttype;
         break;
     case n_ifelse: 
         #ifdef TREE
@@ -604,7 +602,6 @@ void interpret(astptr head)
                 #endif 
             interpret(right);
         }
-        current_dataytpe = head->asttype;
         break;
     case n_booleanexp:
         #ifdef TREE
@@ -666,7 +663,6 @@ void interpret(astptr head)
             flag = boolean_evaluate_string(bool_left_str, bool_right_str,mid->asttype);
         }
         
-        current_dataytpe = head->asttype;
         break;
     case n_listindex:
         #ifdef TREE
@@ -717,7 +713,7 @@ void interpret(astptr head)
         print_current_parsetoken(head->asttype);
         #endif
 
-        current_dataytpe = head->asttype;
+        current_dataytpe = n_list_int;
 
         left=head->p1;
         save_id = head->astdata;
@@ -765,7 +761,7 @@ void interpret(astptr head)
             }
 
         }
-        current_dataytpe = head->asttype;
+        current_dataytpe = n_list_int;
         break;
     case n_prints:
         #ifdef TREE
@@ -881,7 +877,6 @@ void interpret(astptr head)
         } else if(current_line!=previous_line){
             cout<<endl;
         }        
-        current_dataytpe = head->asttype;
         break;
     case n_print:
         #ifdef TREE
@@ -956,7 +951,6 @@ void interpret(astptr head)
         } else if(current_line!=previous_line){
             cout<<endl;
         }
-        current_dataytpe = head->asttype;
         break;
     case n_index_assign_data:
         #ifdef TREE
@@ -992,7 +986,7 @@ void interpret(astptr head)
         } else {
             modify_vector_int(save_id, current_vec_int);
         }
-        current_dataytpe = head->asttype;
+        current_dataytpe = n_list_int;
         break;
     case n_index_assign_id:
         #ifdef TREE
@@ -1004,7 +998,7 @@ void interpret(astptr head)
         } else {
             current_vec_int=get_vector_int(head->astdata);
         }
-        current_dataytpe = head->asttype;
+        current_dataytpe = n_list_int;
         break;
     case n_funct_definiton:
         #ifdef TREE
@@ -1018,7 +1012,6 @@ void interpret(astptr head)
         The parser has saved the head of the function
         pointer in a map with its name as the key
         */ 
-        current_dataytpe = head->asttype;
         break;
     case n_fcall:
         #ifdef TREE
@@ -1058,9 +1051,10 @@ void interpret(astptr head)
             
             interpret(mid);
         }
+
+
         intvalue = returnint;
         current_vec_int = returnlist;
-        current_dataytpe = head->asttype;
         break;
     case n_funct:
         #ifdef TREE

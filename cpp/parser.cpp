@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-// #define DEEBUG
+#define DEEBUG
 
 #ifdef DEEBUG
 int grammar_tracker = 1;
@@ -1030,7 +1030,6 @@ astptr assignment()
         else
         {
             exp = expression();
- 
             pfirst = newnode(n_assignment_int, id, exp, NULL, NULL);
         }
         

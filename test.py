@@ -1,21 +1,31 @@
-def addConstant(x):
-    val = 3
-    x = x + val
-    return x
+#Return list at index
+def getElement(data,index):
+    element = data[index]
+    return element
 
-listA = [2,4,6,8,10]
-listB = [3,6,9,12,15]
-listC = [4,8,12,16,20]
+#Increment val
+def increment(val):
+    val = val + 1
+    return val
 
+data = [100,99,88,77,66,65,72,53,1,134,23,51,38,50,6]
 
-x = 0
-x = addConstant(x)
+a = getElement(data,0)
+l= [1,2,3]
+l = l + [a]
 
-head1 = [100]
-head2 = [300]
-if x <= 1:
-    listD = head1 + listA + listB + listC  
-    print("listD: ",listD)
-else:
-    listA = head2 + listA + listB + listC  
-    print("listA: ",listA)
+print("l: ",l)
+
+h=0
+# insert at head
+l= [h]+l
+print("l: ",l)
+
+e=100
+# append at end
+l= l+[e]
+print("l: ",l)
+
+# print string length
+listlen=len(l)
+print("listlen",listlen)
