@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-#define DEEBUG
+// #define DEEBUG
 
 #ifdef DEEBUG
 int grammar_tracker = 1;
@@ -511,6 +511,9 @@ astptr list()
                 }
             }//: Exit while
             tempid = add_vector(int_vector);
+            // //cout
+            // print_vector_int(int_vector);
+            // //
             int_vector.clear();
             pfirst = newnode(n_list_int,tempid, NULL, NULL, NULL);
         }
@@ -857,8 +860,18 @@ astptr factor()
     }
     else if (currenttoken == opensquaresym)
     {
-        cout << "----------im here---------";
-        //TODO some work
+            #ifdef DEEBUG
+            cout << grammar_tracker<< " -3--list in factor --- line # " << linenumber << endl;
+            grammar_tracker++;
+            #endif
+        pfirst = list();
+        pfirst = newnode(n_list_factor,"",pfirst,NULL,NULL);
+        if (currenttoken != closesquaresym)
+        {
+            // TODO Expected ']'
+        } else{
+            currenttoken = cleanLexer();
+        }
     }
     else if (currenttoken == lensym){
         currenttoken=cleanLexer();
@@ -1019,12 +1032,20 @@ astptr assignment()
         {
             //TODO check for list indexes as well
             lis = list();
+            
             pfirst = newnode(n_assignment_list, id, lis, NULL, NULL);
             if (currenttoken != closesquaresym)
             {
                 // TODO Expected ']'
             } else{
                 currenttoken = cleanLexer();
+
+            }
+
+            if(currenttoken==plussym){
+                exp = expression();
+                pfirst = newnode(n_plus, id, pfirst, exp, NULL);
+
             }
         }
         else
@@ -1269,6 +1290,7 @@ void printParserTree(astptr head)
     case n_block_stmt:
     case n_simple_stmt:
     case n_return:
+    case n_list_factor:
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
 
@@ -1385,6 +1407,7 @@ void freeMemory(astptr head)
     case n_funct:
     case n_funct_arg:
     case n_return:
+    case n_list_factor:
         left = head->p1;
         delete head;
         freeMemory(left);
@@ -1590,7 +1613,9 @@ void print_current_parsetoken(nodetype n){
         case n_list_id:
             cout << "n_list_id" <<endl;
             break;                   
-               
+        case n_list_factor:
+            cout << "n_list_factor" <<endl;
+            break;      
     }
 };
 

@@ -14,7 +14,8 @@ bool firstprint = true,
      assign_list_variable = false,
      flag = false,
      inside_funct = false,
-     funct_found = false;
+     funct_found = false,
+     raw_list_addition=false;
 
 string curr_fname;
 
@@ -272,14 +273,16 @@ void interpret(astptr head)
         temp = 0;
         left = head->p1;
         right = head->p2;
-        //
+        // //
         // cout << "inside n_plus interpreter left n_type = ";
         // print_current_parsetoken(left->asttype);
+        // print_vector_int();
         // cout << endl;
         // //
         // //
         // cout << "inside n_plus interpreter right n_type = ";
         // print_current_parsetoken(right->asttype);
+        // print_vector_int();
         // cout << endl;
         //
         // current_vec_int.clear();
@@ -318,8 +321,20 @@ void interpret(astptr head)
             interpret(left);
             temp = intvalue;   
             left_nodetype = n_integer;
-        } else if(left->asttype==n_list_int){
+        } else if(left->asttype==n_list_int || left->asttype==n_list_id || left->asttype==n_list_factor){
             //This is for a = [1,2,3] + [4,5,6]
+            #ifdef TREE
+            cout << " left " << endl;
+            #endif 
+
+            // //
+            // cout << "----------4-----tringgerred" <<endl;
+            // //
+
+
+            interpret(left);
+            tempvec_double = current_vec_int;
+
             assign_list_variable = true;
             left_nodetype = n_list_int;
 
@@ -332,6 +347,18 @@ void interpret(astptr head)
             temp = temp + intvalue;
             tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
             left_nodetype=current_dataytpe;
+        } else if(left->asttype==n_assignment_list){
+            #ifdef TREE
+            cout << " left " << endl;
+            #endif
+            raw_list_addition=true;     
+            interpret(left);
+            save_id=head->astdata;
+            //The flag is set to false at the bottom of the plus statement;
+            // raw_list_addition=false;     
+            tempvec_double = current_vec_int;
+            assign_list_variable = true;
+            left_nodetype = n_list_int;
         } else {
             #ifdef TREE
             cout << " left " << endl;
@@ -342,6 +369,14 @@ void interpret(astptr head)
             notfound = false;
         }
 
+        // //
+        // cout << "inside n_plus interpreter left n_type = ";
+        // print_current_parsetoken(left->asttype);
+        // cout <<endl;
+        // print_vector_int();
+        // print_vector_int(tempvec_double);
+        // cout << endl;
+        // //
 
 
         if(right->asttype==n_id){
@@ -362,11 +397,14 @@ void interpret(astptr head)
                 assign_list_variable = false;
 
             } else {
+
                 tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
                 assign_list_variable = true;
                 current_vec_int = tempvec_double;
                 right_nodetype = n_list_int;
                 assign_list_variable = true;
+
+
 
             }
         } else if (right->asttype==n_integer || right->asttype==n_listindex){
@@ -377,9 +415,18 @@ void interpret(astptr head)
             temp = temp + intvalue;  
             intvalue = temp;
             right_nodetype = n_integer;
-        } else if(right->asttype==n_list_int){
+        } else if(right->asttype==n_list_int||right->asttype==n_list_id||right->asttype==n_list_factor){
            //This is for a = [1,2] + [3,4] 
-           right_nodetype = n_list_int;
+            #ifdef TREE
+            cout << " right " << endl;
+            #endif
+
+
+            interpret(right);
+            tempvec_double.insert(tempvec_double.end(), current_vec_int.begin(), current_vec_int.end());
+            assign_list_variable = true;
+            current_vec_int = tempvec_double;
+            right_nodetype = n_list_int;
             assign_list_variable = true;
 
         } else if(right->asttype==n_plus){
@@ -393,6 +440,18 @@ void interpret(astptr head)
             current_vec_int = tempvec_double;
             right_nodetype=current_dataytpe;
 
+        } else if(right->asttype==n_assignment_list){
+            #ifdef TREE
+            cout << " left " << endl;
+            #endif
+            raw_list_addition=true;     
+            interpret(right);
+            //The flag is set to false at the bottom of the plus statement;
+            // raw_list_addition=false;     
+            tempvec_double = current_vec_int;
+            assign_list_variable = true;
+            left_nodetype = n_list_int;
+        
         } else {
                 #ifdef TREE
                 cout << " right " << endl;
@@ -412,7 +471,22 @@ void interpret(astptr head)
             current_dataytpe = left_nodetype;
         }
 
+        
+        // cout << "inside n_plus interpreter right n_type = ";
+        // print_current_parsetoken(right->asttype);
+        // print_vector_int();
+        // cout << endl;
+        
         // current_dataytpe = head->asttype;
+        if(raw_list_addition==true){
+            raw_list_addition=false;
+            if(inside_funct){
+                inject_list(save_id,current_vec_int);
+            } else {
+                vector_identifiers[save_id]=current_vec_int;
+            }
+        }
+
         break;
     
    /*
@@ -712,7 +786,6 @@ void interpret(astptr head)
         cout << "token type = ";
         print_current_parsetoken(head->asttype);
         #endif
-
         current_dataytpe = n_list_int;
 
         left=head->p1;
@@ -721,6 +794,11 @@ void interpret(astptr head)
                 cout << " down " << endl;
                 #endif 
         interpret(left);
+
+
+        if(raw_list_addition==true){
+            break;
+        }
         if(left->asttype==n_list_int || left->asttype==n_list_id){
             if(inside_funct){
                 inject_list(save_id,current_vec_int);
@@ -728,6 +806,7 @@ void interpret(astptr head)
                 vector_identifiers[save_id]=current_vec_int;
             }
         }
+
         break;
     case n_assignment_int:
         #ifdef TREE
@@ -1026,7 +1105,6 @@ void interpret(astptr head)
 
             //getting funciton parse tree
             mid = get_funct_head(curr_fname);
-            printParserTree(mid);
 
             if(mid->asttype!=n_funct){
                 //TODO error. takes 0 positional arguments but 1 was given
@@ -1244,6 +1322,16 @@ void interpret(astptr head)
         current_vec_int = temp_vec;
 
 
+        assign_list_variable = true;
+        current_dataytpe = n_list_int;
+        break;
+    case n_list_factor:
+        #ifdef TREE
+        cout << "token type = ";
+        print_current_parsetoken(head->asttype);
+        #endif
+
+        interpret(head->p1);
         assign_list_variable = true;
         current_dataytpe = n_list_int;
         break;
