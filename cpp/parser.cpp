@@ -314,8 +314,12 @@ astptr blockstatements()
 
         //
         cout << " previous token = ";
+        print_current_lextoken(vec[lexer_vectorindex - 2].tokentype);
+        cout << " current token = ";
         print_current_lextoken(vec[lexer_vectorindex - 1].tokentype);
-        cout << " second next token = ";
+        cout << " next token = ";
+        print_current_lextoken(vec[lexer_vectorindex].tokentype);
+        cout << " seond next token = ";
         print_current_lextoken(vec[lexer_vectorindex + 1].tokentype);
         //
         grammar_tracker++;
@@ -1663,6 +1667,9 @@ void print_current_lextoken(lextokens t)
         break;
     case lensym:
         cout << "  len token " << endl;
+        break;
+    case fullstopsym:
+        cout << "  fullstop token " << endl;
         break;
     }
 };

@@ -76,6 +76,14 @@ lextokens lext(){
             strinteger = strinteger + ch;
             ch = getch();
         }
+        if (ch=='.'){
+            strinteger += '.';
+            ch = getch();
+            while (isdigit(ch)){
+                strinteger = strinteger + ch;
+                ch = getch();
+            }
+        }
         intvalue = stod(strinteger);
         return intsym;
     }
@@ -114,6 +122,7 @@ lextokens lext(){
     //TODO Fix "  '2+3 " as a token s.t. block, identifier and double quote
     switch (ch) {
         case ';': currenttoken = semicolonsym; ch = getch(); break;
+        case '.': currenttoken = fullstopsym; ch = getch(); break;
         case ':': currenttoken = colonsym; ch = getch(); break;
         case ',': currenttoken = commasym; ch = getch(); break;
         case '+': currenttoken = plussym; ch = getch(); break;

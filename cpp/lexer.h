@@ -51,6 +51,7 @@ typedef enum{
     singlequotesym,
     doublequotesym,
     newlinesym,
+    fullstopsym,
 } lextokens;
 
 typedef struct lnode {
