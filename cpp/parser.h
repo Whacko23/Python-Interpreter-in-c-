@@ -8,7 +8,6 @@
 #include "lexer.h"
 #include "log.h"
 
-
 using namespace std;
 
 typedef enum
@@ -78,7 +77,6 @@ extern astptr newnode(nodetype n, int s, astptr first, astptr second, astptr thi
 
 extern astptr parseetree;
 
-
 extern astptr statements();
 extern astptr statement();
 extern astptr simple_stmt();
@@ -110,7 +108,7 @@ extern void print_current_lextoken(lextokens t);
 extern void print_current_parsetoken(nodetype n);
 
 /*_______Interpreter_______________*/
-//Data structures & variables
+// Data structures & variables
 extern map<string, double> int_indefiers;
 extern map<string, string> string_identifiers;
 extern map<string, vector<double>> vector_identifiers;
@@ -125,8 +123,7 @@ extern string curr_fname;
 extern int lineInsideFunction;
 extern int function_def_line_start;
 
-
-//Functions
+// Functions
 extern string add_vector(vector<double> v);
 extern string add_idVector(vector<astptr> v);
 extern void modify_vector(int i, string s);

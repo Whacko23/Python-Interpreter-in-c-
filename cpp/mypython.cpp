@@ -39,9 +39,9 @@ int main(int argc, const char *argv[])
             // Taking each line of the file as a string input
             getline(file, lineInput);
 
-            #ifdef DEBUG
+#ifdef DEBUG
             cout << "     Current line = " << lineInput << endl;
-            #endif
+#endif
 
             tracker = -1;
             ch = getch();
@@ -168,13 +168,13 @@ int main(int argc, const char *argv[])
                     break;
                 case lensym:
                     vec.push_back(newtoken(lensym, "len"));
-                    break;                
+                    break;
                 case newlinesym:
                     cout << "  New line " << endl;
                     break;
                 case fullstopsym:
                     vec.push_back(newtoken(fullstopsym, "."));
-                    break; 
+                    break;
                 }
             }
             firstline = false;
@@ -194,15 +194,15 @@ int main(int argc, const char *argv[])
 
 #ifdef ASTTEST
         currenttoken = lexer();
-        #ifdef DEBUG
+#ifdef DEBUG
         cout << " -------behind lexer-------" << endl;
-        #endif
+#endif
         parseetree = parser();
-        #ifdef DEBUG
+#ifdef DEBUG
         cout << " -------behind parser-------" << endl;
         printParserTree(parseetree);
         cout << " -------Parse tree done-------" << endl;
-        #endif
+#endif
         // printParserTree(parseetree);
 
         interpret(parseetree);

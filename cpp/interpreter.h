@@ -11,20 +11,20 @@
 
 using namespace std;
 
-typedef struct function_env {
+typedef struct function_env
+{
   map<string, double> integers;
   map<string, vector<double>> lists;
 } environment;
 
-//Variables
+// Variables
 extern bool funct_found;
 extern environment current_funct_env;
 
-//Data structures
-// extern map<string, environment> funct_scope;
+// Data structures
+//  extern map<string, environment> funct_scope;
 
-
-//Functions
+// Functions
 extern bool boolean_evaluate_int(double l, double r, nodetype n);
 extern bool boolean_evaluate_string(string l, string r, nodetype n);
 // extern environment get_env(string funct_name);

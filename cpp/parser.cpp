@@ -4,7 +4,7 @@
 
 #include "parser.h"
 
-#define DEEBUG
+// #define DEEBUG
 
 #ifdef DEEBUG
 int grammar_tracker = 1;
@@ -540,7 +540,9 @@ astptr list()
                 }
                 else
                 {
-                    cout << "Error in list function checking for comma or closed bracket line # " << linenumber << endl;
+                    cout << "List missing ']', line " << linenumber << endl;
+                    errorMsg = "SyntaxError: invalid syntax";
+                    exitProgram();
                     // Display error
                     break;
                 }

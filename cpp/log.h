@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string>
 
-
 using namespace std;
 
 void log(int code);
