@@ -1,20 +1,14 @@
-#this test case is with function return value as a function parameter 
+varA = 3
+varB = 4
+varC = 5
+varD = 6
 
-def appendVal(listX,x):
-    listTemp = [x,x,x]
-    listTemp2 = listX + listTemp
-    return listTemp2
-    
-def Increment(flag):
-    if flag == 0:
-        val = 10
-    else:
-        val = 100
-    return val
+res1 = varB/(varC - varA) * varD
+res2 = (varC - (varB - varA)) * varD
 
-flag = 1
-xx = Increment(flag)
-print("xx", xx)
-listA = [1,2,3,4]
-listA = appendVal(listA,Increment(flag))
-print(listA)
+res3 = varA * varB * varC
+
+
+print(res1)
+print(res2)
+print(res3)
