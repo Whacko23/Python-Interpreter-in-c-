@@ -172,6 +172,9 @@ int main(int argc, const char *argv[])
                 case newlinesym:
                     cout << "  New line " << endl;
                     break;
+                case fullstopsym:
+                    vec.push_back(newtoken(fullstopsym, "."));
+                    break; 
                 }
             }
             firstline = false;
@@ -204,8 +207,8 @@ int main(int argc, const char *argv[])
 
         interpret(parseetree);
 
-        // freeMemory(parseetree);
-        // freeFunctionMemory();
+        freeMemory(parseetree);
+        freeFunctionMemory();
         // cout << " ---End of program---" << endl;
 #endif
     }

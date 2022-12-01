@@ -303,14 +303,16 @@ astptr blockstatements()
         if(i==40)break;
         i++;
         cout << grammar_tracker<< " ---inside  block stmts loop--- line # " << linenumber << endl;
-        cout << " . currenttoken ";
-        print_current_lextoken(currenttoken);
         cout << endl;
 
         //
         cout << " previous token = ";
+        print_current_lextoken(vec[lexer_vectorindex-2].tokentype);
+        cout << " current token = ";
         print_current_lextoken(vec[lexer_vectorindex-1].tokentype);
-        cout << " second next token = ";
+        cout << " next token = ";
+        print_current_lextoken(vec[lexer_vectorindex].tokentype);
+        cout << " seond next token = ";
         print_current_lextoken(vec[lexer_vectorindex+1].tokentype);
         //
         grammar_tracker++;
@@ -1474,6 +1476,8 @@ void print_current_lextoken(lextokens t){
                     case greaterthansym: cout << "Greater than token "  << endl; break;
                     case newlinesym: cout << "  New line "  << endl; break;
                     case lensym: cout << "  len token "  << endl; break;
+                    case fullstopsym: cout << "  fullstop token "  << endl; break;
+
 
                 }
 };
