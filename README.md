@@ -3,6 +3,6 @@
 This repo is mini-interpreter of Python.
 
 ###Compile
-```bash run.sh ```
+```bash compile.sh ```
 The script compiles the cpp file and copies it to ```/bin``` directory. Make sure you have /bin already
 
